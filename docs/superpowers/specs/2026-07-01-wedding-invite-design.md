@@ -83,7 +83,9 @@ Hiển thị khi bấm "Xác nhận tham dự":
 - **Ghi chú hiển thị cho khách** (ngay lúc chọn): *"Bạn có thể quay lại nhập tên và chọn lại bất cứ lúc nào — hệ thống lấy lựa chọn cuối cùng."*
 
 ### Xử lý trùng tên
-**Điều kiện kích hoạt:** khi khách gửi xác nhận, nếu đã tồn tại một khách **trùng tên (`name_norm`)** + **trùng nhóm (`category`)** + **trùng lựa chọn (`status`)** nhưng **khác IP** → hiện popup:
+**Tín hiệu nhận diện "cùng người":** mỗi trình duyệt được cấp một **`device_id` ngẫu nhiên lưu trong `localStorage`** ngay lần đầu mở web. Đây là tín hiệu chính (ổn định hơn IP — xem mục 11).
+
+**Điều kiện kích hoạt popup:** khi khách gửi xác nhận, nếu đã tồn tại một khách **trùng tên (`name_norm`)** + **trùng nhóm (`category`)** + **trùng lựa chọn (`status`)** nhưng **khác `device_id`** (và IP cũng không khớp) → hiện popup:
 
 > **Có khách trùng tên trong nhóm này**
 > Đã có một người cùng tên trong nhóm **"{Nhóm}"** xác nhận **"{lựa chọn}"** trước đó.
@@ -92,8 +94,9 @@ Hiển thị khi bấm "Xác nhận tham dự":
 >
 > `[ Sửa tên ]  [ Tiếp tục ]`
 
-- **Cùng IP** → không hiện popup (là chính khách đó đổi ý → lấy lựa chọn cuối cùng).
+- **Cùng `device_id`** → không hiện popup (là chính khách đó đổi ý → lấy lựa chọn cuối cùng).
 - Không thỏa các điều kiện trên → ghi bình thường.
+- Popup là **best-effort**: sai sót còn sót lại chỉ dư 1 dòng, dọn khi đối chiếu (mục 11).
 
 ## 6. Q&A (accordion, config-driven)
 
@@ -126,7 +129,8 @@ Nội dung 2 lễ + Q&A + danh sách nhóm + theme nằm trong **file config**, 
 | phone | text null | chỉ khi chọn `bus` |
 | party_size | int | tổng số người (gồm người đi cùng) |
 | matched_guest_id | fk null | trỏ `guests.id` nếu khớp autocomplete |
-| ip | text | IP người xác nhận |
+| device_id | text null | mã thiết bị từ localStorage (tín hiệu "cùng người") |
+| ip | text null | IP người xác nhận (có thể rỗng — xem mục 11) |
 | user_agent | text null | |
 | created_at | timestamptz | |
 
@@ -169,8 +173,11 @@ Nội dung 2 lễ + Q&A + danh sách nhóm + theme nằm trong **file config**, 
 |---|---|---|
 | id | pk | |
 | ceremony | text | |
-| ip | text | |
+| device_id | text null | mã thiết bị (để ước lượng khách "duy nhất") |
+| ip | text null | |
 | visited_at | timestamptz | |
+
+> Đây là **con số ước lượng**, không phải số người thật: IP chung (CGNAT/wifi), IP động, và bot xem trước link (Zalo/Messenger/FB) đều làm lệch. `device_id` giúp ước lượng khách duy nhất sát hơn IP.
 
 ## 8. Import Excel (một lần)
 
@@ -202,6 +209,13 @@ Vợ chồng / gia đình mời chung = **1 dòng** (tên đại diện); tên n
 - Ghi RSVP/wishes qua Supabase với **RLS** cho phép INSERT có kiểm soát; giới hạn nhẹ theo IP qua Edge Function (chống spam cơ bản).
 - Không lưu dữ liệu nhạy cảm ngoài SĐT (chỉ khi khách tự nhập để đi xe).
 - QR mừng cưới là ảnh tĩnh do cô dâu chú rể cung cấp — không tích hợp cổng thanh toán.
+
+### Độ tin cậy của IP (quan trọng)
+IP **chỉ lấy được qua Edge Function** (JS trình duyệt không đọc được IP public của chính nó); nếu function lỗi thì `ip` rỗng → **cho phép null**. IP **không phải định danh chắc chắn**:
+- **Không lấy được / sai:** ghi thẳng DB không qua Edge Function; VPN/proxy; iCloud Private Relay (IP của relay, không phải khách).
+- **Lấy được nhưng lệch:** CGNAT/wifi chung (nhiều người 1 IP); IP động (1 người nhiều IP); bot xem trước link (lượt xem "ma").
+
+→ Vì vậy tín hiệu "cùng người" chính là **`device_id` (localStorage)**, IP chỉ là phụ trợ. Mọi thống kê dựa trên IP (đếm lượt, IP-theo-tên) là **ước lượng**, không tuyệt đối.
 
 ## 12. Config-driven (Tier A) — nền cho bán sau
 
