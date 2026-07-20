@@ -73,7 +73,7 @@ Ví dụ:  /vi/vu-quy   /vi/thanh-hon   /en/vu-quy   /en/thanh-hon
 
 Hiển thị khi bấm "Xác nhận tham dự":
 
-- **Tên của bạn** — ô nhập, có **gợi ý (autocomplete)** từ danh sách `guests`.
+- **Tên của bạn** — ô nhập, có **gợi ý (autocomplete)** từ danh sách `guests`. **Không bắt buộc chọn từ gợi ý** — khách ngoài danh sách (walk-in) gõ tên tự do bình thường.
 - **Nhóm** — **dropdown BẮT BUỘC, có ô search** (gõ để lọc). Danh sách nhóm nằm trong config (VD: Bạn nhà trai / Họ hàng nhà gái / IAS…).
 - **Thêm người đi cùng** — nhập tên từng người; mỗi người có checkbox **"đi xe"** để đếm ghế.
 - **3 lựa chọn** (status):
@@ -81,6 +81,7 @@ Hiển thị khi bấm "Xác nhận tham dự":
   2. **Đồng ý & đăng ký xe HCM–Cần Thơ** (`bus`) — cạnh có **icon (i)**; bấm vào **mở rộng** khối chữ nhạt hơn: điểm lên xe, giờ xuất phát, thời gian di chuyển dự kiến, + **ô nhập SĐT**.
   3. **Không thể tham dự** (`cannot_attend`)
 - **Ghi chú hiển thị cho khách** (ngay lúc chọn): *"Bạn có thể quay lại nhập tên và chọn lại bất cứ lúc nào — hệ thống lấy lựa chọn cuối cùng."*
+- **Sau hạn xác nhận (10/10/2026):** form **vẫn nhận** (không khóa) để không bỏ sót khách trễ, nhưng hiển thị nhắc *"Đã qua hạn xác nhận — gia đình có thể đã chốt số lượng, mong bạn thông cảm."* *(Có thể đổi sang khóa hẳn nếu muốn.)*
 
 ### Xử lý trùng tên
 **Tín hiệu nhận diện "cùng người":** mỗi trình duyệt được cấp một **`device_id` ngẫu nhiên lưu trong `localStorage`** ngay lần đầu mở web. Đây là tín hiệu chính (ổn định hơn IP — xem mục 11).
@@ -203,12 +204,25 @@ Vợ chồng / gia đình mời chung = **1 dòng** (tên đại diện); tên n
 - **Nhạc:** file trong assets/Supabase Storage; bật sau cú bấm "Mở thiệp".
 - **Map:** embed Google Maps (không cần API key) + nút Chỉ đường.
 - **Lịch:** nút Thêm vào Google Calendar + file `.ics` (Apple).
+- **Chia sẻ link (Open Graph):** set thẻ OG (ảnh cưới + tên cô dâu chú rể + tiêu đề theo lễ) để khi gửi qua Zalo/Messenger/Facebook hiện thẻ preview đẹp. Lưu ý: chính các bot preview này tạo lượt xem "ma" trong `page_visits` (đã ghi ở mục 7).
 
 ## 11. Bảo mật (mức phù hợp web cưới)
 
-- Ghi RSVP/wishes qua Supabase với **RLS** cho phép INSERT có kiểm soát; giới hạn nhẹ theo IP qua Edge Function (chống spam cơ bản).
+### Quyền đọc/ghi (RLS) — bắt buộc làm đúng
+Supabase dùng **anon key công khai** (nằm trong frontend). Nếu RLS lỏng, **ai cũng đọc được toàn bộ RSVP + SĐT + IP**. Chính sách:
+| Bảng | anon (khách) INSERT | anon (khách) SELECT |
+|---|---|---|
+| `rsvp` | ✅ có kiểm soát | ❌ cấm |
+| `companions` | ✅ | ❌ cấm |
+| `page_visits` | ✅ (qua Edge Function) | ❌ cấm |
+| `wishes` | ✅ | ✅ **chỉ** `is_public = true`, **chỉ** trả `name` + `message` (ẩn ip/device) |
+| `guests` | ❌ | ✅ chỉ `full_name` (phục vụ autocomplete) — cân nhắc chỉ lộ tên |
+
+- **Admin (cô dâu chú rể) đọc/xuất dữ liệu** qua kênh có xác thực: giai đoạn đầu dùng thẳng **Supabase Dashboard**; nếu cần trang admin trong app thì dùng **Supabase Auth** (1 tài khoản) + policy đọc cho user đã đăng nhập. **Không** đọc dữ liệu nhạy cảm bằng anon key.
+- Giới hạn nhẹ theo IP/`device_id` qua Edge Function (chống spam RSVP/wishes cơ bản).
 - Không lưu dữ liệu nhạy cảm ngoài SĐT (chỉ khi khách tự nhập để đi xe).
 - QR mừng cưới là ảnh tĩnh do cô dâu chú rể cung cấp — không tích hợp cổng thanh toán.
+- Tường lời chúc công khai: cân nhắc **kiểm duyệt nhẹ** (ẩn/xóa) nếu bị spam/bậy.
 
 ### Độ tin cậy của IP (quan trọng)
 IP **chỉ lấy được qua Edge Function** (JS trình duyệt không đọc được IP public của chính nó); nếu function lỗi thì `ip` rỗng → **cho phép null**. IP **không phải định danh chắc chắn**:
@@ -252,5 +266,12 @@ Giai đoạn đầu: điền **data giả** vào config, thay dần bằng data 
 - **Trùng tên:** xử lý bằng popup (mục 5 — "Xử lý trùng tên").
 - **QR mừng cưới:** dời hẳn vào Q&A (câu "Gửi tiền mừng online") — không còn nút riêng.
 
+- **Sau hạn xác nhận:** vẫn nhận (không khóa) + hiển thị nhắc — mục 5.
+- **Walk-in:** cho gõ tên tự do, không bắt chọn từ gợi ý — mục 5.
+- **Quyền đọc dữ liệu:** RLS chặt (khách không SELECT được rsvp/SĐT/IP); admin đọc qua Supabase Dashboard / Supabase Auth — mục 11.
+- **Open Graph** cho preview khi chia sẻ link — mục 10.
+
 **Còn mở:**
 - **Thông tin thật:** tên đầy đủ, ngày giờ, địa điểm 2 lễ, agenda, STK/QR, nhạc, nội dung Q&A "điền sau" → **cập nhật sau** (giai đoạn đầu dùng data giả).
+- **Nội dung tiếng Anh (EN):** bạn cung cấp hay dùng bản dịch tạm.
+- **Tên miền riêng:** mua hay dùng `*.vercel.app` — nếu mua thì mua sớm.
