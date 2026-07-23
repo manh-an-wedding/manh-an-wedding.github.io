@@ -4,14 +4,14 @@ Ngày: 2026-07-01
 Trạng thái: Bản thiết kế chờ duyệt (chưa code)
 Thư mục dự án: `C:\Users\Intelisys_Admin\Desktop\manhan`
 
-> **Lưu ý dữ liệu:** Thông tin thật (tên đầy đủ, ngày giờ, địa điểm 2 lễ, agenda, STK/QR, nhạc, nội dung Q&A) **chưa chốt** → giai đoạn đầu dùng **DATA GIẢ (placeholder)**, thay bằng data thật sau qua file config.
+> **Lưu ý dữ liệu:** Thông tin thật (tên đầy đủ, ngày giờ, địa điểm lễ Vu Quy, agenda, STK/QR, nhạc, nội dung Q&A) **chưa chốt** → giai đoạn đầu dùng **DATA GIẢ (placeholder)**, thay bằng data thật sau qua file config.
 
 ---
 
 ## 1. Mục tiêu
 
-Web thiệp cưới cho cô dâu **Nhật An** và chú rể **Duy Mạnh**, cho phép khách:
-- Xem thiệp mời (2 lễ: **Vu Quy** và **Thành Hôn**, mỗi lễ một phiên bản nội dung).
+Web thiệp cưới cho cô dâu **Nhật An** và chú rể **Duy Mạnh** — **một lễ: Vu Quy**. Cho phép khách:
+- Xem thiệp mời (1 phiên bản nội dung).
 - Xác nhận tham dự (RSVP) với 3 lựa chọn, tự nhập tên + thêm người đi cùng.
 - Đăng ký xe HCM–Cần Thơ (kèm SĐT).
 - Gửi lời chúc (công khai hoặc ẩn) + xem tường lời chúc công khai.
@@ -23,18 +23,23 @@ Web thiệp cưới cho cô dâu **Nhật An** và chú rể **Duy Mạnh**, cho
 ## 2. Kiến trúc & công nghệ
 
 - **Frontend:** Angular, SPA, **config-driven**, mobile-first, responsive nhiều kích cỡ, song ngữ VI/EN.
-- **Hosting:** **Vercel** (chốt) — kéo code từ GitHub, auto-deploy, routing SPA mượt. Code vẫn trên GitHub cho portfolio.
-- **Backend/Data:** **Supabase** (PostgreSQL + REST/Realtime API + RLS) + **1 Edge Function** ghi lượt xem/IP.
+- **Hosting:** **GitHub Pages** — URL gốc `https://manh-an-wedding.github.io` (cần org GitHub tên `manh-an-wedding` + repo `manh-an-wedding.github.io`). Build & publish bằng **GitHub Actions**.
+- **Backend/Data:** **Supabase** (PostgreSQL + REST API + RLS) + **1 Edge Function** ghi lượt xem/IP.
 - **Không dựng server riêng.** Angular gọi thẳng Supabase (RLS bảo vệ ghi); phần cần IP thật đi qua Edge Function.
-- **SSL:** Vercel tự cấp miễn phí, tự gia hạn.
-- **Chi phí:** 0đ ở quy mô đám cưới (chỉ tốn nếu mua tên miền riêng — tùy chọn).
+- **SSL:** GitHub Pages tự cấp miễn phí cho `github.io`.
+- **Chi phí:** 0đ (chỉ tốn nếu mua tên miền riêng — tùy chọn).
+
+**Lưu ý riêng của GitHub Pages:**
+- **`404.html`** = bản sao `index.html` để deep-link `/vi`, `/en` không bị 404 (SPA fallback) — bắt buộc vì QR trỏ thẳng route sâu.
+- **`base-href = /`** (vì dùng URL gốc của org, không có đường dẫn con).
+- **Anon key Supabase** bị build vào JS (không giấu được) — chấp nhận được vì RLS chặt (mục 11); tuyệt đối không để service key ở frontend.
 
 Sơ đồ:
 ```
-[Khách quét QR /vi/vu-quy hoặc /vi/thanh-hon]
+[Khách quét QR → manh-an-wedding.github.io/vi]
         │
         ▼
-   Angular app (Vercel)  ◄── code từ repo GitHub (auto-deploy)
+   Angular app (GitHub Pages)  ◄── repo GitHub (Actions build+publish)
         │  đọc/ghi (RLS)        │ ghi IP + đếm view
         ▼                       ▼
    Supabase PostgreSQL     Supabase Edge Function
@@ -43,31 +48,30 @@ Sơ đồ:
 ## 3. Cấu trúc link
 
 ```
-tên-web.com/{lang}/{ceremony}
-   {lang}     = vi | en        (nút 🌐 đổi bất cứ lúc nào)
-   {ceremony} = vu-quy | thanh-hon
+manh-an-wedding.github.io/{lang}
+   {lang} = vi | en        (nút 🌐 đổi bất cứ lúc nào)
 
-Ví dụ:  /vi/vu-quy   /vi/thanh-hon   /en/vu-quy   /en/thanh-hon
+Ví dụ:  /vi   /en
 ```
-- **2 QR thiệp** = 2 link lễ (mặc định `vi`), in trên 2 loại thiệp giấy.
+- **1 QR thiệp** = link `/vi` (mặc định), in trên thiệp giấy.
 - Không có link riêng từng khách, không token, không slug cá nhân.
 - **Nhóm** không nằm trong link — khách chọn qua dropdown (bắt buộc) khi RSVP.
 
 ## 4. Cấu trúc trang
 
 **Trang 1 — Bìa "nhấn để mở thiệp"**
-- Tên cô dâu chú rể, họa tiết theo lễ, nút **"Mở thiệp"**.
+- Tên cô dâu chú rể, họa tiết, nút **"Mở thiệp"**.
 - Cú bấm "Mở thiệp" = tương tác đầu tiên → **bật nhạc nền** hợp lệ (lách autoplay).
 
 **Trang 2 — Nội dung (auto-scroll), thứ tự từ trên xuống:**
 1. Hình cưới, thông tin nhà trai / nhà gái.
-2. Thông tin mời tiệc + **agenda** của lễ tương ứng.
+2. Thông tin mời tiệc + **agenda**.
 3. Google Map (embed) + nút Chỉ đường + **Thêm vào lịch** (Google + `.ics`).
 4. **Nút Xác nhận tham dự** → mở form RSVP (mục 5).
 5. **Mục Lời chúc:** ô nhập lời chúc + chọn **công khai / ẩn**; bên dưới là **tường hiển thị các lời chúc công khai**.
 6. **Q&A (accordion, dưới cùng):** danh sách câu hỏi bấm mở rộng (mục 6).
 
-> **2 loại QR khác nhau:** (a) *QR thiệp* mở website, in trên thiệp giấy; (b) *QR mừng cưới* để chuyển khoản, hiện trong câu trả lời Q&A "Gửi tiền mừng online".
+> **2 loại QR khác nhau:** (a) *QR thiệp* (1 cái) mở website, in trên thiệp giấy; (b) *QR mừng cưới* (2 cái: cô dâu + chú rể) để chuyển khoản, hiện trong câu trả lời Q&A "Gửi tiền mừng online".
 
 ## 5. Form RSVP
 
@@ -116,13 +120,12 @@ Danh sách câu hỏi dạng mở rộng; nội dung câu trả lời nằm tron
 
 ## 7. Mô hình dữ liệu (Supabase / PostgreSQL)
 
-Nội dung 2 lễ + Q&A + danh sách nhóm + theme nằm trong **file config**, không phải DB.
+Nội dung lễ + Q&A + danh sách nhóm + theme nằm trong **file config**, không phải DB.
 
 ### Bảng `rsvp` (APPEND-ONLY — mỗi lần xác nhận là 1 dòng mới, KHÔNG đè)
 | Cột | Kiểu | Ghi chú |
 |---|---|---|
 | id | pk | |
-| ceremony | text | `vu-quy` \| `thanh-hon` (theo URL khách vào) |
 | guest_name | text | tên khách gõ |
 | name_norm | text | tên chuẩn hóa (bỏ dấu, thường) — để gom/đối chiếu |
 | category | text | từ dropdown nhóm — **bắt buộc** |
@@ -135,7 +138,7 @@ Nội dung 2 lễ + Q&A + danh sách nhóm + theme nằm trong **file config**, 
 | user_agent | text null | |
 | created_at | timestamptz | |
 
-> Không đè. **Trạng thái hiện tại = dòng mới nhất theo (name_norm, ceremony)** qua view `rsvp_latest`.
+> Không đè. **Trạng thái hiện tại = dòng mới nhất theo `name_norm`** qua view `rsvp_latest`.
 > IP-theo-tên = lọc `ip` theo `name_norm`; số lần đổi ý = đếm dòng theo `name_norm`.
 
 ### Bảng `companions` (người đi cùng — gắn theo từng dòng rsvp)
@@ -151,11 +154,11 @@ Nội dung 2 lễ + Q&A + danh sách nhóm + theme nằm trong **file config**, 
 | Cột | Kiểu | Ghi chú |
 |---|---|---|
 | id | pk | |
-| ceremony | text | |
 | name | text | tên người chúc |
 | message | text | nội dung |
 | is_public | bool | true = hiện trên tường công khai |
-| ip | text | |
+| device_id | text null | |
+| ip | text null | |
 | created_at | timestamptz | |
 
 > Tường lời chúc hiển thị `where is_public = true`. (Có thể thêm kiểm duyệt nhẹ sau nếu bị spam.)
@@ -173,7 +176,6 @@ Nội dung 2 lễ + Q&A + danh sách nhóm + theme nằm trong **file config**, 
 | Cột | Kiểu | Ghi chú |
 |---|---|---|
 | id | pk | |
-| ceremony | text | |
 | device_id | text null | mã thiết bị (để ước lượng khách "duy nhất") |
 | ip | text null | |
 | visited_at | timestamptz | |
@@ -191,7 +193,7 @@ Vợ chồng / gia đình mời chung = **1 dòng** (tên đại diện); tên n
 
 ## 9. Trang quản trị / xuất báo cáo
 
-- Danh sách xác nhận theo từng lễ (từ `rsvp_latest`).
+- Danh sách xác nhận (từ `rsvp_latest`).
 - Tổng số người + **tổng ghế xe** (khách `bus` + companions `joins_bus = true`).
 - Lời chúc (công khai/ẩn).
 - Đối chiếu "đã mời (guests) vs đã xác nhận".
@@ -200,11 +202,11 @@ Vợ chồng / gia đình mời chung = **1 dòng** (tên đại diện); tên n
 
 ## 10. Song ngữ, nhạc, map, lịch
 
-- **VI/EN:** mặc định VI; link `/en/...` cho khách nước ngoài; nút 🌐 đổi runtime; (tùy chọn) tự nhận diện ngôn ngữ trình duyệt.
+- **VI/EN:** mặc định VI; link `/en` cho khách nước ngoài; nút 🌐 đổi runtime; (tùy chọn) tự nhận diện ngôn ngữ trình duyệt.
 - **Nhạc:** file trong assets/Supabase Storage; bật sau cú bấm "Mở thiệp".
 - **Map:** embed Google Maps (không cần API key) + nút Chỉ đường.
 - **Lịch:** nút Thêm vào Google Calendar + file `.ics` (Apple).
-- **Chia sẻ link (Open Graph):** set thẻ OG (ảnh cưới + tên cô dâu chú rể + tiêu đề theo lễ) để khi gửi qua Zalo/Messenger/Facebook hiện thẻ preview đẹp. Lưu ý: chính các bot preview này tạo lượt xem "ma" trong `page_visits` (đã ghi ở mục 7).
+- **Chia sẻ link (Open Graph):** set thẻ OG (ảnh cưới + tên cô dâu chú rể + tiêu đề) để khi gửi qua Zalo/Messenger/Facebook hiện thẻ preview đẹp. Vì bot preview không chạy JS, cần **prerender** thẻ OG vào HTML tĩnh (Angular prerender/SSG). Lưu ý: chính các bot này tạo lượt xem "ma" trong `page_visits` (mục 7).
 
 ## 11. Bảo mật (mức phù hợp web cưới)
 
@@ -216,7 +218,7 @@ Supabase dùng **anon key công khai** (nằm trong frontend). Nếu RLS lỏng,
 | `companions` | ✅ | ❌ cấm |
 | `page_visits` | ✅ (qua Edge Function) | ❌ cấm |
 | `wishes` | ✅ | ✅ **chỉ** `is_public = true`, **chỉ** trả `name` + `message` (ẩn ip/device) |
-| `guests` | ❌ | ✅ chỉ `full_name` (phục vụ autocomplete) — cân nhắc chỉ lộ tên |
+| `guests` | ❌ | ✅ chỉ `full_name` (phục vụ autocomplete) |
 
 - **Admin (cô dâu chú rể) đọc/xuất dữ liệu** qua kênh có xác thực: giai đoạn đầu dùng thẳng **Supabase Dashboard**; nếu cần trang admin trong app thì dùng **Supabase Auth** (1 tài khoản) + policy đọc cho user đã đăng nhập. **Không** đọc dữ liệu nhạy cảm bằng anon key.
 - Giới hạn nhẹ theo IP/`device_id` qua Edge Function (chống spam RSVP/wishes cơ bản).
@@ -237,17 +239,16 @@ Toàn bộ nội dung + theme đọc từ config; mỗi đám cưới = 1 bộ c
 ```jsonc
 {
   "couple": { "groom": "Duy Mạnh", "bride": "Nhật An" },
-  "ceremonies": {
-    "vu-quy":    { "venue": "...", "address": "...", "mapUrl": "...", "datetime": "...", "agenda": [...] },
-    "thanh-hon": { "venue": "...", "address": "...", "mapUrl": "...", "datetime": "...", "agenda": [...] }
-  },
-  "rsvp":  { "groups": ["Bạn nhà trai", "Họ hàng nhà gái", "IAS"],
-             "bus": { "pickup": "...", "departTime": "...", "duration": "..." } },
-  "gift":  { "bride": { "name": "...", "bank": "...", "account": "...", "qr": "..." },
-             "groom": { "name": "...", "bank": "...", "account": "...", "qr": "..." } },
-  "faq":   [ { "q": "...", "a": "..." } ],
-  "theme": { "primary": "#9E1B1B", "font": "...", "music": "..." },
-  "i18n":  { "vi": { ... }, "en": { ... } }
+  "event":  { "name": "Lễ Vu Quy", "venue": "...", "address": "...",
+              "mapUrl": "...", "datetime": "...", "agenda": [] },
+  "rsvp":   { "groups": ["Bạn nhà trai", "Họ hàng nhà gái", "IAS"],
+              "deadline": "2026-10-10",
+              "bus": { "pickup": "...", "departTime": "...", "duration": "..." } },
+  "gift":   { "bride": { "name": "...", "bank": "...", "account": "...", "qr": "..." },
+              "groom": { "name": "...", "bank": "...", "account": "...", "qr": "..." } },
+  "faq":    [ { "q": "...", "a": "..." } ],
+  "theme":  { "primary": "#9E1B1B", "font": "...", "music": "..." },
+  "i18n":   { "vi": {}, "en": {} }
 }
 ```
 Giai đoạn đầu: điền **data giả** vào config, thay dần bằng data thật.
@@ -255,23 +256,24 @@ Giai đoạn đầu: điền **data giả** vào config, thay dần bằng data 
 ## 13. Ngoài phạm vi (để sau)
 
 - Tier B (nhiều theme để khách chọn) / Tier C (SaaS: đăng ký, admin, thanh toán, multi-tenant).
-- Tích hợp cổng thanh toán cho mừng cưới.
-- Đăng nhập tài khoản. Kiểm duyệt lời chúc nâng cao.
+- Nhiều lễ (Thành Hôn…) — hiện chỉ 1 lễ Vu Quy; cấu trúc config vẫn cho phép mở rộng sau.
+- Tích hợp cổng thanh toán cho mừng cưới. Đăng nhập tài khoản. Kiểm duyệt lời chúc nâng cao.
 
 ## 14. Quyết định đã chốt & điểm còn mở
 
 **Đã chốt:**
-- **Nơi đặt dự án:** `C:\Users\Intelisys_Admin\Desktop\manhan` (khởi tạo git).
-- **Host:** Vercel.
-- **Trùng tên:** xử lý bằng popup (mục 5 — "Xử lý trùng tên").
-- **QR mừng cưới:** dời hẳn vào Q&A (câu "Gửi tiền mừng online") — không còn nút riêng.
-
-- **Sau hạn xác nhận:** vẫn nhận (không khóa) + hiển thị nhắc — mục 5.
-- **Walk-in:** cho gõ tên tự do, không bắt chọn từ gợi ý — mục 5.
-- **Quyền đọc dữ liệu:** RLS chặt (khách không SELECT được rsvp/SĐT/IP); admin đọc qua Supabase Dashboard / Supabase Auth — mục 11.
-- **Open Graph** cho preview khi chia sẻ link — mục 10.
+- **Chỉ 1 lễ: Vu Quy** (bỏ lễ Thành Hôn) → link chỉ còn `/vi` `/en`, 1 QR thiệp.
+- **Nơi đặt dự án:** `C:\Users\Intelisys_Admin\Desktop\manhan` (git đã khởi tạo).
+- **Host:** **GitHub Pages**, URL gốc `manh-an-wedding.github.io` (org `manh-an-wedding` + repo cùng tên) → cần `404.html`, `base-href=/`, GitHub Actions.
+- **Trùng tên:** popup dựa trên `device_id` (mục 5).
+- **QR mừng cưới:** trong Q&A (câu "Gửi tiền mừng online").
+- **Sau hạn xác nhận:** vẫn nhận + hiển thị nhắc (mục 5).
+- **Walk-in:** gõ tên tự do (mục 5).
+- **Quyền đọc dữ liệu:** RLS chặt; admin đọc qua Supabase Dashboard / Auth (mục 11).
+- **Open Graph** (prerender) cho preview khi chia sẻ (mục 10).
 
 **Còn mở:**
-- **Thông tin thật:** tên đầy đủ, ngày giờ, địa điểm 2 lễ, agenda, STK/QR, nhạc, nội dung Q&A "điền sau" → **cập nhật sau** (giai đoạn đầu dùng data giả).
+- **Tên org `manh-an-wedding`** phải còn trống trên GitHub — cần kiểm tra khi tạo.
+- **Thông tin thật:** tên đầy đủ, ngày giờ, địa điểm, agenda, STK/QR, nhạc, nội dung Q&A "điền sau" → **cập nhật sau** (dùng data giả trước).
 - **Nội dung tiếng Anh (EN):** bạn cung cấp hay dùng bản dịch tạm.
-- **Tên miền riêng:** mua hay dùng `*.vercel.app` — nếu mua thì mua sớm.
+- **Tên miền riêng:** dùng `manh-an-wedding.github.io` (miễn phí) hay mua tên miền — nếu mua thì mua sớm.
