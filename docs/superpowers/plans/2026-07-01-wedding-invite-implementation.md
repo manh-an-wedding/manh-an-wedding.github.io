@@ -410,7 +410,9 @@ create table if not exists page_visits (
 create or replace view rsvp_latest as
 select distinct on (name_norm, coalesce(device_id,'')) *
 from rsvp
-order by name_norm, coalesce(device_id,''), created_at desc;
+order by name_norm, coalesce(device_id,''), created_at desc, id desc;
+-- id desc tiebreaker: created_at can tie when rows share a transaction
+-- timestamp (now() is constant per tx); id is monotonic so latest wins deterministically
 
 -- names appearing under >1 device_id → possible different people (or same person
 -- on 2 devices); the couple reviews these manually via phone/group
