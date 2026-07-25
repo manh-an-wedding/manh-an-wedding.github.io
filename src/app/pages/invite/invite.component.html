@@ -1,0 +1,13 @@
+<app-language-toggle [current]="lang"></app-language-toggle>
+<audio #audio [src]="'assets/audio/bg-music.mp3'" loop></audio>
+
+@if (!opened) {
+  <app-cover (opened)="open()"></app-cover>
+} @else {
+  <main class="invite">
+    <app-map-calendar></app-map-calendar>
+    <app-rsvp-form [lang]="lang"></app-rsvp-form>
+    <app-wishes></app-wishes>
+    <app-faq></app-faq>
+  </main>
+}
