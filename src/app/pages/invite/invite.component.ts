@@ -1,6 +1,5 @@
 import { Component, OnInit, inject, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { CoverComponent } from '../cover/cover.component';
 import { LanguageToggleComponent } from '../../components/language-toggle/language-toggle.component';
 import { RsvpFormComponent } from '../../components/rsvp-form/rsvp-form.component';
 import { WishesComponent } from '../../components/wishes/wishes.component';
@@ -12,7 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-invite', standalone: true,
-  imports: [CoverComponent, LanguageToggleComponent, RsvpFormComponent,
+  imports: [LanguageToggleComponent, RsvpFormComponent,
             WishesComponent, FaqComponent, MapCalendarComponent],
   templateUrl: './invite.component.html',
 })
@@ -22,16 +21,24 @@ export class InviteComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private translate = inject(TranslateService);
   @ViewChild('audio') audio?: ElementRef<HTMLAudioElement>;
-  opened = false;
   lang: 'vi' | 'en' = 'vi';
+  musicOn = false;
 
   async ngOnInit() {
+    // Option C: lang comes from route data ({ lang: 'vi' } at '/', { lang: 'en' } at '/en')
     this.lang = this.route.snapshot.data['lang'] === 'en' ? 'en' : 'vi';
     this.translate.use(this.lang);
     await this.visit.log(this.device.get());
   }
-  open() {
-    this.opened = true;
-    this.audio?.nativeElement.play().catch(() => { /* autoplay may still block */ });
+
+  toggleMusic() {
+    const el = this.audio?.nativeElement;
+    if (!el) return;
+    if (el.paused) {
+      el.play().then(() => (this.musicOn = true)).catch(() => (this.musicOn = false));
+    } else {
+      el.pause();
+      this.musicOn = false;
+    }
   }
 }

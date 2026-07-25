@@ -19,16 +19,20 @@ describe('InviteComponent', () => {
     }).compileComponents();
   });
 
-  it('logs a visit on init and starts hidden (cover showing)', async () => {
+  it('logs a visit on init', async () => {
     const f = TestBed.createComponent(InviteComponent);
     await f.componentInstance.ngOnInit();
     expect(visit.count).toBe(1);
-    expect(f.componentInstance.opened).toBe(false);
   });
 
-  it('open() reveals content', () => {
+  it('reads lang from route data (defaults to vi)', async () => {
+    const f = TestBed.createComponent(InviteComponent);
+    await f.componentInstance.ngOnInit();
+    expect(f.componentInstance.lang).toBe('vi');
+  });
+
+  it('music starts off (no cover click to auto-start)', () => {
     const c = TestBed.createComponent(InviteComponent).componentInstance;
-    c.open();
-    expect(c.opened).toBe(true);
+    expect(c.musicOn).toBe(false);
   });
 });
