@@ -1,1 +1,174 @@
-/* You can add global styles to this file, and also import other style files */
+/* ============================================================
+   Wedding invite theme — red traditional Vietnamese
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap&subset=vietnamese');
+
+:root {
+  --red: #9E1B1B;
+  --red-dark: #7a1414;
+  --gold: #C9A24B;
+  --cream: #FBF6EE;
+  --paper: #ffffff;
+  --ink: #3a2b2b;
+  --muted: #8a7a72;
+  --line: #eaddcf;
+  --font-head: 'Playfair Display', Georgia, serif;
+  --font-body: 'Be Vietnam Pro', system-ui, sans-serif;
+  --maxw: 640px;
+  --radius: 14px;
+  --shadow: 0 6px 24px rgba(122, 20, 20, 0.10);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { font-family: var(--font-head); color: var(--red); font-weight: 600; line-height: 1.2; }
+
+/* ---- main container: an invitation card centered on the page ---- */
+main.invite {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 1.1rem 4rem;
+}
+
+/* ---- hero ---- */
+.hero {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 3.2rem 1.1rem 2.4rem;
+  text-align: center;
+  position: relative;
+}
+.hero .double-happiness {
+  font-family: var(--font-head);
+  font-size: 3rem;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 1rem;
+}
+.hero .names {
+  font-family: var(--font-head);
+  font-size: clamp(2rem, 9vw, 3.1rem);
+  color: var(--red);
+  margin: .3rem 0;
+}
+.hero .amp { color: var(--gold); font-style: italic; display: block; font-size: .55em; margin: .2rem 0; }
+.hero .event-name { letter-spacing: .28em; text-transform: uppercase; color: var(--muted); font-size: .85rem; margin-top: 1rem; }
+.hero .event-date { color: var(--red-dark); font-weight: 600; margin-top: .35rem; font-size: 1.05rem; }
+.hero .cover-photo {
+  width: 100%; max-width: 420px; aspect-ratio: 3/4; object-fit: cover;
+  border-radius: var(--radius); margin: 1.6rem auto 0; display: block;
+  border: 4px solid var(--paper); box-shadow: var(--shadow);
+}
+
+/* ---- decorative divider ---- */
+.divider { text-align: center; color: var(--gold); margin: 2.2rem 0 1.4rem; font-size: 1.2rem; letter-spacing: .5rem; }
+.divider::before, .divider::after {
+  content: ''; display: inline-block; width: 42px; height: 1px;
+  background: var(--gold); vertical-align: middle; margin: 0 .6rem; opacity: .6;
+}
+
+/* ---- generic section headings ---- */
+main.invite h2 { text-align: center; font-size: 1.5rem; margin: 0 0 1.1rem; }
+
+/* ---- cards: wrap each feature block ---- */
+app-map-calendar, app-rsvp-form, app-wishes, app-faq { display: block; margin: 1.4rem 0; }
+
+.map-cal, app-rsvp-form form, app-rsvp-form .thanks, .wishes, .faq {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.4rem 1.2rem;
+}
+
+.map-cal { display: flex; flex-direction: column; gap: .7rem; }
+.map-cal iframe { border-radius: 10px; }
+.map-cal a {
+  display: inline-block; text-align: center; text-decoration: none;
+  color: var(--red); border: 1px solid var(--gold); border-radius: 999px;
+  padding: .5rem .9rem; font-weight: 500; font-size: .95rem;
+}
+
+/* ---- forms (RSVP + wishes) ---- */
+app-rsvp-form form { display: flex; flex-direction: column; gap: 1rem; }
+label { display: block; font-weight: 500; color: var(--ink); font-size: .95rem; }
+input[type="text"], input:not([type]), input[name], select, textarea {
+  width: 100%; margin-top: .35rem; padding: .6rem .7rem;
+  border: 1px solid var(--line); border-radius: 10px; font: inherit; color: var(--ink);
+  background: #fff;
+}
+input[type="radio"], input[type="checkbox"] { width: auto; margin-right: .5rem; accent-color: var(--red); }
+textarea { min-height: 90px; resize: vertical; }
+
+fieldset { border: 1px solid var(--line); border-radius: 10px; padding: .8rem; display: flex; flex-direction: column; gap: .55rem; }
+fieldset label { font-weight: 400; }
+.bus-info { background: var(--cream); border-radius: 8px; padding: .7rem; }
+.bus-info p { color: var(--muted); font-size: .9rem; margin: 0 0 .5rem; }
+
+.note { color: var(--muted); font-size: .82rem; font-style: italic; }
+.warn { color: var(--red-dark); background: #fbeaea; border-radius: 8px; padding: .6rem .7rem; font-size: .88rem; }
+
+button, .mock-button {
+  font: inherit; cursor: pointer;
+}
+button[type="submit"], app-wishes button {
+  background: var(--red); color: #fff; border: none; border-radius: 999px;
+  padding: .7rem 1.4rem; font-weight: 600; letter-spacing: .02em;
+}
+button[type="submit"]:disabled { background: #d8b9b9; cursor: not-allowed; }
+
+app-companions-editor { display: block; }
+app-companions-editor .row { display: flex; gap: .5rem; align-items: center; margin-bottom: .5rem; }
+app-companions-editor .row input[type="text"], app-companions-editor .row input:not([type]) { margin-top: 0; }
+app-companions-editor > button { background: transparent; color: var(--red); border: 1px dashed var(--gold); border-radius: 999px; padding: .45rem .9rem; }
+
+.thanks { text-align: center; color: var(--red); font-family: var(--font-head); font-size: 1.3rem; }
+
+/* ---- clash modal ---- */
+.modal {
+  position: fixed; inset: 0; margin: auto; height: max-content; max-width: 420px;
+  background: #fff; border-radius: var(--radius); padding: 1.5rem; box-shadow: 0 12px 40px rgba(0,0,0,.25);
+  z-index: 50;
+}
+.modal h3 { margin-top: 0; }
+.modal button { margin: .8rem .4rem 0 0; border-radius: 999px; padding: .5rem 1rem; border: 1px solid var(--gold); background: #fff; color: var(--red); }
+.modal button:last-child { background: var(--red); color: #fff; border: none; }
+
+/* ---- wishes wall ---- */
+.wishes blockquote { border-left: 3px solid var(--gold); margin: .6rem 0; padding: .3rem .8rem; background: var(--cream); border-radius: 0 8px 8px 0; }
+
+/* ---- FAQ accordion ---- */
+.faq .qa { border-bottom: 1px solid var(--line); }
+.faq .qa > button { width: 100%; text-align: left; background: none; border: none; padding: .9rem 0; font-weight: 500; color: var(--ink); font-size: 1rem; }
+.faq .answer { padding: 0 0 1rem; color: var(--muted); }
+.faq .gift { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
+.faq .gift img { width: 150px; height: 150px; object-fit: contain; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.faq figure { text-align: center; margin: 0; }
+.faq figcaption { font-size: .82rem; color: var(--ink); margin-top: .4rem; }
+
+/* ---- floating buttons ---- */
+.lang-toggle {
+  position: fixed; top: .7rem; right: .7rem; z-index: 30;
+  background: var(--red); color: #fff !important; text-decoration: none;
+  border-radius: 999px; padding: .4rem .8rem; font-size: .85rem; box-shadow: var(--shadow);
+}
+.music-btn {
+  position: fixed; top: .7rem; left: .7rem; z-index: 30;
+  width: 42px; height: 42px; border-radius: 50%; border: none;
+  background: var(--red); color: #fff; font-size: 1.1rem; box-shadow: var(--shadow);
+}
+
+@media (min-width: 700px) {
+  .hero { padding-top: 4rem; }
+}

@@ -3,7 +3,18 @@
 <button class="music-btn" type="button" (click)="toggleMusic()"
         [attr.aria-label]="musicOn ? 'Pause music' : 'Play music'">{{ musicOn ? '🔊' : '🔇' }}</button>
 
+<header class="hero">
+  <div class="double-happiness">囍</div>
+  <h1 class="names">{{ cfg.couple.bride }}<span class="amp">&amp;</span>{{ cfg.couple.groom }}</h1>
+  <div class="event-name">{{ cfg.event.name }}</div>
+  <div class="event-date">{{ cfg.event.datetime | date:'dd.MM.yyyy' }}</div>
+  @if (coverOk) {
+    <img class="cover-photo" [src]="cfg.media.coverImg" alt="" (error)="coverOk = false" />
+  }
+</header>
+
 <main class="invite">
+  <div class="divider">❦</div>
   <app-map-calendar></app-map-calendar>
   <app-rsvp-form [lang]="lang"></app-rsvp-form>
   @if (cfg.sections.wishes) { <app-wishes></app-wishes> }

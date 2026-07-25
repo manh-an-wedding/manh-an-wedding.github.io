@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, ViewChild, ElementRef, Inject } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { LanguageToggleComponent } from '../../components/language-toggle/language-toggle.component';
 import { RsvpFormComponent } from '../../components/rsvp-form/rsvp-form.component';
@@ -13,7 +14,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-invite', standalone: true,
-  imports: [LanguageToggleComponent, RsvpFormComponent,
+  imports: [DatePipe, LanguageToggleComponent, RsvpFormComponent,
             WishesComponent, FaqComponent, MapCalendarComponent],
   templateUrl: './invite.component.html',
 })
@@ -25,6 +26,7 @@ export class InviteComponent implements OnInit {
   @ViewChild('audio') audio?: ElementRef<HTMLAudioElement>;
   lang: 'vi' | 'en' = 'vi';
   musicOn = false;
+  coverOk = true;
 
   constructor(@Inject(WEDDING_CONFIG) public cfg: WeddingConfig) {}
 
