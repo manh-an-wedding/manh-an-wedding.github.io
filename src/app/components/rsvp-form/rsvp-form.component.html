@@ -1,0 +1,53 @@
+@if (done) {
+  <p class="thanks">{{ 'rsvp.thanks' | translate }}</p>
+} @else {
+  <form (ngSubmit)="trySubmit()">
+    @if (deadlinePassed) { <p class="warn">{{ 'rsvp.deadline_passed' | translate }}</p> }
+
+    <label>{{ 'rsvp.your_name' | translate }}
+      <input name="name" [(ngModel)]="model.guestName" (ngModelChange)="onNameInput()"
+             list="guest-suggest" autocomplete="off" required>
+      <datalist id="guest-suggest">
+        @for (s of suggestions; track s) { <option [value]="s"></option> }
+      </datalist>
+    </label>
+
+    <label>{{ 'rsvp.group' | translate }}
+      <select name="group" [(ngModel)]="model.category" required>
+        <option value="" disabled selected></option>
+        @for (g of cfg.rsvp.groups; track g) { <option [value]="g">{{ g }}</option> }
+      </select>
+    </label>
+
+    <app-companions-editor (changed)="companions = $event"></app-companions-editor>
+
+    <fieldset>
+      <label><input type="radio" name="st" value="self_transport" [(ngModel)]="model.status">
+        {{ 'rsvp.self_transport' | translate }}</label>
+      <label><input type="radio" name="st" value="bus" [(ngModel)]="model.status">
+        {{ 'rsvp.bus' | translate }}
+        <button type="button" (click)="showBusInfo = !showBusInfo" aria-label="info">ⓘ</button></label>
+      @if (showBusInfo) {
+        <div class="bus-info">
+          <p>{{ cfg.rsvp.bus.pickup }} · {{ cfg.rsvp.bus.departTime }} · {{ cfg.rsvp.bus.duration }}</p>
+          <label>{{ 'rsvp.phone' | translate }}
+            <input name="phone" [(ngModel)]="model.phone" inputmode="tel"></label>
+        </div>
+      }
+      <label><input type="radio" name="st" value="cannot_attend" [(ngModel)]="model.status">
+        {{ 'rsvp.cannot_attend' | translate }}</label>
+    </fieldset>
+
+    <p class="note">{{ 'rsvp.note_change' | translate }}</p>
+    <button type="submit" [disabled]="!valid()">{{ 'rsvp.submit' | translate }}</button>
+  </form>
+
+  @if (showClash) {
+    <div class="modal">
+      <h3>{{ 'rsvp.clash_title' | translate }}</h3>
+      <p>{{ 'rsvp.clash_body' | translate }}</p>
+      <button type="button" (click)="showClash = false">{{ 'rsvp.edit_name' | translate }}</button>
+      <button type="button" (click)="confirmDespiteClash()">{{ 'rsvp.continue' | translate }}</button>
+    </div>
+  }
+}
