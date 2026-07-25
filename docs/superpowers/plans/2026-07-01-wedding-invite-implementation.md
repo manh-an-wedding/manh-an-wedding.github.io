@@ -9,7 +9,7 @@
 **Tech Stack:** Angular **22** (standalone components, Angular Router, `@ngx-translate/core` **v18** for runtime i18n), `@supabase/supabase-js`, Supabase (PostgreSQL + RLS + Edge Functions/Deno), **vitest + jsdom** (Angular 22's `@angular/build:unit-test` builder — NOT Karma/ChromeHeadless), GitHub Actions, GitHub Pages.
 
 > **Test runner note (discovered in Task 0):** run unit tests with `npm test -- --watch=false` (no `--browsers` flag; vitest runs headless via jsdom). Jasmine-style `describe/it/expect` + `TestBed` from `@angular/core/testing` work under this builder.
-> **ngx-translate v18 note:** v18's API differs from older majors. The Task 7 implementer must adapt the illustrative i18n setup code to the installed v18 API (check the package's actual exports — e.g. `provideTranslateService` / `provideTranslateHttpLoader`).
+> **ngx-translate v18 note (CONFIRMED during Tasks 7–9):** v18 has **NO `TranslateModule`**. In components, `imports: [TranslateModule]` → use **`imports: [TranslatePipe]`** (`import { TranslatePipe } from '@ngx-translate/core'`). In tests, `TranslateModule.forRoot()` → use **`providers: [provideTranslateService({})]`**. App providers use `provideTranslateService({ lang:'vi', fallbackLang:'vi', loader: provideTranslateHttpLoader({ prefix:'assets/i18n/', suffix:'.json' }) })` (already wired in `app.config.ts`). Apply this substitution wherever later tasks show `TranslateModule`.
 
 ---
 
