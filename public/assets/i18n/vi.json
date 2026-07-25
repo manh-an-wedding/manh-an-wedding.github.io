@@ -1,5 +1,6 @@
 {
   "cover": { "open": "Mở thiệp" },
+  "map": { "directions": "Chỉ đường", "gcal": "Thêm vào Google Calendar", "ics": "Thêm vào lịch (Apple)" },
   "invite": { "invite_you": "Trân trọng kính mời", "confirm": "Xác nhận tham dự", "agenda": "Chương trình" },
   "agenda": { "welcome": "Đón khách", "ceremony": "Nghi lễ", "lunch": "Dùng tiệc", "party": "Chung vui" },
   "rsvp": { "your_name": "Tên của bạn", "group": "Bạn thuộc nhóm", "add_companion": "Thêm người đi cùng",

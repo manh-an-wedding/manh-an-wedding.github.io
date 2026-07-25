@@ -1,5 +1,6 @@
 {
   "cover": { "open": "Open invitation" },
+  "map": { "directions": "Directions", "gcal": "Add to Google Calendar", "ics": "Add to calendar (Apple)" },
   "invite": { "invite_you": "We cordially invite", "confirm": "RSVP", "agenda": "Schedule" },
   "agenda": { "welcome": "Welcome", "ceremony": "Ceremony", "lunch": "Banquet", "party": "Celebration" },
   "rsvp": { "your_name": "Your name", "group": "Your group", "add_companion": "Add companion",

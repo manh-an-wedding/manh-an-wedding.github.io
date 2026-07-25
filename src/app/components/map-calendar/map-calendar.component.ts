@@ -9,9 +9,9 @@ import { WeddingConfig } from '../../core/wedding-config';
   template: `
     <section class="map-cal">
       <iframe [src]="safeMap" width="100%" height="260" style="border:0" loading="lazy"></iframe>
-      <a [href]="cfg.event.mapDirUrl" target="_blank" rel="noopener">Chỉ đường</a>
-      <a [href]="googleCalUrl()" target="_blank" rel="noopener">Google Calendar</a>
-      <a [href]="icsHref()" download="wedding.ics">Apple / .ics</a>
+      <a [href]="cfg.event.mapDirUrl" target="_blank" rel="noopener">{{ 'map.directions' | translate }}</a>
+      <a [href]="googleCalUrl()" target="_blank" rel="noopener">{{ 'map.gcal' | translate }}</a>
+      <a [href]="icsHref()" download="wedding.ics">{{ 'map.ics' | translate }}</a>
     </section>`,
 })
 export class MapCalendarComponent {
