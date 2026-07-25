@@ -412,6 +412,25 @@ order by name_norm, created_at desc;
 create or replace view wishes_public as
 select id, name, message, created_at from wishes where is_public = true;
 
+-- autocomplete source: expose ONLY names (never category/notes)
+create or replace view guests_public as
+select full_name from guests;
+
+-- correct bus-seat counts: only companions of the LATEST rsvp per person
+-- (append-only means old rsvp rows still have their old companions; must exclude them)
+create or replace view bus_manifest as
+select r.guest_name, r.category, r.phone, c.name as companion_name, c.joins_bus
+from rsvp_latest r
+left join companions c on c.rsvp_id = r.id
+where r.status = 'bus';
+
+create or replace view bus_seat_count as
+select
+  (select count(*) from rsvp_latest where status = 'bus') as guest_seats,
+  (select count(*) from companions c
+     join rsvp_latest r on r.id = c.rsvp_id
+     where c.joins_bus = true) as companion_seats;
+
 -- RLS
 alter table rsvp enable row level security;
 alter table companions enable row level security;
@@ -419,15 +438,19 @@ alter table wishes enable row level security;
 alter table page_visits enable row level security;
 alter table guests enable row level security;
 
--- anon may INSERT responses but never SELECT them
+-- anon may INSERT responses but never SELECT the raw tables
+grant insert on rsvp, companions, wishes to anon;
 create policy rsvp_insert on rsvp for insert to anon with check (true);
 create policy companions_insert on companions for insert to anon with check (true);
 create policy wishes_insert on wishes for insert to anon with check (true);
--- page_visits are inserted by the Edge Function (service role), not anon:
+-- (no SELECT policy on rsvp/companions/wishes/guests for anon → reads denied)
+
+-- page_visits: only the Edge Function (service role) writes; anon has no access
 revoke all on page_visits from anon;
 
--- anon may read only guest names (autocomplete) and public wishes
-create policy guests_select_names on guests for select to anon using (true);
+-- anon may read ONLY the safe views
+grant select on guests_public, wishes_public to anon;
+-- do NOT grant rsvp_latest/bus_manifest/bus_seat_count to anon (admin-only)
 ```
 
 - [ ] **Step 2: Write verification assertions**
@@ -444,6 +467,11 @@ insert into wishes (name,message,is_public) values ('B','hi',false);
 insert into wishes (name,message,is_public) values ('C','congrats',true);
 -- wishes_public must exclude the private one:
 select count(*) as should_be_1 from wishes_public;
+-- bus-seat count must IGNORE companions of superseded rsvp rows (risk #5):
+-- attach a bus companion to 'a's now-superseded bus row; latest status is cannot_attend
+insert into companions (rsvp_id, name, joins_bus)
+  select id, 'X', true from rsvp where name_norm='a' and status='bus';
+select companion_seats as should_be_0 from bus_seat_count;
 ```
 
 - [ ] **Step 3: Apply and verify**
@@ -451,13 +479,31 @@ select count(*) as should_be_1 from wishes_public;
 Run in the Supabase project SQL editor (or `supabase db reset` locally):
 1. Execute `0001_init.sql`.
 2. Execute `0001_init.verify.sql`.
-Expected: `should_be_1 = 1`, `should_be_cannot_attend = cannot_attend`, second `should_be_1 = 1`. Then delete the test rows.
+Expected: `should_be_1 = 1`, `should_be_cannot_attend = cannot_attend`, second `should_be_1 = 1`, and `should_be_0 = 0` (companion on the superseded bus row is NOT counted). Then delete the test rows.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 4: Verify RLS blocks anon reads (negative test — risk #1)**
+
+Using the project's **anon** key (never the service key), a read of the raw tables MUST be denied:
+```bash
+curl -s "https://REPLACE.supabase.co/rest/v1/rsvp?select=*" \
+  -H "apikey: <ANON_KEY>" -H "Authorization: Bearer <ANON_KEY>"
+```
+Expected: `[]` (RLS hides all rows) — **not** the inserted rows. Repeat for `companions` and `page_visits` (also `[]` / error). Then confirm the safe views DO return data:
+```bash
+curl -s "https://REPLACE.supabase.co/rest/v1/guests_public?select=full_name" -H "apikey: <ANON_KEY>"
+curl -s "https://REPLACE.supabase.co/rest/v1/wishes_public?select=*" -H "apikey: <ANON_KEY>"
+```
+Expected: these return rows. Also confirm `rsvp_latest` is **denied** to anon:
+```bash
+curl -s "https://REPLACE.supabase.co/rest/v1/rsvp_latest?select=*" -H "apikey: <ANON_KEY>"
+```
+Expected: `[]` or permission error. **If `rsvp` or `rsvp_latest` returns any real row, RLS is misconfigured — stop and fix before continuing.**
+
+- [ ] **Step 5: Commit**
 
 ```bash
 git add supabase/migrations/
-git commit -m "feat: supabase schema, rsvp_latest/wishes_public views, RLS"
+git commit -m "feat: supabase schema, views (rsvp_latest/wishes_public/guests_public/bus_*), RLS"
 ```
 
 ---
@@ -676,7 +722,7 @@ export class GuestsService {
   constructor(@Inject(SUPABASE) private sb: SupabaseClient) {}
   async suggest(prefix: string): Promise<string[]> {
     if (prefix.trim().length < 1) return [];
-    const { data } = await this.sb.from('guests').select('full_name').ilike('full_name', `%${prefix}%`).limit(8);
+    const { data } = await this.sb.from('guests_public').select('full_name').ilike('full_name', `%${prefix}%`).limit(8);
     return (data ?? []).map((r: any) => r.full_name);
   }
 }
@@ -1736,6 +1782,21 @@ git add src/assets/config/wedding.config.ts
 git commit -m "chore: wire real Supabase url + anon key"
 ```
 
+- [ ] **Step 3: PRE-LAUNCH GATE — replace ALL fake data (risk #2)**
+
+⚠️ **Do NOT deploy to production or print the invitation QR until every `DATA GIẢ` / `[GIẢ]` / `REPLACE` placeholder is replaced with real values.** Wrong gift QR/bank details = guests transferring money to a non-existent/wrong account.
+Checklist — grep the repo and confirm none remain:
+```bash
+grep -rn "GIẢ\|REPLACE\|placeholder\|0000000000\|1111111111" src/assets/config/
+```
+Expected: **no matches** before go-live. Specifically verify:
+- [ ] Gift QR images (`qr-bride.png`, `qr-groom.png`) are the REAL VietQR images, and `bank`/`account`/`name` are correct.
+- [ ] Event venue, address, `mapEmbedUrl`, `mapDirUrl`, `datetime` are real.
+- [ ] Bus pickup/time/duration, RSVP groups, deadline are real.
+- [ ] Cover + couple photos are real; `bg-music.mp3` is the chosen track.
+- [ ] Q&A "(cập nhật sau)" answers filled (or intentionally left as "will update").
+- [ ] `supabase.url`/`anonKey` point to the real project (anon key only — never the service key).
+
 ---
 
 ## Task 17: GitHub Pages deploy (404 fallback + Actions)
@@ -1860,6 +1921,7 @@ git commit -m "docs: one-time guest list CSV import procedure"
 
 ## Self-Review Notes (author checklist — done)
 
-- **Spec coverage:** cover/invite pages (T9/T15), 3 RSVP options + companions + bus + phone (T10/T11), name clash via device_id (T6/T11), wishes public/private + wall (T12), Q&A + gift QR (T13), map + calendar (T14), i18n VI/EN + toggle (T7/T8), append-only rsvp + `rsvp_latest` (T4), visit/IP via Edge Function (T5/T15), guests autocomplete + import (T6/T19), RLS (T4), GitHub Pages + 404 + base-href (T17), Open Graph (T18). Admin/export (spec §9) intentionally deferred to Supabase Dashboard — not app code — noted here as a gap to revisit if an in-app admin page is later wanted.
+- **Spec coverage:** cover/invite pages (T9/T15), 3 RSVP options + companions + bus + phone (T10/T11), name clash via device_id (T6/T11), wishes public/private + wall (T12), Q&A + gift QR (T13), map + calendar (T14), i18n VI/EN + toggle (T7/T8), append-only rsvp + `rsvp_latest` (T4), visit/IP via Edge Function (T5/T15), guests autocomplete + import (T6/T19), RLS + negative read test (T4), GitHub Pages + 404 + base-href (T17), Open Graph (T18). Admin/export (spec §9) deferred to Supabase Dashboard — the `bus_seat_count`/`bus_manifest` views (T4) give the couple correct seat totals directly; revisit if an in-app admin page is later wanted.
+- **Risk mitigations folded in:** #1 RLS negative test (T4 Step 4) + `guests_public`/`wishes_public` views so anon never touches raw tables; #2 pre-launch "replace fake data" gate (T16 Step 3); #5 `bus_seat_count`/`bus_manifest` count only companions of the latest rsvp per person, with a regression assertion in the verify SQL.
 - **Placeholders:** all "DATA GIẢ" markers are intentional fake content in config, not plan gaps; every code step is complete.
 - **Type consistency:** `RsvpDraft`/`CompanionDraft` defined in T6 and reused in T10/T11; `WeddingConfig`/`FaqItem` defined in T1 and reused in T13/T14; `nameNorm`, `DeviceIdService`, `VisitService`, `WishesService`, `GuestsService`, `RsvpService` names consistent across tasks.
