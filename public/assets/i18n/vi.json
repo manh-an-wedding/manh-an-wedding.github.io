@@ -1,0 +1,22 @@
+{
+  "cover": { "open": "Mở thiệp" },
+  "invite": { "invite_you": "Trân trọng kính mời", "confirm": "Xác nhận tham dự", "agenda": "Chương trình" },
+  "agenda": { "welcome": "Đón khách", "ceremony": "Nghi lễ", "lunch": "Dùng tiệc", "party": "Chung vui" },
+  "rsvp": { "your_name": "Tên của bạn", "group": "Bạn thuộc nhóm", "add_companion": "Thêm người đi cùng",
+            "joins_bus": "Đi xe", "self_transport": "Đồng ý & tự túc xe",
+            "bus": "Đồng ý & đăng ký xe HCM–Cần Thơ", "cannot_attend": "Không thể tham dự",
+            "phone": "Số điện thoại", "note_change": "Bạn có thể quay lại nhập tên và chọn lại bất cứ lúc nào — hệ thống lấy lựa chọn cuối cùng.",
+            "deadline_passed": "Đã qua hạn xác nhận — gia đình có thể đã chốt số lượng, mong bạn thông cảm.",
+            "clash_title": "Có khách trùng tên trong nhóm này",
+            "clash_body": "Đã có một người cùng tên trong nhóm này xác nhận trước đó. Nếu là bạn, bấm Tiếp tục. Nếu là người khác, vui lòng thêm chi tiết vào tên để phân biệt.",
+            "edit_name": "Sửa tên", "continue": "Tiếp tục", "submit": "Gửi xác nhận", "thanks": "Cảm ơn bạn!" },
+  "wishes": { "title": "Gửi lời chúc", "public": "Công khai", "private": "Ẩn",
+              "placeholder": "Lời chúc của bạn…", "send": "Gửi", "wall": "Lời chúc từ mọi người" },
+  "faq": { "title": "Hỏi & Đáp",
+           "gift": { "q": "Gửi tiền mừng online được không?", "a": "Bạn có thể chuyển khoản qua mã QR bên dưới." },
+           "bus": { "q": "Lịch trình xe đưa đón thế nào?", "a": "(Thông tin sẽ cập nhật sau.)" },
+           "oneway": { "q": "Nếu chỉ đi HCM → Cần Thơ, không quay về?", "a": "(Cập nhật sau.)" },
+           "returnonly": { "q": "Nếu chỉ ké chiều về HCM?", "a": "(Cập nhật sau.)" },
+           "cantho": { "q": "Cần Thơ có gì chơi?", "a": "(Cập nhật sau.)" },
+           "daklak": { "q": "Đắk Lắk có gì chơi?", "a": "(Cập nhật sau.)" } }
+}

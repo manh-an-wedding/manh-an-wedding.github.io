@@ -1,0 +1,22 @@
+{
+  "cover": { "open": "Open invitation" },
+  "invite": { "invite_you": "We cordially invite", "confirm": "RSVP", "agenda": "Schedule" },
+  "agenda": { "welcome": "Welcome", "ceremony": "Ceremony", "lunch": "Banquet", "party": "Celebration" },
+  "rsvp": { "your_name": "Your name", "group": "Your group", "add_companion": "Add companion",
+            "joins_bus": "On the bus", "self_transport": "Yes — own transport",
+            "bus": "Yes — book the HCM–Can Tho bus", "cannot_attend": "Cannot attend",
+            "phone": "Phone number", "note_change": "You can re-enter your name and choose again anytime — the latest choice counts.",
+            "deadline_passed": "The RSVP deadline has passed — numbers may be finalized; thank you for understanding.",
+            "clash_title": "Someone with the same name in this group",
+            "clash_body": "Someone with the same name already responded. If it's you, tap Continue. Otherwise, please add detail to your name.",
+            "edit_name": "Edit name", "continue": "Continue", "submit": "Submit", "thanks": "Thank you!" },
+  "wishes": { "title": "Send your wishes", "public": "Public", "private": "Hidden",
+              "placeholder": "Your wishes…", "send": "Send", "wall": "Wishes from guests" },
+  "faq": { "title": "Q&A",
+           "gift": { "q": "Can I send a gift online?", "a": "You can transfer via the QR codes below." },
+           "bus": { "q": "What's the shuttle schedule?", "a": "(To be updated.)" },
+           "oneway": { "q": "What if I only go HCM → Can Tho, no return?", "a": "(To be updated.)" },
+           "returnonly": { "q": "What if I only need the return leg to HCM?", "a": "(To be updated.)" },
+           "cantho": { "q": "What to do in Can Tho?", "a": "(To be updated.)" },
+           "daklak": { "q": "What to do in Dak Lak?", "a": "(To be updated.)" } }
+}
