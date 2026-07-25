@@ -36,7 +36,7 @@ Web thiệp cưới cho cô dâu **Nhật An** và chú rể **Duy Mạnh** — 
 
 Sơ đồ:
 ```
-[Khách quét QR → manh-an-wedding.github.io/vi]
+[Khách quét QR → manh-an-wedding.github.io]  (gốc = Việt)
         │
         ▼
    Angular app (GitHub Pages)  ◄── repo GitHub (Actions build+publish)
@@ -48,12 +48,11 @@ Sơ đồ:
 ## 3. Cấu trúc link
 
 ```
-manh-an-wedding.github.io/{lang}
-   {lang} = vi | en        (nút 🌐 đổi bất cứ lúc nào)
-
-Ví dụ:  /vi   /en
+manh-an-wedding.github.io        → Tiếng Việt (mặc định, KHÔNG có prefix)
+manh-an-wedding.github.io/en     → Tiếng Anh
+   (nút 🌐 đổi bất cứ lúc nào; gửi /en cho khách nước ngoài)
 ```
-- **1 QR thiệp** = link `/vi` (mặc định), in trên thiệp giấy.
+- **1 QR thiệp** = link gốc (Việt), in trên thiệp giấy.
 - Không có link riêng từng khách, không token, không slug cá nhân.
 - **Nhóm** không nằm trong link — khách chọn qua dropdown (bắt buộc) khi RSVP.
 
@@ -138,7 +137,8 @@ Nội dung lễ + Q&A + danh sách nhóm + theme nằm trong **file config**, kh
 | user_agent | text null | |
 | created_at | timestamptz | |
 
-> Không đè. **Trạng thái hiện tại = dòng mới nhất theo `name_norm`** qua view `rsvp_latest`.
+> Không đè. **Trạng thái hiện tại = dòng mới nhất theo `(name_norm, device_id)`** qua view `rsvp_latest`.
+> **Chấp nhận dup:** khóa gồm `device_id` để hai người khác nhau trùng tên (khác máy) **không bị mất** — mỗi máy là một dòng; cùng người + cùng máy sửa lại thì đè đúng. Cái giá: cùng người đổi máy sẽ hiện 2 dòng (dư, nhìn thấy được — an toàn hơn mất người). View `possible_duplicates` liệt kê tên có nhiều `device_id` để rà tay.
 > IP-theo-tên = lọc `ip` theo `name_norm`; số lần đổi ý = đếm dòng theo `name_norm`.
 
 ### Bảng `companions` (người đi cùng — gắn theo từng dòng rsvp)
@@ -202,7 +202,7 @@ Vợ chồng / gia đình mời chung = **1 dòng** (tên đại diện); tên n
 
 ## 10. Song ngữ, nhạc, map, lịch
 
-- **VI/EN:** mặc định VI; link `/en` cho khách nước ngoài; nút 🌐 đổi runtime; (tùy chọn) tự nhận diện ngôn ngữ trình duyệt.
+- **VI/EN:** mặc định VI ở **URL gốc** (không prefix); tiếng Anh ở **`/en`** (gửi cho khách nước ngoài); nút 🌐 đổi runtime; (tùy chọn) tự nhận diện ngôn ngữ trình duyệt.
 - **Nhạc:** file trong assets/Supabase Storage; bật sau cú bấm "Mở thiệp".
 - **Map:** embed Google Maps (không cần API key) + nút Chỉ đường.
 - **Lịch:** nút Thêm vào Google Calendar + file `.ics` (Apple).
@@ -262,7 +262,10 @@ Giai đoạn đầu: điền **data giả** vào config, thay dần bằng data 
 ## 14. Quyết định đã chốt & điểm còn mở
 
 **Đã chốt:**
-- **Chỉ 1 lễ: Vu Quy** (bỏ lễ Thành Hôn) → link chỉ còn `/vi` `/en`, 1 QR thiệp.
+- **Chỉ 1 lễ: Vu Quy** (bỏ lễ Thành Hôn) → 1 QR thiệp.
+- **Ngôn ngữ (phương án C):** Việt ở URL gốc (không prefix), Anh ở `/en`.
+- **Định danh chấp nhận dup:** `rsvp_latest` khóa theo `(name_norm, device_id)` → không mất khách trùng tên; dư dòng thì rà bằng view `possible_duplicates`.
+- **Thực thi:** Subagent-Driven.
 - **Nơi đặt dự án:** `C:\Users\Intelisys_Admin\Desktop\manhan` (git đã khởi tạo).
 - **Host:** **GitHub Pages**, URL gốc `manh-an-wedding.github.io` (org `manh-an-wedding` + repo cùng tên) → cần `404.html`, `base-href=/`, GitHub Actions.
 - **Trùng tên:** popup dựa trên `device_id` (mục 5).

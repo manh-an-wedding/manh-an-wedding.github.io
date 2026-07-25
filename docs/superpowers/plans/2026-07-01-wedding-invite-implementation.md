@@ -402,11 +402,23 @@ create table if not exists page_visits (
   visited_at timestamptz not null default now()
 );
 
--- latest choice per person
+-- latest choice per person+device (accepts visible duplicates instead of
+-- silently overwriting two different people who share a name — see spec §7)
 create or replace view rsvp_latest as
-select distinct on (name_norm) *
+select distinct on (name_norm, coalesce(device_id,'')) *
 from rsvp
-order by name_norm, created_at desc;
+order by name_norm, coalesce(device_id,''), created_at desc;
+
+-- names appearing under >1 device_id → possible different people (or same person
+-- on 2 devices); the couple reviews these manually via phone/group
+create or replace view possible_duplicates as
+select name_norm,
+       count(distinct coalesce(device_id,'')) as device_count,
+       array_agg(distinct guest_name) as names,
+       array_agg(distinct category) as groups
+from rsvp
+group by name_norm
+having count(distinct coalesce(device_id,'')) > 1;
 
 -- public wishes wall (no ip/device leak)
 create or replace view wishes_public as
@@ -450,7 +462,7 @@ revoke all on page_visits from anon;
 
 -- anon may read ONLY the safe views
 grant select on guests_public, wishes_public to anon;
--- do NOT grant rsvp_latest/bus_manifest/bus_seat_count to anon (admin-only)
+-- do NOT grant rsvp_latest/bus_manifest/bus_seat_count/possible_duplicates to anon (admin-only)
 ```
 
 - [ ] **Step 2: Write verification assertions**
@@ -458,11 +470,21 @@ grant select on guests_public, wishes_public to anon;
 ```sql
 -- supabase/migrations/0001_init.verify.sql
 -- Run after 0001_init.sql. Each SELECT should return the noted result.
+-- same person, same (null) device, changes mind → latest wins, collapses to 1:
 insert into rsvp (guest_name,name_norm,category,status) values ('A','a','IAS','bus');
 insert into rsvp (guest_name,name_norm,category,status) values ('A','a','IAS','cannot_attend');
--- rsvp_latest must show only the most recent row for name_norm='a':
 select count(*) as should_be_1 from rsvp_latest where name_norm='a';
 select status as should_be_cannot_attend from rsvp_latest where name_norm='a';
+-- TWO different devices, same name → BOTH kept (accepted dup, no data loss):
+insert into rsvp (guest_name,name_norm,category,status,device_id) values ('B','b','IAS','bus','dev-1');
+insert into rsvp (guest_name,name_norm,category,status,device_id) values ('B','b','IAS','bus','dev-2');
+select count(*) as should_be_2 from rsvp_latest where name_norm='b';
+-- same device re-submits → collapses to latest for that device (still 2 total):
+insert into rsvp (guest_name,name_norm,category,status,device_id) values ('B','b','IAS','cannot_attend','dev-1');
+select count(*) as still_2 from rsvp_latest where name_norm='b';
+select status as dev1_should_be_cannot from rsvp_latest where name_norm='b' and device_id='dev-1';
+-- possible_duplicates flags name_norm='b' (2 devices):
+select device_count as should_be_2b from possible_duplicates where name_norm='b';
 insert into wishes (name,message,is_public) values ('B','hi',false);
 insert into wishes (name,message,is_public) values ('C','congrats',true);
 -- wishes_public must exclude the private one:
@@ -479,7 +501,7 @@ select companion_seats as should_be_0 from bus_seat_count;
 Run in the Supabase project SQL editor (or `supabase db reset` locally):
 1. Execute `0001_init.sql`.
 2. Execute `0001_init.verify.sql`.
-Expected: `should_be_1 = 1`, `should_be_cannot_attend = cannot_attend`, second `should_be_1 = 1`, and `should_be_0 = 0` (companion on the superseded bus row is NOT counted). Then delete the test rows.
+Expected: `should_be_1 = 1`, `should_be_cannot_attend = cannot_attend`, `should_be_2 = 2` (two devices kept), `still_2 = 2`, `dev1_should_be_cannot = cannot_attend`, `should_be_2b = 2`, wishes `should_be_1 = 1`, and `should_be_0 = 0` (companion on the superseded bus row is NOT counted). Then delete the test rows.
 
 - [ ] **Step 4: Verify RLS blocks anon reads (negative test — risk #1)**
 
@@ -767,19 +789,21 @@ git commit -m "feat: supabase client + rsvp/wishes/guests/visit services"
 - Modify: `src/app/app.config.ts`, `src/app/app.routes.ts`, `src/app/app.component.ts`
 - Test: `src/app/app.routes.spec.ts`
 
-- [ ] **Step 1: Write the failing test (route redirects to default lang)**
+- [ ] **Step 1: Write the failing test (Option C: root = vi, /en = en)**
 
 ```typescript
 // app.routes.spec.ts
 import { routes } from './app.routes';
 
-describe('routes', () => {
-  it('redirects empty path to /vi', () => {
+describe('routes (Option C)', () => {
+  it('root path is Vietnamese (no redirect, no prefix)', () => {
     const root = routes.find(r => r.path === '');
-    expect(root?.redirectTo).toBe('vi');
+    expect(root?.data?.['lang']).toBe('vi');
+    expect(root?.redirectTo).toBeUndefined();
   });
-  it('has a :lang route', () => {
-    expect(routes.some(r => r.path === ':lang')).toBe(true);
+  it('/en path is English', () => {
+    const en = routes.find(r => r.path === 'en');
+    expect(en?.data?.['lang']).toBe('en');
   });
 });
 ```
@@ -797,9 +821,9 @@ import { Routes } from '@angular/router';
 import { InviteComponent } from './pages/invite/invite.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'vi', pathMatch: 'full' },
-  { path: ':lang', component: InviteComponent },
-  { path: '**', redirectTo: 'vi' },
+  { path: '', component: InviteComponent, data: { lang: 'vi' } },
+  { path: 'en', component: InviteComponent, data: { lang: 'en' } },
+  { path: '**', redirectTo: '' },
 ];
 ```
 
@@ -829,29 +853,18 @@ export const appConfig: ApplicationConfig = {
 };
 ```
 
-- [ ] **Step 5: Sync language from the route in the shell**
+- [ ] **Step 5: Minimal shell (language is set in InviteComponent from route data — Task 15)**
 
 ```typescript
 // src/app/app.component.ts
-import { Component, inject } from '@angular/core';
-import { RouterOutlet, ActivatedRoute } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-import { filter } from 'rxjs';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root', standalone: true, imports: [RouterOutlet],
   template: `<router-outlet />`,
 })
-export class AppComponent {
-  constructor() {
-    const t = inject(TranslateService);
-    const route = inject(ActivatedRoute);
-    route.firstChild?.paramMap.subscribe(p => {
-      const lang = p.get('lang') === 'en' ? 'en' : 'vi';
-      t.use(lang);
-    });
-  }
-}
+export class AppComponent {}
 ```
 
 - [ ] **Step 6: Seed translation files (VI real-ish, EN placeholder)**
@@ -936,16 +949,18 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { LanguageToggleComponent } from './language-toggle.component';
 
-describe('LanguageToggleComponent', () => {
-  it('computes the other lang link', async () => {
+describe('LanguageToggleComponent (Option C)', () => {
+  it('links vi→/en and en→/ (root is Vietnamese)', async () => {
     await TestBed.configureTestingModule({
       imports: [LanguageToggleComponent], providers: [provideRouter([])],
     }).compileComponents();
     const c = TestBed.createComponent(LanguageToggleComponent).componentInstance;
     c.current = 'vi';
-    expect(c.other).toBe('en');
+    expect(c.otherLink).toBe('/en');
+    expect(c.otherLabel).toBe('EN');
     c.current = 'en';
-    expect(c.other).toBe('vi');
+    expect(c.otherLink).toBe('/');
+    expect(c.otherLabel).toBe('VI');
   });
 });
 ```
@@ -964,12 +979,14 @@ import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-language-toggle', standalone: true, imports: [RouterLink],
-  template: `<a [routerLink]="'/' + other" class="lang-toggle">🌐 {{ other.toUpperCase() }}</a>`,
+  template: `<a [routerLink]="otherLink" class="lang-toggle">🌐 {{ otherLabel }}</a>`,
   styles: [`.lang-toggle{position:fixed;top:.5rem;right:.5rem;z-index:20;text-decoration:none}`],
 })
 export class LanguageToggleComponent {
   @Input() current: 'vi' | 'en' = 'vi';
-  get other(): 'vi' | 'en' { return this.current === 'vi' ? 'en' : 'vi'; }
+  // Option C: Vietnamese lives at the root '/', English at '/en'
+  get otherLink(): string { return this.current === 'vi' ? '/en' : '/'; }
+  get otherLabel(): string { return this.current === 'vi' ? 'EN' : 'VI'; }
 }
 ```
 
@@ -1638,7 +1655,7 @@ git commit -m "feat: map embed + google calendar + ics"
 
 **Files:**
 - Create: `src/app/pages/invite/invite.component.ts`
-- Modify: `src/app/app.component.ts` (host the audio element)
+- Create: `src/app/pages/invite/invite.component.html`
 - Test: `src/app/pages/invite/invite.component.spec.ts`
 
 - [ ] **Step 1: Write the failing test (cover→content toggle + visit logged once)**
@@ -1700,6 +1717,7 @@ import { FaqComponent } from '../../components/faq/faq.component';
 import { MapCalendarComponent } from '../../components/map-calendar/map-calendar.component';
 import { VisitService } from '../../core/visit.service';
 import { DeviceIdService } from '../../core/device-id.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-invite', standalone: true,
@@ -1711,12 +1729,15 @@ export class InviteComponent implements OnInit {
   private visit = inject(VisitService);
   private device = inject(DeviceIdService);
   private route = inject(ActivatedRoute);
+  private translate = inject(TranslateService);
   @ViewChild('audio') audio?: ElementRef<HTMLAudioElement>;
   opened = false;
   lang: 'vi' | 'en' = 'vi';
 
   async ngOnInit() {
-    this.lang = this.route.snapshot.paramMap.get('lang') === 'en' ? 'en' : 'vi';
+    // Option C: lang comes from route data ({ lang: 'vi' } at '/', { lang: 'en' } at '/en')
+    this.lang = this.route.snapshot.data['lang'] === 'en' ? 'en' : 'vi';
+    this.translate.use(this.lang);
     await this.visit.log(this.device.get());
   }
   open() {
@@ -1765,9 +1786,9 @@ git commit -m "feat: invite page wiring cover, map, rsvp, wishes, faq + visit lo
 
 - [ ] **Step 1: Serve and click through**
 
-Run: `npm start` and open http://localhost:4200/vi
+Run: `npm start` and open http://localhost:4200/ (Vietnamese root)
 - [ ] Cover shows; clicking "Mở thiệp" reveals content and starts music.
-- [ ] Language toggle switches VI↔EN and the URL becomes `/en`.
+- [ ] Language toggle: from `/` shows Vietnamese; clicking it navigates to `/en` and content switches to English; from `/en` the toggle returns to `/`.
 - [ ] Submit an RSVP with a companion + bus + phone → row in `rsvp` + `companions`; `party_size` correct.
 - [ ] Re-submit the same name/group/status from the same browser → no popup (same device_id).
 - [ ] In a different browser/incognito, submit identical name/group/status → clash popup appears.
@@ -1857,8 +1878,8 @@ Expected: the Actions run goes green; site live at `https://manh-an-wedding.gith
 
 - [ ] **Step 4: Verify the live deep link**
 
-Open `https://manh-an-wedding.github.io/vi` directly (not via homepage).
-Expected: the invitation loads (404.html fallback works), music/RSVP/wishes/FAQ all function against Supabase.
+Open `https://manh-an-wedding.github.io/en` directly (not via homepage) to exercise the SPA fallback on a deep link.
+Expected: the invitation loads in English (404.html fallback works); the root `https://manh-an-wedding.github.io` loads Vietnamese; music/RSVP/wishes/FAQ all function against Supabase.
 
 ---
 
@@ -1881,7 +1902,7 @@ Expected: the invitation loads (404.html fallback works), music/RSVP/wishes/FAQ 
 
 - [ ] **Step 2: Verify after deploy**
 
-Paste `https://manh-an-wedding.github.io/vi` into Facebook Sharing Debugger (or a Zalo chat) and confirm the preview shows the title + cover image.
+Paste `https://manh-an-wedding.github.io` into Facebook Sharing Debugger (or a Zalo chat) and confirm the preview shows the title + cover image.
 
 - [ ] **Step 3: Commit**
 
@@ -1923,5 +1944,7 @@ git commit -m "docs: one-time guest list CSV import procedure"
 
 - **Spec coverage:** cover/invite pages (T9/T15), 3 RSVP options + companions + bus + phone (T10/T11), name clash via device_id (T6/T11), wishes public/private + wall (T12), Q&A + gift QR (T13), map + calendar (T14), i18n VI/EN + toggle (T7/T8), append-only rsvp + `rsvp_latest` (T4), visit/IP via Edge Function (T5/T15), guests autocomplete + import (T6/T19), RLS + negative read test (T4), GitHub Pages + 404 + base-href (T17), Open Graph (T18). Admin/export (spec §9) deferred to Supabase Dashboard — the `bus_seat_count`/`bus_manifest` views (T4) give the couple correct seat totals directly; revisit if an in-app admin page is later wanted.
 - **Risk mitigations folded in:** #1 RLS negative test (T4 Step 4) + `guests_public`/`wishes_public` views so anon never touches raw tables; #2 pre-launch "replace fake data" gate (T16 Step 3); #5 `bus_seat_count`/`bus_manifest` count only companions of the latest rsvp per person, with a regression assertion in the verify SQL.
+- **Language = Option C:** Vietnamese at root `/` (no prefix), English at `/en`; routes carry `data.lang`, `InviteComponent` sets `TranslateService.use()`, toggle links `/`↔`/en` (T7/T8/T15).
+- **Identity accepts duplicates:** `rsvp_latest` keyed on `(name_norm, device_id)` so two same-named people are never silently overwritten; `possible_duplicates` view surfaces names spanning multiple devices for manual review (T4). Verify SQL asserts both the collapse (same device) and the keep-both (two devices) cases.
 - **Placeholders:** all "DATA GIẢ" markers are intentional fake content in config, not plan gaps; every code step is complete.
 - **Type consistency:** `RsvpDraft`/`CompanionDraft` defined in T6 and reused in T10/T11; `WeddingConfig`/`FaqItem` defined in T1 and reused in T13/T14; `nameNorm`, `DeviceIdService`, `VisitService`, `WishesService`, `GuestsService`, `RsvpService` names consistent across tasks.
