@@ -1849,7 +1849,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: npm }
+        with: { node-version: 24, cache: npm }   # Angular 22 needs Node >= 22.22.3
       - run: npm ci
       - run: npx ng build --base-href /
       - name: SPA fallback (404 = index)
