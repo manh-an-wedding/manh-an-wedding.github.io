@@ -84,10 +84,28 @@ Before launch, run and confirm **no matches**:
 ```bash
 grep -rn "GIẢ\|REPLACE\|placeholder\|0000000000\|1111111111" src/assets/config/
 ```
-Replace: gift QR images (`public/assets/img/qr-bride.png`, `qr-groom.png`) + bank/account/name;
-event venue/address/map/datetime; bus pickup/time/duration + RSVP groups + deadline; cover + couple
-photos (`public/assets/img/`); `public/assets/audio/bg-music.mp3`; Q&A "(cập nhật sau)" answers.
-(Assets referenced by config live under `public/assets/`; they are placeholders/absent until added.)
+Replace: gift QR images + bank/account/name; event venue/address/map/datetime; bus
+pickup/time/duration + RSVP groups + deadline; Q&A "(cập nhật sau)" answers.
+
+### Assets to add (drop files here — names must match `wedding.config.ts`)
+Static assets are served from `public/` (mapped to `/`). Folders + READMEs already exist:
+| Put file at | Config key | Notes |
+|-------------|-----------|-------|
+| `public/assets/img/cover.jpg`    | `media.coverImg`   | hero photo, ~3:4 portrait |
+| `public/assets/img/couple-1.jpg` | `media.couplePhotos[0]` | optional |
+| `public/assets/img/qr-bride.png` | `gift.bride.qr`    | bride VietQR (square) |
+| `public/assets/img/qr-groom.png` | `gift.groom.qr`    | groom VietQR (square) |
+| `public/assets/audio/bg-music.mp3` | `theme.music`    | background music, keep small |
+Hero hides the cover `<img>` gracefully (via `coverOk` flag + `(error)`) until the file exists.
+To change a filename, edit the matching key in `wedding.config.ts`.
+
+## Section toggles + theme
+- `wedding.config.ts` → `sections: { wishes, faq }` toggles the Wishes wall and Q&A accordion.
+  **Currently both `false` (hidden)** per request; set to `true` to show. Wired via `@if` in
+  `invite.component.html`.
+- Visual theme (red-traditional VN) lives in `src/styles.scss` (CSS vars from `theme` colors,
+  Playfair Display + Be Vietnam Pro via Google Fonts @import, invitation-card layout, hero with 囍).
+  `InviteComponent` renders the hero (names/date/cover) above the feature cards.
 
 ## Conventions
 - TDD: failing test → run → implement → pass → commit. Small, focused commits.
