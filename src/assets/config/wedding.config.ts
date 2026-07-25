@@ -33,4 +33,6 @@ export const WEDDING: WeddingConfig = {
   supabase: { url: 'https://bmhwpctxxfpculhigham.supabase.co',
               anonKey: 'sb_publishable_-O11WC89Xynpmtj6BiFseQ_iubAJjFy' },
   media: { coverImg: 'assets/img/cover.jpg', couplePhotos: ['assets/img/couple-1.jpg'] },
+  // Bật/tắt từng phần. Tạm ẩn Q&A + Lời chúc (đổi thành true để hiện lại).
+  sections: { wishes: false, faq: false },
 };

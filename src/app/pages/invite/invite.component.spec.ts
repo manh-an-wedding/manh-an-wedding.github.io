@@ -35,4 +35,10 @@ describe('InviteComponent', () => {
     const c = TestBed.createComponent(InviteComponent).componentInstance;
     expect(c.musicOn).toBe(false);
   });
+
+  it('exposes section toggles (wishes + faq hidden by default)', () => {
+    const c = TestBed.createComponent(InviteComponent).componentInstance;
+    expect(c.cfg.sections.wishes).toBe(false);
+    expect(c.cfg.sections.faq).toBe(false);
+  });
 });

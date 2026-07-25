@@ -11,4 +11,5 @@ export interface WeddingConfig {
   theme: { primary: string; accent: string; fontHeading: string; fontBody: string; music: string };
   supabase: { url: string; anonKey: string };
   media: { coverImg: string; couplePhotos: string[] };
+  sections: { wishes: boolean; faq: boolean };
 }

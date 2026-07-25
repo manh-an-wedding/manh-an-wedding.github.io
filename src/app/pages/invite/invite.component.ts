@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, ElementRef, Inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LanguageToggleComponent } from '../../components/language-toggle/language-toggle.component';
 import { RsvpFormComponent } from '../../components/rsvp-form/rsvp-form.component';
@@ -7,6 +7,8 @@ import { FaqComponent } from '../../components/faq/faq.component';
 import { MapCalendarComponent } from '../../components/map-calendar/map-calendar.component';
 import { VisitService } from '../../core/visit.service';
 import { DeviceIdService } from '../../core/device-id.service';
+import { WEDDING_CONFIG } from '../../core/wedding-config.token';
+import { WeddingConfig } from '../../core/wedding-config';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -23,6 +25,8 @@ export class InviteComponent implements OnInit {
   @ViewChild('audio') audio?: ElementRef<HTMLAudioElement>;
   lang: 'vi' | 'en' = 'vi';
   musicOn = false;
+
+  constructor(@Inject(WEDDING_CONFIG) public cfg: WeddingConfig) {}
 
   async ngOnInit() {
     // Option C: lang comes from route data ({ lang: 'vi' } at '/', { lang: 'en' } at '/en')
