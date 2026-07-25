@@ -58,11 +58,9 @@ manh-an-wedding.github.io/en     → Tiếng Anh
 
 ## 4. Cấu trúc trang
 
-**Trang 1 — Bìa "nhấn để mở thiệp"**
-- Tên cô dâu chú rể, họa tiết, nút **"Mở thiệp"**.
-- Cú bấm "Mở thiệp" = tương tác đầu tiên → **bật nhạc nền** hợp lệ (lách autoplay).
+**Không có trang bìa** — khách vào là thấy thẳng nội dung thiệp. Nhạc nền bật bằng **nút nhạc nổi 🔊/🔇** (vì bỏ cú bấm "Mở thiệp" nên trình duyệt chặn autoplay — khách tự bật).
 
-**Trang 2 — Nội dung (auto-scroll), thứ tự từ trên xuống:**
+**Trang nội dung (auto-scroll), thứ tự từ trên xuống:**
 1. Hình cưới, thông tin nhà trai / nhà gái.
 2. Thông tin mời tiệc + **agenda**.
 3. Google Map (embed) + nút Chỉ đường + **Thêm vào lịch** (Google + `.ics`).
@@ -203,7 +201,7 @@ Vợ chồng / gia đình mời chung = **1 dòng** (tên đại diện); tên n
 ## 10. Song ngữ, nhạc, map, lịch
 
 - **VI/EN:** mặc định VI ở **URL gốc** (không prefix); tiếng Anh ở **`/en`** (gửi cho khách nước ngoài); nút 🌐 đổi runtime; (tùy chọn) tự nhận diện ngôn ngữ trình duyệt.
-- **Nhạc:** file trong assets/Supabase Storage; bật sau cú bấm "Mở thiệp".
+- **Nhạc:** file trong assets; bật bằng nút nhạc nổi 🔊/🔇 (không autoplay vì đã bỏ trang bìa).
 - **Map:** embed Google Maps (không cần API key) + nút Chỉ đường.
 - **Lịch:** nút Thêm vào Google Calendar + file `.ics` (Apple).
 - **Chia sẻ link (Open Graph):** set thẻ OG (ảnh cưới + tên cô dâu chú rể + tiêu đề) để khi gửi qua Zalo/Messenger/Facebook hiện thẻ preview đẹp. Vì bot preview không chạy JS, cần **prerender** thẻ OG vào HTML tĩnh (Angular prerender/SSG). Lưu ý: chính các bot này tạo lượt xem "ma" trong `page_visits` (mục 7).
