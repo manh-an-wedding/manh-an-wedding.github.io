@@ -6,7 +6,10 @@
 
 **Architecture:** Angular standalone-component SPA. All wedding content + theme + i18n strings live in one typed config object (not the DB), so the app is reusable for other weddings later. Guest data (RSVP, companions, wishes, page visits) is written directly to Supabase from the browser, protected by Row Level Security; the real client IP is captured by a Supabase Edge Function. Identity is by typed name (append-only, latest-row-wins), with a `localStorage` `device_id` distinguishing "same person editing" from a genuine name clash. Deployed as static files to GitHub Pages via GitHub Actions, with a `404.html` SPA fallback so deep links (`/vi`, `/en`) resolve.
 
-**Tech Stack:** Angular (standalone components, Angular Router, `@ngx-translate` for runtime i18n), `@supabase/supabase-js`, Supabase (PostgreSQL + RLS + Edge Functions/Deno), Karma/Jasmine (Angular default unit tests), GitHub Actions, GitHub Pages.
+**Tech Stack:** Angular **22** (standalone components, Angular Router, `@ngx-translate/core` **v18** for runtime i18n), `@supabase/supabase-js`, Supabase (PostgreSQL + RLS + Edge Functions/Deno), **vitest + jsdom** (Angular 22's `@angular/build:unit-test` builder — NOT Karma/ChromeHeadless), GitHub Actions, GitHub Pages.
+
+> **Test runner note (discovered in Task 0):** run unit tests with `npm test -- --watch=false` (no `--browsers` flag; vitest runs headless via jsdom). Jasmine-style `describe/it/expect` + `TestBed` from `@angular/core/testing` work under this builder.
+> **ngx-translate v18 note:** v18's API differs from older majors. The Task 7 implementer must adapt the illustrative i18n setup code to the installed v18 API (check the package's actual exports — e.g. `provideTranslateService` / `provideTranslateHttpLoader`).
 
 ---
 
@@ -88,7 +91,7 @@ Expected: installs with no peer-dependency errors.
 
 - [ ] **Step 4: Run the default unit tests once (baseline)**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: the default `app.component.spec.ts` passes (or is removed). Fix Chrome headless config if needed before proceeding.
 
 - [ ] **Step 5: Commit**
@@ -130,7 +133,7 @@ describe('wedding config (fake data)', () => {
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: FAIL — cannot find module `wedding.config`.
 
 - [ ] **Step 3: Define the config type**
@@ -210,7 +213,7 @@ export const WEDDING_CONFIG = new InjectionToken<WeddingConfig>('WEDDING_CONFIG'
 
 - [ ] **Step 6: Run to verify it passes**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: PASS.
 
 - [ ] **Step 7: Commit**
@@ -246,7 +249,7 @@ describe('nameNorm', () => {
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: FAIL — `name-normalize` not found.
 
 - [ ] **Step 3: Implement**
@@ -266,7 +269,7 @@ export function nameNorm(input: string): string {
 
 - [ ] **Step 4: Run to verify it passes**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -303,7 +306,7 @@ describe('DeviceIdService', () => {
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: FAIL — service not found.
 
 - [ ] **Step 3: Implement**
@@ -329,7 +332,7 @@ export class DeviceIdService {
 
 - [ ] **Step 4: Run to verify it passes**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -650,7 +653,7 @@ describe('RsvpService', () => {
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: FAIL — `rsvp.service` not found.
 
 - [ ] **Step 3: Implement the client + service**
@@ -770,7 +773,7 @@ export class VisitService {
 
 - [ ] **Step 4: Run to verify it passes**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: PASS (all 3 RsvpService tests).
 
 - [ ] **Step 5: Commit**
@@ -810,7 +813,7 @@ describe('routes (Option C)', () => {
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: FAIL — routes shape doesn't match.
 
 - [ ] **Step 3: Define routes**
@@ -924,7 +927,7 @@ export class AppComponent {}
 
 - [ ] **Step 7: Run to verify tests pass + app builds**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless` then `npm run build`
+Run: `npm test -- --watch=false` then `npm run build`
 Expected: routes test PASSES; production build succeeds.
 
 - [ ] **Step 8: Commit**
@@ -967,7 +970,7 @@ describe('LanguageToggleComponent (Option C)', () => {
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: FAIL — component not found.
 
 - [ ] **Step 3: Implement**
@@ -992,7 +995,7 @@ export class LanguageToggleComponent {
 
 - [ ] **Step 4: Run to verify it passes**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -1031,7 +1034,7 @@ describe('CoverComponent', () => {
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: FAIL — component not found.
 
 - [ ] **Step 3: Implement**
@@ -1061,7 +1064,7 @@ export class CoverComponent {
 
 - [ ] **Step 4: Run to verify it passes**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -1101,7 +1104,7 @@ describe('CompanionsEditorComponent', () => {
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: FAIL — component not found.
 
 - [ ] **Step 3: Implement**
@@ -1137,7 +1140,7 @@ export class CompanionsEditorComponent {
 
 - [ ] **Step 4: Run to verify it passes**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -1220,7 +1223,7 @@ describe('RsvpFormComponent', () => {
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: FAIL — component not found.
 
 - [ ] **Step 3: Implement**
@@ -1349,7 +1352,7 @@ export class RsvpFormComponent {
 
 - [ ] **Step 4: Run to verify it passes**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: PASS (all 4 tests).
 
 - [ ] **Step 5: Commit**
@@ -1410,7 +1413,7 @@ describe('WishesComponent', () => {
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: FAIL — component not found.
 
 - [ ] **Step 3: Implement**
@@ -1456,7 +1459,7 @@ export class WishesComponent implements OnInit {
 
 - [ ] **Step 4: Run to verify it passes**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -1498,7 +1501,7 @@ describe('FaqComponent', () => {
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: FAIL — component not found.
 
 - [ ] **Step 3: Implement**
@@ -1545,7 +1548,7 @@ export class FaqComponent {
 
 - [ ] **Step 4: Run to verify it passes**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -1586,7 +1589,7 @@ describe('MapCalendarComponent', () => {
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: FAIL — component not found.
 
 - [ ] **Step 3: Implement**
@@ -1639,7 +1642,7 @@ export class MapCalendarComponent {
 
 - [ ] **Step 4: Run to verify it passes**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -1699,7 +1702,7 @@ describe('InviteComponent', () => {
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: FAIL — component not found.
 
 - [ ] **Step 3: Implement the page**
@@ -1766,7 +1769,7 @@ export class InviteComponent implements OnInit {
 
 - [ ] **Step 4: Run to verify it passes**
 
-Run: `npm test -- --watch=false --browsers=ChromeHeadless`
+Run: `npm test -- --watch=false`
 Expected: PASS. Then `npm run build` — production build succeeds.
 
 - [ ] **Step 5: Commit**
