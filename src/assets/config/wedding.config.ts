@@ -30,6 +30,7 @@ export const WEDDING: WeddingConfig = {
   ],
   theme: { primary: '#9E1B1B', accent: '#C9A24B', fontHeading: 'serif', fontBody: 'sans-serif',
            music: 'assets/audio/bg-music.mp3' },
-  supabase: { url: 'https://REPLACE.supabase.co', anonKey: 'REPLACE_ANON_KEY' },
+  supabase: { url: 'https://bmhwpctxxfpculhigham.supabase.co',
+              anonKey: 'sb_publishable_-O11WC89Xynpmtj6BiFseQ_iubAJjFy' },
   media: { coverImg: 'assets/img/cover.jpg', couplePhotos: ['assets/img/couple-1.jpg'] },
 };
