@@ -3,8 +3,6 @@ import {
   OnInit,
   OnDestroy,
   inject,
-  ViewChild,
-  ElementRef,
   Inject,
   HostListener,
 } from '@angular/core';
@@ -22,6 +20,7 @@ import { WeddingConfig } from '../../core/wedding-config';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RevealOnScrollDirective } from '../../directives/reveal-on-scroll.directive';
 import { HappinessRainComponent } from '../../components/happiness-rain/happiness-rain.component';
+import { MusicService } from '../../core/music.service';
 
 @Component({
   selector: 'app-invite', standalone: true,
@@ -36,11 +35,13 @@ export class InviteComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private translate = inject(TranslateService);
   private document = inject(DOCUMENT);
+  private music = inject(MusicService);
   private slideshowTimer?: ReturnType<typeof setInterval>;
+  private autoScrollFrame?: number;
+  private lastAutoScrollTime = 0;
   private touchStartX: number | null = null;
-  @ViewChild('audio') audio?: ElementRef<HTMLAudioElement>;
+  readonly musicOn = this.music.playing;
   lang: 'vi' | 'en' = 'vi';
-  musicOn = false;
   coverOk = true;
   failedPhotoIndexes = new Set<number>();
   activeSlide = 0;
@@ -53,23 +54,31 @@ export class InviteComponent implements OnInit, OnDestroy {
     this.lang = this.route.snapshot.data['lang'] === 'en' ? 'en' : 'vi';
     this.translate.use(this.lang);
     this.startSlideshow();
+    if (this.music.playing() && this.music.autoScrollEnabled()) {
+      this.startAutoScroll();
+    }
     await this.visit.log(this.device.get());
   }
 
   ngOnDestroy() {
     this.stopSlideshow();
+    this.stopAutoScrollAnimation();
     this.document.body.classList.remove('album-lightbox-open');
   }
 
-  toggleMusic() {
-    const el = this.audio?.nativeElement;
-    if (!el) return;
-    if (el.paused) {
-      el.play().then(() => (this.musicOn = true)).catch(() => (this.musicOn = false));
+  async toggleMusic() {
+    if (await this.music.toggle()) {
+      this.startAutoScroll();
     } else {
-      el.pause();
-      this.musicOn = false;
+      this.stopAutoScrollAnimation();
     }
+  }
+
+  @HostListener('window:wheel')
+  @HostListener('window:touchmove')
+  stopAutoScrollFromUser() {
+    this.music.stopAutoScroll();
+    this.stopAutoScrollAnimation();
   }
 
   photoFailed(index: number) {
@@ -132,6 +141,9 @@ export class InviteComponent implements OnInit, OnDestroy {
 
   @HostListener('document:keydown', ['$event'])
   handleLightboxKeyboard(event: KeyboardEvent) {
+    if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(event.key)) {
+      this.stopAutoScrollFromUser();
+    }
     if (!this.lightboxOpen) return;
 
     if (event.key === 'Escape') {
@@ -172,5 +184,40 @@ export class InviteComponent implements OnInit, OnDestroy {
       clearInterval(this.slideshowTimer);
       this.slideshowTimer = undefined;
     }
+  }
+
+  private startAutoScroll() {
+    const view = this.document.defaultView;
+    if (!view || this.autoScrollFrame !== undefined || !this.music.autoScrollEnabled()) return;
+
+    this.lastAutoScrollTime = view.performance.now();
+    const scrollStep = (timestamp: number) => {
+      if (!this.music.playing() || !this.music.autoScrollEnabled()) {
+        this.autoScrollFrame = undefined;
+        return;
+      }
+
+      const maxScroll = Math.max(0, this.document.documentElement.scrollHeight - view.innerHeight);
+      if (view.scrollY >= maxScroll - 1) {
+        this.music.stopAutoScroll();
+        this.autoScrollFrame = undefined;
+        return;
+      }
+
+      const elapsed = Math.min(timestamp - this.lastAutoScrollTime, 50);
+      this.lastAutoScrollTime = timestamp;
+      view.scrollBy(0, elapsed * 0.016);
+      this.autoScrollFrame = view.requestAnimationFrame(scrollStep);
+    };
+
+    this.autoScrollFrame = view.requestAnimationFrame(scrollStep);
+  }
+
+  private stopAutoScrollAnimation() {
+    const view = this.document.defaultView;
+    if (view && this.autoScrollFrame !== undefined) {
+      view.cancelAnimationFrame(this.autoScrollFrame);
+    }
+    this.autoScrollFrame = undefined;
   }
 }

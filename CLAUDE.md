@@ -41,7 +41,7 @@ one typed object) so it can be reused for other weddings later.
 - The key in `wedding.config.ts` is the **publishable (anon) key** — public by design, safe to commit.
   **NEVER commit the service_role/secret key.**
 - Schema/RLS/views: `supabase/migrations/0001_init.sql` (already applied to the project).
-  Verify script: `supabase/migrations/0001_init.verify.sql`.
+  Verify script: `supabase/tests/0001_init.verify.sql`.
 - **RLS verified live:** anon SELECT on `rsvp`/`companions`/`rsvp_latest` = permission denied;
   anon reads only `guests_public` (names) and `wishes_public` (public wishes, no ip/device);
   anon INSERT on `rsvp`/`wishes` = OK; anon INSERT on `page_visits` = denied (edge-fn only).

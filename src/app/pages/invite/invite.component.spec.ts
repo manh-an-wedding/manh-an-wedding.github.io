@@ -3,6 +3,7 @@ import { provideRouter } from '@angular/router';
 import { InviteComponent } from './invite.component';
 import { VisitService } from '../../core/visit.service';
 import { DeviceIdService } from '../../core/device-id.service';
+import { MusicService } from '../../core/music.service';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 
 class VisitStub { count = 0; log = async () => { this.count++; }; }
@@ -76,7 +77,7 @@ describe('InviteComponent', () => {
 
   it('music starts off (no cover click to auto-start)', () => {
     const c = TestBed.createComponent(InviteComponent).componentInstance;
-    expect(c.musicOn).toBe(false);
+    expect(c.musicOn()).toBe(false);
   });
 
   it('exposes section toggles (wishes + faq hidden by default)', () => {
@@ -99,9 +100,14 @@ describe('InviteComponent', () => {
     expect(coverText).toContain('11:00');
     expect(coverText).toContain('17/10/2026');
     expect(coverText).toContain('Vạn Phát Riverside');
+    expect(Array.from(element.querySelectorAll('.save-the-day span'))
+      .map(line => line.textContent?.trim()))
+      .toEqual(['Save', 'The', 'Day']);
     expect(element.querySelector('.hero')).toBeNull();
-    expect(element.querySelector('audio')?.getAttribute('src'))
-      .toBe(fixture.componentInstance.cfg.theme.music);
+    const music = TestBed.inject(MusicService);
+    expect(element.querySelector('audio')).toBeNull();
+    expect(music.source).toContain(fixture.componentInstance.cfg.theme.music);
+    expect(music.volume).toBe(0.5);
   });
 
   it('renders the formal family, ceremony, and reception invitation details', async () => {

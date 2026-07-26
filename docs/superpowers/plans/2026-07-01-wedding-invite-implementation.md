@@ -348,7 +348,7 @@ git commit -m "feat: persistent localStorage device_id service"
 
 **Files:**
 - Create: `supabase/migrations/0001_init.sql`
-- Test: `supabase/migrations/0001_init.verify.sql` (assertions run via `psql`/Supabase SQL editor)
+- Test: `supabase/tests/0001_init.verify.sql` (assertions run via `psql`/Supabase SQL editor)
 
 > This task defines the DB. Verification is by running the SQL against a Supabase project (or local `supabase start`) and checking the assert queries return expected rows. No Angular test here.
 
@@ -473,7 +473,7 @@ grant select on guests_public, wishes_public to anon;
 - [ ] **Step 2: Write verification assertions**
 
 ```sql
--- supabase/migrations/0001_init.verify.sql
+-- supabase/tests/0001_init.verify.sql
 -- Run after 0001_init.sql. Each SELECT should return the noted result.
 -- same person, same (null) device, changes mind → latest wins, collapses to 1:
 insert into rsvp (guest_name,name_norm,category,status) values ('A','a','IAS','bus');
@@ -505,7 +505,7 @@ select companion_seats as should_be_0 from bus_seat_count;
 
 Run in the Supabase project SQL editor (or `supabase db reset` locally):
 1. Execute `0001_init.sql`.
-2. Execute `0001_init.verify.sql`.
+2. Execute `supabase/tests/0001_init.verify.sql`.
 Expected: `should_be_1 = 1`, `should_be_cannot_attend = cannot_attend`, `should_be_2 = 2` (two devices kept), `still_2 = 2`, `dev1_should_be_cannot = cannot_attend`, `should_be_2b = 2`, wishes `should_be_1 = 1`, and `should_be_0 = 0` (companion on the superseded bus row is NOT counted). Then delete the test rows.
 
 - [ ] **Step 4: Verify RLS blocks anon reads (negative test — risk #1)**

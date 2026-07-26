@@ -31,6 +31,14 @@ describe('MapCalendarComponent', () => {
     expect(directions.querySelector('.directions-icon')).not.toBeNull();
   });
 
+  it('shows the matching icon on each calendar action', async () => {
+    const fixture = await createComponent();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.google-calendar-icon')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.apple-calendar-icon')).not.toBeNull();
+  });
+
   it('offers 11:00–13:30 calendar entries without an embedded map', async () => {
     const fixture = await createComponent();
     const c = fixture.componentInstance;

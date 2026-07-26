@@ -12,6 +12,13 @@ const cors = {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { ...cors, 'content-type': 'application/json' },
+    });
+  }
+
   const admin = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
@@ -19,7 +26,15 @@ Deno.serve(async (req) => {
   const ip = (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || null;
   let device_id: string | null = null;
   try { device_id = (await req.json())?.device_id ?? null; } catch { /* no body */ }
-  await admin.from('page_visits').insert({ ip, device_id });
+  const { error } = await admin.from('page_visits').insert({ ip, device_id });
+  if (error) {
+    console.error('page_visits insert failed', error);
+    return new Response(JSON.stringify({ error: 'Unable to log visit' }), {
+      status: 500,
+      headers: { ...cors, 'content-type': 'application/json' },
+    });
+  }
+
   return new Response(JSON.stringify({ ok: true }), {
     headers: { ...cors, 'content-type': 'application/json' },
   });

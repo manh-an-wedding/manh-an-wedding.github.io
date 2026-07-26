@@ -5,10 +5,15 @@ import { WEDDING } from '../../assets/config/wedding.config';
 export class VisitService {
   async log(deviceId: string): Promise<void> {
     try {
-      await fetch(`${WEDDING.supabase.url}/functions/v1/log-visit`, {
+      const response = await fetch(`${WEDDING.supabase.url}/functions/v1/log-visit`, {
         method: 'POST', headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ device_id: deviceId }),
       });
-    } catch { /* visit logging is best-effort */ }
+      if (!response.ok) {
+        console.warn(`Visit logging failed: ${response.status} ${response.statusText}`);
+      }
+    } catch (error) {
+      console.warn('Visit logging failed:', error);
+    }
   }
 }

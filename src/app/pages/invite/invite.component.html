@@ -1,10 +1,25 @@
 <app-language-toggle [current]="lang"></app-language-toggle>
 <app-happiness-rain></app-happiness-rain>
-<audio #audio [src]="cfg.theme.music" loop></audio>
 <button class="music-btn" type="button" (click)="toggleMusic()"
-        [attr.aria-label]="musicOn
+        [class.is-playing]="musicOn()"
+        [attr.aria-pressed]="musicOn()"
+        [attr.aria-label]="musicOn()
           ? ('controls.pause_music' | translate)
-          : ('controls.play_music' | translate)">{{ musicOn ? '🔊' : '🔇' }}</button>
+          : ('controls.play_music' | translate)">
+  @if (musicOn()) {
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M11 5 6.8 8.5H3.5v7h3.3L11 19V5Z" />
+      <path d="M15 8.5a5 5 0 0 1 0 7" />
+      <path d="M17.8 6a8.5 8.5 0 0 1 0 12" />
+    </svg>
+  } @else {
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M11 5 6.8 8.5H3.5v7h3.3L11 19V5Z" />
+      <path d="m15.2 9.2 5.6 5.6" />
+      <path d="m20.8 9.2-5.6 5.6" />
+    </svg>
+  }
+</button>
 
 <header class="cover-hero">
   @if (coverOk) {
@@ -13,6 +28,11 @@
   }
   <div class="cover-shade" aria-hidden="true"></div>
   <div class="cover-overlay">
+    <p class="save-the-day" aria-label="Save The Day">
+      <span>Save</span>
+      <span>The</span>
+      <span>Day</span>
+    </p>
     <div class="cover-details">
       <h1 class="cover-couple">
         <span class="cover-name">{{ cfg.couple.groom }}</span>
