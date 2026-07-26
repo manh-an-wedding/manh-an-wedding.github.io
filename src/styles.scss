@@ -15,6 +15,7 @@
   --font-head: 'Playfair Display', Georgia, serif;
   --font-body: 'Be Vietnam Pro', system-ui, sans-serif;
   --maxw: 640px;
+  --music-control-size: 38px;
   --radius: 14px;
   --shadow: 0 6px 24px rgba(122, 20, 20, 0.10);
 }
@@ -44,6 +45,7 @@ main.invite {
 
 /* ---- photo cover ---- */
 .cover-hero {
+  --cover-inline-padding: clamp(1rem, 5vw, 2.2rem);
   max-width: var(--maxw);
   margin: 0 auto;
   position: relative;
@@ -72,7 +74,7 @@ main.invite {
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
-  padding: clamp(1.4rem, 6vw, 3rem) clamp(1rem, 5vw, 2.2rem) clamp(1.3rem, 5vw, 2.4rem);
+  padding: clamp(1.4rem, 6vw, 3rem) var(--cover-inline-padding) clamp(1.3rem, 5vw, 2.4rem);
   color: #fff8eb;
   text-align: right;
 }
@@ -80,11 +82,12 @@ main.invite {
   max-width: 100%;
   text-align: right;
   text-shadow: 0 2px 14px rgba(0, 0, 0, .72);
+  animation: cover-copy-fade-in 1.2s cubic-bezier(.22, .61, .36, 1) .12s both;
 }
 .save-the-day {
   position: absolute;
-  top: clamp(1.15rem, 4vw, 1.8rem);
-  left: 4.4rem;
+  top: calc(var(--music-control-size) + 1.5rem);
+  left: var(--cover-inline-padding);
   margin: 0;
   color: #fff8eb;
   display: grid;
@@ -96,9 +99,20 @@ main.invite {
   line-height: 1;
   text-align: left;
   text-shadow: 0 2px 14px rgba(0, 0, 0, .72);
+  animation: cover-copy-fade-in 1.2s cubic-bezier(.22, .61, .36, 1) both;
 }
 .save-the-day span {
   display: block;
+}
+@keyframes cover-copy-fade-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 .cover-couple {
   margin: 0 0 .55rem;
@@ -387,8 +401,13 @@ main.invite h2 { text-align: center; font-size: 1.5rem; margin: 0 0 1.1rem; }
   display: flex;
   width: 100%;
   height: 100%;
-  transition: transform .65s cubic-bezier(.22, .61, .36, 1);
   will-change: transform;
+}
+.album-track {
+  transition: transform 2s cubic-bezier(.22, .61, .36, 1);
+}
+.lightbox-track {
+  transition: transform .65s cubic-bezier(.22, .61, .36, 1);
 }
 .album-slide {
   flex: 0 0 100%;
@@ -530,8 +549,8 @@ body.album-lightbox-open { overflow: hidden; }
   opacity: 0;
   transform: translate3d(0, 1.6rem, 0);
   transition:
-    opacity .75s ease,
-    transform .8s cubic-bezier(.22, .61, .36, 1);
+    opacity 1.2s ease,
+    transform 1.2s cubic-bezier(.22, .61, .36, 1);
   will-change: opacity, transform;
 }
 .scroll-reveal.is-visible {
@@ -619,6 +638,10 @@ body.album-lightbox-open { overflow: hidden; }
     opacity: 1;
     transform: none;
     transition: none;
+  }
+  .save-the-day,
+  .cover-details {
+    animation: none;
   }
   .happiness-rain { display: none; }
 }
@@ -883,8 +906,8 @@ app-companions-editor > button { background: transparent; color: var(--red); bor
   left: .7rem;
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
+  width: var(--music-control-size);
+  height: var(--music-control-size);
   padding: 0;
   color: #fff8eb;
   background: rgba(122, 20, 20, .92);
@@ -895,25 +918,44 @@ app-companions-editor > button { background: transparent; color: var(--red); bor
   cursor: pointer;
 }
 .music-btn svg {
-  width: 21px;
-  height: 21px;
+  width: 22px;
+  height: 22px;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
+  transform-origin: center;
+}
+.music-btn .music-disc-label {
+  fill: currentColor;
+  stroke: none;
+  opacity: .78;
+}
+.music-btn .music-disc-hole {
+  fill: var(--red-dark);
+  stroke: none;
 }
 .music-btn.is-playing {
   color: #f4d994;
+}
+.music-btn.is-playing .music-disc {
+  animation: music-disc-spin 3.2s linear infinite;
+}
+@keyframes music-disc-spin {
+  to { transform: rotate(1turn); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .music-btn.is-playing .music-disc {
+    animation: none;
+  }
 }
 
 @media (min-width: 700px) {
   .cover-hero {
     margin-top: 1.5rem;
     border: 1px solid rgba(201, 162, 75, .55);
-  }
-  .save-the-day {
-    left: clamp(1.2rem, 4vw, 2rem);
   }
 }
 

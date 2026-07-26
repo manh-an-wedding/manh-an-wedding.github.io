@@ -1,7 +1,7 @@
 {
   "cover": { "open": "Mở thiệp" },
   "controls": { "play_music": "Phát nhạc", "pause_music": "Tạm dừng nhạc" },
-  "map": { "directions": "Chỉ đường", "gcal": "Thêm vào Google Calendar", "ics": "Thêm vào lịch (Apple)" },
+  "map": { "directions": "Chỉ đường", "gcal": "Thêm vào Google Calendar", "ics": "Thêm vào lịch Apple" },
   "invite": { "invite_you": "Trân trọng kính mời", "confirm": "Xác nhận tham dự", "agenda": "Chương trình" },
   "details": {
     "cover_invitation": "Thư mời",

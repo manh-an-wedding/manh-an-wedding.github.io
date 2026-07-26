@@ -6,19 +6,13 @@
         [attr.aria-label]="musicOn()
           ? ('controls.pause_music' | translate)
           : ('controls.play_music' | translate)">
-  @if (musicOn()) {
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M11 5 6.8 8.5H3.5v7h3.3L11 19V5Z" />
-      <path d="M15 8.5a5 5 0 0 1 0 7" />
-      <path d="M17.8 6a8.5 8.5 0 0 1 0 12" />
-    </svg>
-  } @else {
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M11 5 6.8 8.5H3.5v7h3.3L11 19V5Z" />
-      <path d="m15.2 9.2 5.6 5.6" />
-      <path d="m20.8 9.2-5.6 5.6" />
-    </svg>
-  }
+  <svg class="music-disc" viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="12" cy="12" r="8.5" />
+    <circle cx="12" cy="12" r="5.5" />
+    <circle class="music-disc-label" cx="12" cy="12" r="2.2" />
+    <circle class="music-disc-hole" cx="12" cy="12" r=".65" />
+    <path d="M8.2 6.3a7 7 0 0 1 2.3-.9" />
+  </svg>
 </button>
 
 <header class="cover-hero">

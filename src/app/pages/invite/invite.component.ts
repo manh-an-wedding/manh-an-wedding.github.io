@@ -39,6 +39,7 @@ export class InviteComponent implements OnInit, OnDestroy {
   private slideshowTimer?: ReturnType<typeof setInterval>;
   private autoScrollFrame?: number;
   private lastAutoScrollTime = 0;
+  private autoplayWaitingForGesture = false;
   private touchStartX: number | null = null;
   readonly musicOn = this.music.playing;
   lang: 'vi' | 'en' = 'vi';
@@ -54,8 +55,16 @@ export class InviteComponent implements OnInit, OnDestroy {
     this.lang = this.route.snapshot.data['lang'] === 'en' ? 'en' : 'vi';
     this.translate.use(this.lang);
     this.startSlideshow();
-    if (this.music.playing() && this.music.autoScrollEnabled()) {
-      this.startAutoScroll();
+    if (this.music.playing()) {
+      if (this.music.autoScrollEnabled()) {
+        this.startAutoScroll();
+      }
+    } else if (this.music.shouldAutoplay) {
+      const started = await this.music.tryAutoplay();
+      this.autoplayWaitingForGesture = !started;
+      if (started) {
+        this.startAutoScroll();
+      }
     }
     await this.visit.log(this.device.get());
   }
@@ -67,11 +76,18 @@ export class InviteComponent implements OnInit, OnDestroy {
   }
 
   async toggleMusic() {
-    if (await this.music.toggle()) {
+    const started = await this.music.toggle();
+    this.autoplayWaitingForGesture = !started && this.music.shouldAutoplay;
+    if (started) {
       this.startAutoScroll();
     } else {
       this.stopAutoScrollAnimation();
     }
+  }
+
+  @HostListener('document:pointerdown', ['$event'])
+  resumeAutoplayOnFirstGesture(event: PointerEvent) {
+    void this.resumeAutoplayAfterGesture(event.target);
   }
 
   @HostListener('window:wheel')
@@ -141,6 +157,7 @@ export class InviteComponent implements OnInit, OnDestroy {
 
   @HostListener('document:keydown', ['$event'])
   handleLightboxKeyboard(event: KeyboardEvent) {
+    void this.resumeAutoplayAfterGesture(event.target);
     if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(event.key)) {
       this.stopAutoScrollFromUser();
     }
@@ -219,5 +236,17 @@ export class InviteComponent implements OnInit, OnDestroy {
       view.cancelAnimationFrame(this.autoScrollFrame);
     }
     this.autoScrollFrame = undefined;
+  }
+
+  private async resumeAutoplayAfterGesture(target: EventTarget | null) {
+    if (!this.autoplayWaitingForGesture || this.music.playing()) return;
+    if (target instanceof Element && target.closest('.music-btn')) return;
+
+    this.autoplayWaitingForGesture = false;
+    const started = await this.music.tryAutoplay();
+    this.autoplayWaitingForGesture = !started && this.music.shouldAutoplay;
+    if (started) {
+      this.startAutoScroll();
+    }
   }
 }
