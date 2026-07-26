@@ -1,10 +1,75 @@
+<ng-template #busInformation>
+  <div class="bus-info">
+    <section class="bus-leg">
+      <h3>{{ 'rsvp.bus_outbound_title' | translate }}</h3>
+      <p><strong>{{ 'rsvp.departure_label' | translate }}:</strong>
+        {{ 'rsvp.bus_outbound_departure' | translate }}</p>
+      <p><strong>{{ 'rsvp.location_label' | translate }}:</strong>
+        <a [href]="busPickupMapUrl" target="_blank" rel="noopener">
+          <span aria-hidden="true">&#128205;</span>
+          {{ 'rsvp.bus_outbound_location' | translate }}
+        </a>
+      </p>
+      <p><strong>{{ 'rsvp.bus_restaurant_arrival' | translate }}:</strong>
+        {{ cfg.rsvp.bus.restaurantArrivalTime }}</p>
+    </section>
+    <section class="bus-leg">
+      <h3>{{ 'rsvp.bus_return_title' | translate }}</h3>
+      <p><strong>{{ 'rsvp.departure_label' | translate }}:</strong>
+        {{ 'rsvp.bus_return_departure_time' | translate }}</p>
+      <p><strong>{{ 'rsvp.location_label' | translate }}:</strong>
+        {{ 'rsvp.bus_return_location' | translate }}</p>
+      <p><strong>{{ 'rsvp.bus_hotel_arrival' | translate }}:</strong>
+        {{ cfg.rsvp.bus.hotelArrivalTime }}</p>
+    </section>
+    <p class="bus-registration-deadline">
+      <em>
+        {{ 'rsvp.bus_deadline_prefix' | translate }}
+        <strong>{{ 'rsvp.bus_deadline_detail' | translate }}</strong>.
+      </em>
+    </p>
+  </div>
+</ng-template>
+
 @if (done) {
-  <p class="thanks">{{ 'rsvp.thanks' | translate }}</p>
-} @else {
-  <form (ngSubmit)="trySubmit()">
+  <section class="thanks rsvp-confirmation" aria-live="polite">
+    <h2>{{ 'rsvp.confirmation_thanks' | translate:{ name: model.guestName } }}</h2>
+    @if (model.status === 'bus' || model.status === 'self_transport') {
+      <div class="rsvp-confirmation-details">
+        <p class="rsvp-confirmation-summary">
+          {{ (model.status === 'bus'
+            ? 'rsvp.confirmation_bus'
+            : 'rsvp.confirmation_self_transport') | translate:{ count: formattedBusPartySize } }}
+        </p>
+        <ul class="rsvp-confirmation-guests">
+          <li>
+            <span class="rsvp-confirmation-check" aria-hidden="true">✓</span>
+            <strong class="rsvp-confirmation-name">{{ model.guestName }} ({{ model.category }})</strong>
+          </li>
+          @for (companion of companions; track $index) {
+            <li>
+              <span class="rsvp-confirmation-check" aria-hidden="true">✓</span>
+              <strong class="rsvp-confirmation-name">{{ companion.name }}</strong>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+    @if (model.status === 'bus') {
+      <ng-container [ngTemplateOutlet]="busInformation"></ng-container>
+    }
+    <button type="button" class="rsvp-edit-response" (click)="editResponse()">
+      {{ 'rsvp.edit_response' | translate }}
+    </button>
+  </section>
+}
+
+<form (ngSubmit)="trySubmit()" [attr.aria-busy]="submitting" [hidden]="done">
+    <h2 class="rsvp-title">{{ 'invite.confirm' | translate }}</h2>
+
     @if (deadlinePassed) { <p class="warn">{{ 'rsvp.deadline_passed' | translate }}</p> }
 
-    <label>{{ 'rsvp.your_name' | translate }}
+    <label class="rsvp-name-label">{{ 'rsvp.your_name' | translate }}
       <input name="name" [(ngModel)]="model.guestName" (ngModelChange)="onNameInput()"
              list="guest-suggest" autocomplete="off" required>
       <datalist id="guest-suggest">
@@ -12,42 +77,46 @@
       </datalist>
     </label>
 
-    <label>{{ 'rsvp.group' | translate }}
-      <select name="group" [(ngModel)]="model.category" required>
+    <label class="rsvp-group-label">{{ 'rsvp.group' | translate }}
+      <select class="rsvp-group-select" name="group" [(ngModel)]="model.category" required>
         <option value="" disabled selected></option>
         @for (g of cfg.rsvp.groups; track g) { <option [value]="g">{{ g }}</option> }
       </select>
     </label>
 
-    <app-companions-editor (changed)="companions = $event"></app-companions-editor>
+    <app-companions-editor
+      [maxCompanions]="maxPartySize - 1"
+      (changed)="companions = $event">
+    </app-companions-editor>
 
+    @if (hasFullTable) {
+      <p class="table-full-message">{{ 'rsvp.table_full' | translate }}</p>
+    }
     <fieldset>
-      <label><input type="radio" name="st" value="self_transport" [(ngModel)]="model.status">
-        {{ 'rsvp.self_transport' | translate }}</label>
-      <label><input type="radio" name="st" value="bus" [(ngModel)]="model.status">
-        {{ 'rsvp.bus' | translate }}
-        <button type="button" (click)="showBusInfo = !showBusInfo" aria-label="info">ⓘ</button></label>
+      <label class="bus-option-label"><input type="radio" name="st" value="bus" [(ngModel)]="model.status"
+                    (ngModelChange)="onStatusChange($event)">
+        {{ 'rsvp.bus' | translate:{ count: formattedBusPartySize } }}
+        <button type="button" class="bus-info-button" (click)="showBusInfo = !showBusInfo" aria-label="info">i</button>
+      </label>
       @if (showBusInfo) {
-        <div class="bus-info">
-          <p>{{ cfg.rsvp.bus.pickup }} · {{ cfg.rsvp.bus.departTime }} · {{ cfg.rsvp.bus.duration }}</p>
-          <label>{{ 'rsvp.phone' | translate }}
-            <input name="phone" [(ngModel)]="model.phone" inputmode="tel"></label>
-        </div>
+        <ng-container [ngTemplateOutlet]="busInformation"></ng-container>
       }
-      <label><input type="radio" name="st" value="cannot_attend" [(ngModel)]="model.status">
+      @if (model.status === 'bus') {
+        <label class="bus-phone">{{ 'rsvp.phone' | translate }}
+          <input name="phone" [(ngModel)]="model.phone" inputmode="tel"></label>
+      }
+      <label><input type="radio" name="st" value="self_transport" [(ngModel)]="model.status"
+                    (ngModelChange)="onStatusChange($event)">
+        {{ 'rsvp.self_transport' | translate }}</label>
+      <label><input type="radio" name="st" value="cannot_attend" [(ngModel)]="model.status"
+                    (ngModelChange)="onStatusChange($event)">
         {{ 'rsvp.cannot_attend' | translate }}</label>
     </fieldset>
 
-    <p class="note">{{ 'rsvp.note_change' | translate }}</p>
-    <button type="submit" [disabled]="!valid()">{{ 'rsvp.submit' | translate }}</button>
+    @if (submitFailed) {
+      <p class="rsvp-error" role="alert">{{ 'rsvp.submit_error' | translate }}</p>
+    }
+    <button type="submit" [disabled]="!valid() || submitting">
+      {{ (submitting ? 'rsvp.submitting' : 'rsvp.submit') | translate }}
+    </button>
   </form>
-
-  @if (showClash) {
-    <div class="modal">
-      <h3>{{ 'rsvp.clash_title' | translate }}</h3>
-      <p>{{ 'rsvp.clash_body' | translate }}</p>
-      <button type="button" (click)="showClash = false">{{ 'rsvp.edit_name' | translate }}</button>
-      <button type="button" (click)="confirmDespiteClash()">{{ 'rsvp.continue' | translate }}</button>
-    </div>
-  }
-}

@@ -1,22 +1,203 @@
 <app-language-toggle [current]="lang"></app-language-toggle>
-<audio #audio [src]="'assets/audio/bg-music.mp3'" loop></audio>
+<app-happiness-rain></app-happiness-rain>
+<audio #audio [src]="cfg.theme.music" loop></audio>
 <button class="music-btn" type="button" (click)="toggleMusic()"
-        [attr.aria-label]="musicOn ? 'Pause music' : 'Play music'">{{ musicOn ? '🔊' : '🔇' }}</button>
+        [attr.aria-label]="musicOn
+          ? ('controls.pause_music' | translate)
+          : ('controls.play_music' | translate)">{{ musicOn ? '🔊' : '🔇' }}</button>
 
-<header class="hero">
-  <div class="double-happiness">囍</div>
-  <h1 class="names">{{ cfg.couple.bride }}<span class="amp">&amp;</span>{{ cfg.couple.groom }}</h1>
-  <div class="event-name">{{ cfg.event.name }}</div>
-  <div class="event-date">{{ cfg.event.datetime | date:'dd.MM.yyyy' }}</div>
+<header class="cover-hero">
   @if (coverOk) {
-    <img class="cover-photo" [src]="cfg.media.coverImg" alt="" (error)="coverOk = false" />
+    <img class="cover-image" [src]="cfg.media.coverImg"
+         [alt]="cfg.couple.groom + ' & ' + cfg.couple.bride" (error)="coverOk = false" />
   }
+  <div class="cover-shade" aria-hidden="true"></div>
+  <div class="cover-overlay">
+    <div class="cover-details">
+      <h1 class="cover-couple">
+        <span class="cover-name">{{ cfg.couple.groom }}</span>
+        <i>&amp;</i>
+        <span class="cover-name">{{ cfg.couple.bride }}</span>
+      </h1>
+      <strong>
+        {{ cfg.reception.datetime | date:'HH:mm':'+0700' }}
+        <i aria-hidden="true">·</i>
+        {{ cfg.reception.datetime | date:'dd/MM/yyyy':'+0700' }}
+      </strong>
+      <em>{{ 'details.reception_short_venue' | translate }}</em>
+    </div>
+  </div>
 </header>
 
 <main class="invite">
-  <div class="divider">❦</div>
-  <app-map-calendar></app-map-calendar>
-  <app-rsvp-form [lang]="lang"></app-rsvp-form>
-  @if (cfg.sections.wishes) { <app-wishes></app-wishes> }
-  @if (cfg.sections.faq) { <app-faq></app-faq> }
+  <section class="invitation-sheet announcement-section">
+    <section class="families" appRevealOnScroll
+             [attr.aria-label]="'details.families' | translate">
+      <article class="family-card">
+        <p class="eyebrow">{{ 'details.groom_family' | translate }}</p>
+        <p class="family-line">{{ 'details.father' | translate }} {{ cfg.families.groom.father }}</p>
+        <p class="family-line">{{ 'details.mother' | translate }} {{ cfg.families.groom.mother }}</p>
+        <address>{{ cfg.families.groom.address }}</address>
+      </article>
+      <article class="family-card">
+        <p class="eyebrow">{{ 'details.bride_family' | translate }}</p>
+        <p class="family-line">{{ 'details.father' | translate }} {{ cfg.families.bride.father }}</p>
+        <p class="family-line">{{ 'details.mother' | translate }} {{ cfg.families.bride.mother }}</p>
+        <address>{{ cfg.families.bride.address }}</address>
+      </article>
+    </section>
+
+    <div class="sheet-divider" appRevealOnScroll aria-hidden="true">♡</div>
+
+    <section class="invitation-intro" appRevealOnScroll>
+      <p class="eyebrow">{{ 'details.announcement' | translate }}</p>
+      <div class="couple-full-names">
+        <strong>{{ cfg.couple.groom }}</strong>
+        <span>&amp;</span>
+        <strong>{{ cfg.couple.bride }}</strong>
+      </div>
+    </section>
+
+    <section class="event-card ceremony-card" appRevealOnScroll>
+      <p class="eyebrow">{{ 'details.ceremony_eyebrow' | translate }}</p>
+      <h2 class="ceremony-venue-title">{{ 'details.ceremony_venue' | translate }}</h2>
+      <div class="event-time-grid">
+        <div>
+          <span>{{ 'details.time' | translate }}</span>
+          <strong>{{ cfg.ceremony.datetime | date:'HH:mm':'+0700' }}</strong>
+        </div>
+        <div>
+          <span>{{ 'details.date' | translate }}</span>
+          <strong>{{ cfg.ceremony.datetime | date:'dd.MM.yyyy':'+0700' }}</strong>
+        </div>
+      </div>
+      <p class="lunar-date">{{ 'details.lunar' | translate }} {{ 'details.ceremony_lunar_date' | translate }}</p>
+    </section>
+  </section>
+
+  <div class="section-separator" aria-hidden="true"><span>♡</span></div>
+
+  <section class="invitation-sheet reception-section">
+    <section class="event-card reception-card" appRevealOnScroll>
+      <p class="eyebrow reception-title">{{ 'details.reception_title' | translate }}</p>
+      <p class="reception-invitation">{{ 'details.reception_invitation' | translate }}</p>
+      <div class="event-place">
+        <span class="reception-venue-label">{{ 'details.reception_venue_label' | translate }}</span>
+        <strong class="reception-venue-name">{{ 'details.reception_venue' | translate }}</strong>
+        <address>{{ 'details.reception_address' | translate }}</address>
+      </div>
+      <div class="event-time-grid">
+        <div>
+          <span>{{ 'details.welcome' | translate }}</span>
+          <strong class="event-value">{{ cfg.reception.welcomeTime }}</strong>
+        </div>
+        <div>
+          <span>{{ 'details.start' | translate }}</span>
+          <strong class="event-value">{{ cfg.reception.datetime | date:'HH:mm':'+0700' }}</strong>
+        </div>
+      </div>
+      <div class="reception-date-row">
+        <span class="event-label">{{ 'details.date' | translate }}</span>
+        <strong class="event-value">{{ cfg.reception.datetime | date:'dd.MM.yyyy':'+0700' }}</strong>
+      </div>
+      <p class="lunar-date">{{ 'details.lunar' | translate }} {{ 'details.ceremony_lunar_date' | translate }}</p>
+      <p>{{ 'details.rsvp_intro' | translate }}</p>
+    </section>
+
+    <app-map-calendar appRevealOnScroll></app-map-calendar>
+  </section>
+
+  <div class="section-separator" aria-hidden="true"><span>♡</span></div>
+
+  <app-rsvp-form appRevealOnScroll [lang]="lang"></app-rsvp-form>
+
+  <div class="section-separator" aria-hidden="true"><span>♡</span></div>
+
+  <section class="album" appRevealOnScroll>
+    <p class="eyebrow">{{ 'details.album_eyebrow' | translate }}</p>
+    @if (visiblePhotos.length) {
+      <div class="album-slider" aria-roledescription="carousel"
+           [attr.aria-label]="'details.album_eyebrow' | translate">
+        <div class="album-stage">
+          <div class="album-track"
+               [style.transform]="'translateX(-' + (activeSlide * 100) + '%)'">
+            @for (photo of visiblePhotos; track photo.originalIndex; let slideIndex = $index) {
+              <button class="album-slide" type="button"
+                      [attr.aria-label]="'Mở ảnh ' + (slideIndex + 1)"
+                      (click)="openLightbox()">
+                <img [src]="photo.src"
+                     [alt]="cfg.couple.groom + ' & ' + cfg.couple.bride"
+                     loading="lazy"
+                     (error)="photoFailed(photo.originalIndex)" />
+              </button>
+            }
+          </div>
+
+          @if (visiblePhotos.length > 1) {
+            <button class="album-arrow album-arrow-prev" type="button"
+                    aria-label="Ảnh trước" (click)="previousPhoto()">‹</button>
+            <button class="album-arrow album-arrow-next" type="button"
+                    aria-label="Ảnh tiếp theo" (click)="nextPhoto()">›</button>
+
+            <div class="album-dots" aria-label="Chọn ảnh">
+              @for (photo of visiblePhotos; track photo.originalIndex; let slideIndex = $index) {
+                <button type="button"
+                        [class.is-active]="activeSlide === slideIndex"
+                        [attr.aria-current]="activeSlide === slideIndex ? 'true' : null"
+                        [attr.aria-label]="'Xem ảnh ' + (slideIndex + 1)"
+                        (click)="selectPhoto(slideIndex)"></button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </section>
+
+  @if (cfg.sections.wishes) { <app-wishes appRevealOnScroll></app-wishes> }
+  @if (cfg.sections.faq) { <app-faq appRevealOnScroll></app-faq> }
 </main>
+
+@if (lightboxOpen && visiblePhotos.length) {
+  <div class="album-lightbox" role="dialog" aria-modal="true"
+       aria-label="Xem ảnh toàn màn hình" (click)="closeLightbox()">
+    <button class="lightbox-close" type="button" aria-label="Đóng ảnh"
+            (click)="closeLightbox()">×</button>
+
+    <div class="lightbox-stage"
+         (click)="$event.stopPropagation()"
+         (touchstart)="startSwipe($event)"
+         (touchend)="endSwipe($event)">
+      <div class="lightbox-track"
+           [style.transform]="'translateX(-' + (activeSlide * 100) + '%)'">
+        @for (photo of visiblePhotos; track photo.originalIndex) {
+          <figure class="lightbox-slide">
+            <img [src]="photo.src"
+                 [alt]="cfg.couple.groom + ' & ' + cfg.couple.bride"
+                 (error)="photoFailed(photo.originalIndex)" />
+          </figure>
+        }
+      </div>
+    </div>
+
+    @if (visiblePhotos.length > 1) {
+      <button class="lightbox-arrow lightbox-arrow-prev" type="button"
+              aria-label="Ảnh trước"
+              (click)="$event.stopPropagation(); previousPhoto()">‹</button>
+      <button class="lightbox-arrow lightbox-arrow-next" type="button"
+              aria-label="Ảnh tiếp theo"
+              (click)="$event.stopPropagation(); nextPhoto()">›</button>
+
+      <div class="lightbox-dots" aria-label="Chọn ảnh"
+           (click)="$event.stopPropagation()">
+        @for (photo of visiblePhotos; track photo.originalIndex; let slideIndex = $index) {
+          <button type="button"
+                  [class.is-active]="activeSlide === slideIndex"
+                  [attr.aria-current]="activeSlide === slideIndex ? 'true' : null"
+                  [attr.aria-label]="'Xem ảnh ' + (slideIndex + 1)"
+                  (click)="selectPhoto(slideIndex)"></button>
+        }
+      </div>
+    }
+  </div>
+}

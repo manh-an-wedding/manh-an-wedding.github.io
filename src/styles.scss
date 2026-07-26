@@ -34,41 +34,92 @@ html, body {
 
 h1, h2, h3 { font-family: var(--font-head); color: var(--red); font-weight: 600; line-height: 1.2; }
 
-/* ---- main container: an invitation card centered on the page ---- */
+/* ---- continuous invitation canvas ---- */
 main.invite {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 0 1.1rem 4rem;
+  padding: 0;
+  background: #fffdf8;
 }
 
-/* ---- hero ---- */
-.hero {
+/* ---- photo cover ---- */
+.cover-hero {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 3.2rem 1.1rem 2.4rem;
-  text-align: center;
   position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: var(--red-dark);
+  border-inline: 1px solid rgba(201, 162, 75, .55);
+  box-shadow: none;
 }
-.hero .double-happiness {
-  font-family: var(--font-head);
-  font-size: 3rem;
+.cover-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cover-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(38, 14, 14, .16) 0%, transparent 34%, rgba(53, 7, 12, .12) 52%, rgba(42, 3, 8, .76) 100%),
+    linear-gradient(90deg, transparent 48%, rgba(40, 4, 8, .16) 100%);
+}
+.cover-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  padding: clamp(1.4rem, 6vw, 3rem) clamp(1rem, 5vw, 2.2rem) clamp(1.3rem, 5vw, 2.4rem);
+  color: #fff8eb;
+  text-align: right;
+}
+.cover-details {
+  max-width: 100%;
+  text-align: right;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, .72);
+}
+.cover-couple {
+  margin: 0 0 .55rem;
+  color: #fff8eb;
+  font-size: clamp(1.45rem, 6.4vw, 2.7rem);
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.1;
+}
+.cover-couple .cover-name,
+.cover-couple i {
+  display: block;
+}
+.cover-couple i {
+  margin: .08em 0;
+  padding: 0;
   color: var(--gold);
-  line-height: 1;
-  margin-bottom: 1rem;
+  font-size: .62em;
+  font-weight: 500;
+  text-align: center;
 }
-.hero .names {
+.cover-details > strong,
+.cover-details > em {
+  display: block;
+}
+.cover-details > strong {
+  margin-bottom: .15rem;
+  color: #f4d994;
+  font-size: clamp(.95rem, 3.5vw, 1.15rem);
+  letter-spacing: .06em;
+}
+.cover-details > strong i {
+  padding: 0 .3rem;
+  font-style: normal;
+}
+.cover-details > em {
+  color: rgba(255, 248, 235, .88);
   font-family: var(--font-head);
-  font-size: clamp(2rem, 9vw, 3.1rem);
-  color: var(--red);
-  margin: .3rem 0;
-}
-.hero .amp { color: var(--gold); font-style: italic; display: block; font-size: .55em; margin: .2rem 0; }
-.hero .event-name { letter-spacing: .28em; text-transform: uppercase; color: var(--muted); font-size: .85rem; margin-top: 1rem; }
-.hero .event-date { color: var(--red-dark); font-weight: 600; margin-top: .35rem; font-size: 1.05rem; }
-.hero .cover-photo {
-  width: 100%; max-width: 420px; aspect-ratio: 3/4; object-fit: cover;
-  border-radius: var(--radius); margin: 1.6rem auto 0; display: block;
-  border: 4px solid var(--paper); box-shadow: var(--shadow);
+  font-size: clamp(.9rem, 3.4vw, 1.08rem);
+  font-style: normal;
 }
 
 /* ---- decorative divider ---- */
@@ -80,11 +131,460 @@ main.invite {
 
 /* ---- generic section headings ---- */
 main.invite h2 { text-align: center; font-size: 1.5rem; margin: 0 0 1.1rem; }
+.eyebrow {
+  margin: 0 0 .55rem;
+  color: var(--gold);
+  font-size: .73rem;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
 
-/* ---- cards: wrap each feature block ---- */
-app-map-calendar, app-rsvp-form, app-wishes, app-faq { display: block; margin: 1.4rem 0; }
+/* ---- formal invitation sheet ---- */
+.invitation-sheet {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.6rem, 6vw, 2.8rem) clamp(1rem, 5vw, 2.25rem);
+  margin: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.sheet-monogram {
+  color: var(--gold);
+  font-family: var(--font-head);
+  font-size: 2.35rem;
+  line-height: 1;
+  text-align: center;
+}
+.sheet-divider {
+  margin: 1.8rem 0;
+  color: var(--gold);
+  font-size: .95rem;
+  letter-spacing: .35rem;
+  text-align: center;
+}
+.sheet-divider::before,
+.sheet-divider::after {
+  content: '';
+  display: inline-block;
+  width: 38px;
+  height: 1px;
+  margin: 0 .55rem;
+  background: var(--gold);
+  vertical-align: middle;
+  opacity: .52;
+}
+.section-separator {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 1.9rem;
+  margin: 0;
+  place-items: center;
+  color: var(--gold);
+}
+.section-separator::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--gold);
+  opacity: .62;
+}
+.section-separator span {
+  position: relative;
+  z-index: 1;
+  padding: 0 .8rem;
+  background: #fffdf8;
+  font-size: .95rem;
+  line-height: 1;
+}
+.invitation-intro, .rsvp-intro {
+  max-width: 520px;
+  margin: 0 auto 1.6rem;
+  text-align: center;
+}
+.invitation-intro {
+  margin-bottom: 2.35rem;
+}
+.invitation-intro .eyebrow {
+  max-width: 370px;
+  margin-inline: auto;
+  color: var(--red-dark);
+  line-height: 1.8;
+}
+.couple-full-names {
+  margin: 1.1rem 0 0;
+}
+.couple-full-names strong,
+.couple-full-names small,
+.couple-full-names span {
+  display: block;
+}
+.couple-full-names strong {
+  color: var(--red);
+  font-family: var(--font-head);
+  font-size: clamp(1.85rem, 8vw, 3rem);
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.couple-full-names small {
+  margin-top: .28rem;
+  color: var(--muted);
+  font-size: .65rem;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+.couple-full-names span {
+  margin: .8rem 0;
+  color: var(--gold);
+  font-family: var(--font-head);
+  font-size: 1.25rem;
+  font-style: italic;
+}
+.families {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(.65rem, 4vw, 2rem);
+  margin: 1.4rem 0 0;
+}
+.family-card {
+  padding: .45rem .2rem;
+  text-align: center;
+}
+.family-card p:not(.eyebrow) { margin: .2rem 0; }
+.family-card p span {
+  display: block;
+  color: var(--muted);
+  font-size: .72rem;
+  font-weight: 400;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.family-card address {
+  margin-top: .75rem;
+  color: var(--ink);
+  font-size: .82rem;
+  font-style: normal;
+}
 
-.map-cal, app-rsvp-form form, app-rsvp-form .thanks, .wishes, .faq {
+/* ---- centered ceremony and reception details ---- */
+.event-card {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+.event-time-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 360px;
+  margin: 1.1rem auto;
+  border-block: 1px solid var(--line);
+}
+.event-time-grid > div { padding: .85rem .5rem; }
+.event-time-grid > div + div { border-left: 1px solid var(--line); }
+.event-time-grid span, .event-place > span, .reception-date-row .event-label {
+  display: block;
+  color: var(--muted);
+  font-size: .72rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.event-time-grid strong, .reception-date-row .event-value {
+  display: block;
+  color: var(--red);
+  font-family: var(--font-head);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+.lunar-date { margin: .45rem 0; color: var(--muted); font-size: .85rem; }
+.event-place { margin-top: 1.1rem; }
+.event-place strong {
+  display: block;
+  margin: .25rem 0;
+  color: var(--red);
+  font-family: var(--font-head);
+  font-size: 1.18rem;
+}
+.event-place address { color: var(--muted); font-size: .9rem; font-style: normal; }
+.reception-venue-name {
+  font-variant-numeric: lining-nums proportional-nums;
+  font-feature-settings: 'lnum' 1, 'pnum' 1;
+}
+.reception-card {
+  padding-bottom: .25rem;
+}
+.reception-title {
+  margin-bottom: 1.25rem;
+  color: var(--red);
+  font-family: var(--font-head);
+  font-size: 1.35rem;
+  letter-spacing: .12em;
+}
+.reception-date-row {
+  margin: 1rem auto .45rem;
+  text-align: center;
+}
+.reception-section .map-cal {
+  margin-top: .85rem;
+  padding: 0;
+  border-top: 0;
+}
+.reception-card > p:last-child { margin-bottom: 0; }
+
+/* ---- closing photo album ---- */
+.album {
+  margin: 0;
+  padding: 2rem clamp(1rem, 5vw, 2.25rem);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-align: center;
+}
+.album .eyebrow {
+  margin-bottom: .75rem;
+}
+.album-slider {
+  width: 100%;
+  margin: 0 auto;
+}
+.album-stage {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  background: var(--cream);
+  border: 3px solid #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px rgba(73, 22, 22, .10);
+}
+.album-track,
+.lightbox-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform .65s cubic-bezier(.22, .61, .36, 1);
+  will-change: transform;
+}
+.album-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: zoom-in;
+}
+.album-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.album-arrow,
+.lightbox-arrow {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  padding: 0 0 .18rem;
+  color: #fff;
+  background: rgba(91, 13, 22, .62);
+  border: 1px solid rgba(255, 255, 255, .55);
+  border-radius: 50%;
+  font-family: Georgia, serif;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+.album-arrow-prev,
+.lightbox-arrow-prev { left: .75rem; }
+.album-arrow-next,
+.lightbox-arrow-next { right: .75rem; }
+.album-dots,
+.lightbox-dots {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  transform: translateX(-50%);
+}
+.album-dots {
+  padding: .38rem .55rem;
+  background: rgba(0, 0, 0, .22);
+  border-radius: 999px;
+}
+.album-dots button,
+.lightbox-dots button {
+  width: .65rem;
+  height: .65rem;
+  padding: 0;
+  background: #fff;
+  border: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .08);
+  cursor: pointer;
+  transition: background-color .2s ease, transform .2s ease;
+}
+.album-dots button.is-active,
+.lightbox-dots button.is-active {
+  background: #ff315f;
+  transform: scale(1.08);
+}
+
+body.album-lightbox-open { overflow: hidden; }
+.album-lightbox {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 3.5rem clamp(.75rem, 3vw, 2rem);
+  background: rgba(12, 8, 9, .96);
+  touch-action: pan-y;
+}
+.lightbox-stage {
+  width: min(100%, 1100px);
+  height: min(82vh, 900px);
+  overflow: hidden;
+}
+.lightbox-slide {
+  display: grid;
+  flex: 0 0 100%;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+.lightbox-slide img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.lightbox-close {
+  position: absolute;
+  z-index: 5;
+  top: max(1rem, env(safe-area-inset-top));
+  right: max(1rem, env(safe-area-inset-right));
+  display: grid;
+  place-items: center;
+  width: 2.7rem;
+  height: 2.7rem;
+  padding: 0 0 .15rem;
+  color: #fff;
+  background: rgba(255, 49, 95, .78);
+  border: 0;
+  border-radius: 50%;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.lightbox-dots {
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .album-track,
+  .lightbox-track {
+    transition: none;
+  }
+}
+
+/* ---- progressive entrance + falling double-happiness ---- */
+.scroll-reveal {
+  opacity: 0;
+  transform: translate3d(0, 1.6rem, 0);
+  transition:
+    opacity .75s ease,
+    transform .8s cubic-bezier(.22, .61, .36, 1);
+  will-change: opacity, transform;
+}
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.happiness-rain {
+  position: fixed;
+  z-index: 12;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+.happiness-rain span {
+  position: absolute;
+  top: -12vh;
+  color: var(--gold);
+  font-family: 'Songti SC', 'Noto Serif SC', Georgia, serif;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0;
+  text-shadow: 0 1px 4px rgba(122, 20, 20, .12);
+  will-change: transform, opacity;
+  animation-name: happiness-snowfall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes happiness-snowfall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -12vh, 0) rotate(-12deg);
+  }
+  12% { opacity: .48; }
+  52% {
+    opacity: .42;
+    transform: translate3d(var(--drift), 52vh, 0) rotate(110deg);
+  }
+  88% { opacity: .32; }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift-back), 114vh, 0) rotate(235deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal,
+  .scroll-reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .happiness-rain { display: none; }
+}
+
+/* ---- continuous feature sections ---- */
+app-map-calendar, app-rsvp-form { display: block; margin: 0; }
+app-wishes, app-faq { display: block; margin: 1.4rem 0; }
+
+.map-cal, app-rsvp-form form, app-rsvp-form .thanks {
+  margin: 0;
+  padding: 2rem clamp(1rem, 5vw, 2.25rem);
+  background: transparent;
+  border: 0;
+  border-top: 1px solid rgba(201, 162, 75, .35);
+  border-radius: 0;
+  box-shadow: none;
+}
+app-rsvp-form form, app-rsvp-form .thanks { border-top: 0; }
+
+.wishes, .faq {
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -95,29 +595,106 @@ app-map-calendar, app-rsvp-form, app-wishes, app-faq { display: block; margin: 1
 .map-cal { display: flex; flex-direction: column; gap: .7rem; }
 .map-cal iframe { border-radius: 10px; }
 .map-cal a {
-  display: inline-block; text-align: center; text-decoration: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+  text-align: center; text-decoration: none;
   color: var(--red); border: 1px solid var(--gold); border-radius: 999px;
   padding: .5rem .9rem; font-weight: 500; font-size: .95rem;
+}
+.directions-icon {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
 }
 
 /* ---- forms (RSVP + wishes) ---- */
 app-rsvp-form form { display: flex; flex-direction: column; gap: 1rem; }
+app-rsvp-form form[hidden] { display: none; }
+.rsvp-title {
+  margin-bottom: .4rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
 label { display: block; font-weight: 500; color: var(--ink); font-size: .95rem; }
 input[type="text"], input:not([type]), input[name], select, textarea {
   width: 100%; margin-top: .35rem; padding: .6rem .7rem;
   border: 1px solid var(--line); border-radius: 10px; font: inherit; color: var(--ink);
   background: #fff;
 }
+.rsvp-group-select {
+  appearance: none;
+  padding-right: 2.75rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%23231f20' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: .75rem .5rem;
+}
 input[type="radio"], input[type="checkbox"] { width: auto; margin-right: .5rem; accent-color: var(--red); }
 textarea { min-height: 90px; resize: vertical; }
 
 fieldset { border: 1px solid var(--line); border-radius: 10px; padding: .8rem; display: flex; flex-direction: column; gap: .55rem; }
 fieldset label { font-weight: 400; }
-.bus-info { background: var(--cream); border-radius: 8px; padding: .7rem; }
+.bus-info { display: grid; gap: 1rem; background: var(--cream); border-radius: 8px; padding: .85rem; }
+.bus-info h3 {
+  margin: 0 0 .55rem;
+  color: var(--red);
+  font-family: var(--font-head);
+  font-size: 1rem;
+  line-height: 1.4;
+}
 .bus-info p { color: var(--muted); font-size: .9rem; margin: 0 0 .5rem; }
-
-.note { color: var(--muted); font-size: .82rem; font-style: italic; }
+.bus-info p:last-child { margin-bottom: 0; }
+.bus-info strong { color: var(--ink); font-weight: 600; }
+.bus-registration-deadline {
+  padding-top: .75rem;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+.bus-info a {
+  color: var(--red);
+  text-decoration: underline;
+  text-decoration-color: rgba(158, 27, 27, .42);
+  text-underline-offset: .15em;
+}
+.bus-info-button {
+  display: inline-grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-left: .3rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #d8b9b9;
+  color: #fff;
+  font-family: Georgia, serif;
+  font-size: .85rem;
+  font-style: italic;
+  line-height: 1;
+}
 .warn { color: var(--red-dark); background: #fbeaea; border-radius: 8px; padding: .6rem .7rem; font-size: .88rem; }
+.table-full-message {
+  margin: 0;
+  padding: .65rem .8rem;
+  border: 1px solid rgba(201, 162, 75, .5);
+  border-radius: 8px;
+  background: rgba(201, 162, 75, .08);
+  color: var(--red);
+  font-weight: 600;
+  text-align: center;
+}
+.rsvp-error {
+  margin: 0;
+  padding: .65rem .75rem;
+  color: var(--red-dark);
+  background: #fbeaea;
+  border-radius: 8px;
+  font-size: .9rem;
+  text-align: center;
+}
 
 button, .mock-button {
   font: inherit; cursor: pointer;
@@ -130,19 +707,69 @@ button[type="submit"]:disabled { background: #d8b9b9; cursor: not-allowed; }
 
 app-companions-editor { display: block; }
 app-companions-editor .row { display: flex; gap: .5rem; align-items: center; margin-bottom: .5rem; }
-app-companions-editor .row input[type="text"], app-companions-editor .row input:not([type]) { margin-top: 0; }
+app-companions-editor .row input[type="text"], app-companions-editor .row input:not([type]) {
+  flex: 1;
+  margin-top: 0;
+  border: 2px solid var(--red);
+  font-weight: 700;
+}
+app-companions-editor .companion-remove {
+  flex: 0 0 auto;
+  padding: .3rem;
+  border: 0;
+  background: transparent;
+  color: var(--red);
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1;
+}
 app-companions-editor > button { background: transparent; color: var(--red); border: 1px dashed var(--gold); border-radius: 999px; padding: .45rem .9rem; }
 
-.thanks { text-align: center; color: var(--red); font-family: var(--font-head); font-size: 1.3rem; }
-
-/* ---- clash modal ---- */
-.modal {
-  position: fixed; inset: 0; margin: auto; height: max-content; max-width: 420px;
-  background: #fff; border-radius: var(--radius); padding: 1.5rem; box-shadow: 0 12px 40px rgba(0,0,0,.25);
-  z-index: 50;
+.thanks { text-align: center; color: var(--red); }
+.rsvp-confirmation h2 {
+  margin: 0 0 .65rem;
+  font-family: var(--font-head);
+  font-size: 1.45rem;
 }
-.modal h3 { margin-top: 0; }
-.modal button { margin: .8rem .4rem 0 0; border-radius: 999px; padding: .5rem 1rem; border: 1px solid var(--gold); background: #fff; color: var(--red); }
+.rsvp-confirmation p {
+  margin: .45rem 0;
+  color: var(--ink);
+  font-size: .95rem;
+}
+.rsvp-confirmation-summary { line-height: 1.55; }
+.rsvp-confirmation-guests {
+  display: inline-grid;
+  gap: .3rem;
+  margin: .35rem auto .2rem;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+.rsvp-confirmation-guests li {
+  display: flex;
+  gap: .45rem;
+  align-items: baseline;
+}
+.rsvp-confirmation-check,
+.rsvp-confirmation-name {
+  color: var(--red);
+  font-weight: 700;
+}
+.rsvp-confirmation-check { flex: 0 0 auto; }
+.rsvp-confirmation strong { color: var(--red); }
+.rsvp-confirmation .bus-info {
+  margin-top: 1rem;
+  text-align: left;
+}
+.rsvp-edit-response {
+  margin-top: 1rem;
+  padding: .6rem 1.25rem;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--red);
+  font-weight: 600;
+}
 .modal button:last-child { background: var(--red); color: #fff; border: none; }
 
 /* ---- wishes wall ---- */
@@ -159,9 +786,34 @@ app-companions-editor > button { background: transparent; color: var(--red); bor
 
 /* ---- floating buttons ---- */
 .lang-toggle {
-  position: fixed; top: .7rem; right: .7rem; z-index: 30;
-  background: var(--red); color: #fff !important; text-decoration: none;
-  border-radius: 999px; padding: .4rem .8rem; font-size: .85rem; box-shadow: var(--shadow);
+  position: fixed;
+  z-index: 30;
+  top: .7rem;
+  right: .7rem;
+  display: flex;
+  gap: .15rem;
+  padding: .2rem;
+  background: rgba(255, 253, 248, .94);
+  border: 1px solid rgba(201, 162, 75, .7);
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(8px);
+}
+.lang-toggle a {
+  min-width: 2.15rem;
+  padding: .28rem .45rem;
+  color: var(--red);
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color .2s ease, color .2s ease;
+}
+.lang-toggle a.is-active {
+  background: var(--red);
+  color: #fff;
 }
 .music-btn {
   position: fixed; top: .7rem; left: .7rem; z-index: 30;
@@ -170,5 +822,20 @@ app-companions-editor > button { background: transparent; color: var(--red); bor
 }
 
 @media (min-width: 700px) {
-  .hero { padding-top: 4rem; }
+  .cover-hero {
+    margin-top: 1.5rem;
+    border: 1px solid rgba(201, 162, 75, .55);
+  }
+}
+
+@media (max-width: 420px) {
+  .families {
+    gap: .55rem;
+  }
+  .family-card {
+    font-size: .88rem;
+  }
+  .family-card address {
+    font-size: .75rem;
+  }
 }
