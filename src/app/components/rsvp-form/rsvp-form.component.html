@@ -20,7 +20,9 @@
       <p><strong>{{ 'rsvp.location_label' | translate }}:</strong>
         {{ 'rsvp.bus_return_location' | translate }}</p>
       <p><strong>{{ 'rsvp.bus_hotel_arrival' | translate }}:</strong>
-        {{ cfg.rsvp.bus.hotelArrivalTime }}</p>
+        {{ cfg.rsvp.bus.hotelArrivalTime }}
+        <span class="bus-traffic-note">{{ 'rsvp.bus_return_traffic_note' | translate }}</span>
+      </p>
     </section>
     <p class="bus-registration-deadline">
       <em>
@@ -32,7 +34,8 @@
 </ng-template>
 
 @if (done) {
-  <section class="thanks rsvp-confirmation" aria-live="polite">
+  <section #confirmationPanel class="thanks rsvp-confirmation"
+           aria-live="polite" tabindex="-1">
     <h2>{{ 'rsvp.confirmation_thanks' | translate:{ name: model.guestName } }}</h2>
     @if (model.status === 'bus' || model.status === 'self_transport') {
       <div class="rsvp-confirmation-details">
@@ -71,7 +74,7 @@
 
     <label class="rsvp-name-label">{{ 'rsvp.your_name' | translate }}
       <input name="name" [(ngModel)]="model.guestName" (ngModelChange)="onNameInput()"
-             list="guest-suggest" autocomplete="off" required>
+             #guestNameInput list="guest-suggest" autocomplete="off" required>
       <datalist id="guest-suggest">
         @for (s of suggestions; track s) { <option [value]="s"></option> }
       </datalist>
@@ -96,10 +99,16 @@
       <label class="bus-option-label"><input type="radio" name="st" value="bus" [(ngModel)]="model.status"
                     (ngModelChange)="onStatusChange($event)">
         {{ 'rsvp.bus' | translate:{ count: formattedBusPartySize } }}
-        <button type="button" class="bus-info-button" (click)="showBusInfo = !showBusInfo" aria-label="info">i</button>
+        <button #busInfoButton type="button" class="bus-info-button"
+                (click)="toggleBusInfo()" aria-label="info"
+                aria-controls="bus-information"
+                [attr.aria-expanded]="showBusInfo">i</button>
       </label>
       @if (showBusInfo) {
-        <ng-container [ngTemplateOutlet]="busInformation"></ng-container>
+        <div #busInfoPanel id="bus-information" class="bus-info-focus-target"
+             role="region" tabindex="-1">
+          <ng-container [ngTemplateOutlet]="busInformation"></ng-container>
+        </div>
       }
       @if (model.status === 'bus') {
         <label class="bus-phone">{{ 'rsvp.phone' | translate }}
@@ -114,7 +123,9 @@
     </fieldset>
 
     @if (submitFailed) {
-      <p class="rsvp-error" role="alert">{{ 'rsvp.submit_error' | translate }}</p>
+      <p #submitError class="rsvp-error" role="alert" tabindex="-1">
+        {{ 'rsvp.submit_error' | translate }}
+      </p>
     }
     <button type="submit" [disabled]="!valid() || submitting">
       {{ (submitting ? 'rsvp.submitting' : 'rsvp.submit') | translate }}

@@ -18,7 +18,7 @@
 <header class="cover-hero">
   @if (coverOk) {
     <img class="cover-image" [src]="cfg.media.coverImg"
-         [alt]="cfg.couple.groom + ' & ' + cfg.couple.bride" (error)="coverOk = false" />
+         [alt]="cfg.couple.bride + ' & ' + cfg.couple.groom" (error)="coverOk = false" />
   }
   <div class="cover-shade" aria-hidden="true"></div>
   <div class="cover-overlay">
@@ -29,9 +29,9 @@
     </p>
     <div class="cover-details">
       <h1 class="cover-couple">
-        <span class="cover-name">{{ cfg.couple.groom }}</span>
-        <i>&amp;</i>
         <span class="cover-name">{{ cfg.couple.bride }}</span>
+        <i>&amp;</i>
+        <span class="cover-name">{{ cfg.couple.groom }}</span>
       </h1>
       <strong>
         {{ cfg.reception.datetime | date:'HH:mm':'+0700' }}
@@ -66,9 +66,15 @@
     <section class="invitation-intro" appRevealOnScroll>
       <p class="eyebrow">{{ 'details.announcement' | translate }}</p>
       <div class="couple-full-names">
-        <strong>{{ cfg.couple.groom }}</strong>
+        <div class="couple-person">
+          <strong>{{ cfg.couple.bride }}</strong>
+          <small>{{ 'details.bride_birth_order' | translate }}</small>
+        </div>
         <span>&amp;</span>
-        <strong>{{ cfg.couple.bride }}</strong>
+        <div class="couple-person">
+          <strong>{{ cfg.couple.groom }}</strong>
+          <small>{{ 'details.groom_birth_order' | translate }}</small>
+        </div>
       </div>
     </section>
 
@@ -140,7 +146,7 @@
                       [attr.aria-label]="'Mở ảnh ' + (slideIndex + 1)"
                       (click)="openLightbox()">
                 <img [src]="photo.src"
-                     [alt]="cfg.couple.groom + ' & ' + cfg.couple.bride"
+                     [alt]="cfg.couple.bride + ' & ' + cfg.couple.groom"
                      loading="lazy"
                      (error)="photoFailed(photo.originalIndex)" />
               </button>
@@ -187,7 +193,7 @@
         @for (photo of visiblePhotos; track photo.originalIndex) {
           <figure class="lightbox-slide">
             <img [src]="photo.src"
-                 [alt]="cfg.couple.groom + ' & ' + cfg.couple.bride"
+                 [alt]="cfg.couple.bride + ' & ' + cfg.couple.groom"
                  (error)="photoFailed(photo.originalIndex)" />
           </figure>
         }

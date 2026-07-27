@@ -39,6 +39,7 @@ export class InviteComponent implements OnInit, OnDestroy {
   private slideshowTimer?: ReturnType<typeof setInterval>;
   private autoScrollFrame?: number;
   private lastAutoScrollTime = 0;
+  private autoScrollPosition = 0;
   private autoplayWaitingForGesture = false;
   private touchStartX: number | null = null;
   readonly musicOn = this.music.playing;
@@ -55,16 +56,15 @@ export class InviteComponent implements OnInit, OnDestroy {
     this.lang = this.route.snapshot.data['lang'] === 'en' ? 'en' : 'vi';
     this.translate.use(this.lang);
     this.startSlideshow();
+    this.music.initializeAutoScroll();
+    if (this.music.autoScrollEnabled()) {
+      this.startAutoScroll();
+    }
     if (this.music.playing()) {
-      if (this.music.autoScrollEnabled()) {
-        this.startAutoScroll();
-      }
-    } else if (this.music.shouldAutoplay) {
+      this.autoplayWaitingForGesture = false;
+    } else {
       const started = await this.music.tryAutoplay();
       this.autoplayWaitingForGesture = !started;
-      if (started) {
-        this.startAutoScroll();
-      }
     }
     await this.visit.log(this.device.get());
   }
@@ -77,8 +77,9 @@ export class InviteComponent implements OnInit, OnDestroy {
 
   async toggleMusic() {
     const started = await this.music.toggle();
-    this.autoplayWaitingForGesture = !started && this.music.shouldAutoplay;
+    this.autoplayWaitingForGesture = false;
     if (started) {
+      this.music.enableAutoScroll();
       this.startAutoScroll();
     } else {
       this.stopAutoScrollAnimation();
@@ -208,14 +209,15 @@ export class InviteComponent implements OnInit, OnDestroy {
     if (!view || this.autoScrollFrame !== undefined || !this.music.autoScrollEnabled()) return;
 
     this.lastAutoScrollTime = view.performance.now();
+    this.autoScrollPosition = view.scrollY;
     const scrollStep = (timestamp: number) => {
-      if (!this.music.playing() || !this.music.autoScrollEnabled()) {
+      if (!this.music.autoScrollEnabled()) {
         this.autoScrollFrame = undefined;
         return;
       }
 
       const maxScroll = Math.max(0, this.document.documentElement.scrollHeight - view.innerHeight);
-      if (view.scrollY >= maxScroll - 1) {
+      if (this.autoScrollPosition >= maxScroll - 1) {
         this.music.stopAutoScroll();
         this.autoScrollFrame = undefined;
         return;
@@ -223,7 +225,8 @@ export class InviteComponent implements OnInit, OnDestroy {
 
       const elapsed = Math.min(timestamp - this.lastAutoScrollTime, 50);
       this.lastAutoScrollTime = timestamp;
-      view.scrollBy(0, elapsed * 0.016);
+      this.autoScrollPosition = Math.min(maxScroll, this.autoScrollPosition + elapsed * 0.03);
+      view.scrollTo(0, this.autoScrollPosition);
       this.autoScrollFrame = view.requestAnimationFrame(scrollStep);
     };
 
@@ -244,9 +247,6 @@ export class InviteComponent implements OnInit, OnDestroy {
 
     this.autoplayWaitingForGesture = false;
     const started = await this.music.tryAutoplay();
-    this.autoplayWaitingForGesture = !started && this.music.shouldAutoplay;
-    if (started) {
-      this.startAutoScroll();
-    }
+    this.autoplayWaitingForGesture = !started;
   }
 }

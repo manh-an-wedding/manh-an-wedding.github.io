@@ -13,6 +13,8 @@ const testTranslations = {
     father: 'Ông',
     mother: 'Bà',
     announcement: 'Trân trọng báo tin Lễ Vu Quy của',
+    bride_birth_order: 'Trưởng Nữ',
+    groom_birth_order: 'Trưởng Nam',
     ceremony_eyebrow: 'Hôn lễ được cử hành tại',
     ceremony_venue: 'Tư gia nhà gái',
     ceremony_lunar_date: '08 tháng 09 năm Bính Ngọ',
@@ -32,6 +34,8 @@ const englishTranslations = {
     father: 'Father',
     mother: 'Mother',
     announcement: 'We respectfully announce the Vu Quy ceremony',
+    bride_birth_order: 'Eldest Daughter',
+    groom_birth_order: 'Eldest Son',
     ceremony_eyebrow: 'The ceremony will be held at',
     ceremony_venue: "the Bride's house",
     ceremony_lunar_date: '08 September, Year of the Fire Horse',
@@ -96,7 +100,7 @@ describe('InviteComponent', () => {
     const heroNames = element.querySelector('.cover-couple')?.textContent ?? '';
     const coverText = element.querySelector('.cover-hero')?.textContent?.replace(/\s+/g, ' ') ?? '';
 
-    expect(heroNames.indexOf('Duy Mạnh')).toBeLessThan(heroNames.indexOf('Nhật An'));
+    expect(heroNames.indexOf('Nhật An')).toBeLessThan(heroNames.indexOf('Duy Mạnh'));
     expect(coverText).toContain('11:00');
     expect(coverText).toContain('17/10/2026');
     expect(coverText).toContain('Vạn Phát Riverside');
@@ -125,6 +129,10 @@ describe('InviteComponent', () => {
     expect(element.querySelectorAll('.family-line')).toHaveLength(4);
     expect(sectionText('.invitation-intro')).not.toContain('Chú rể');
     expect(sectionText('.invitation-intro')).not.toContain('Cô dâu');
+    expect(sectionText('.couple-person:first-child')).toContain('Nhật An');
+    expect(sectionText('.couple-person:first-child')).toContain('Trưởng Nữ');
+    expect(sectionText('.couple-person:last-child')).toContain('Duy Mạnh');
+    expect(sectionText('.couple-person:last-child')).toContain('Trưởng Nam');
     expect(sectionText('.invitation-intro'))
       .toContain('Trân trọng báo tin Lễ Vu Quy của');
     expect(sectionText('.invitation-intro')).not.toContain('của chúng tôi');
@@ -165,6 +173,8 @@ describe('InviteComponent', () => {
     expect(sectionText('.cover-hero')).toContain('Van Phat Riverside, Can Tho');
     expect(sectionText('.invitation-intro'))
       .toContain('We respectfully announce the Vu Quy ceremony');
+    expect(sectionText('.invitation-intro')).toContain('Eldest Daughter');
+    expect(sectionText('.invitation-intro')).toContain('Eldest Son');
     expect(sectionText('.reception-card'))
       .toContain('We cordially invite you to celebrate with the family at');
     expect(sectionText('.ceremony-card')).toContain("the Bride's house");

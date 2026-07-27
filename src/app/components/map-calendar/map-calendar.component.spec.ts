@@ -9,17 +9,14 @@ describe('MapCalendarComponent', () => {
     return TestBed.createComponent(MapCalendarComponent);
   }
 
-  it('builds a reception calendar entry with the groom before the bride', async () => {
+  it('builds a reception calendar entry with the bride before the groom', async () => {
     const c = (await createComponent()).componentInstance;
     expect(c.googleCalUrl()).toContain('calendar.google.com');
     expect(c.googleCalUrl()).toContain('dates=');
     const calendar = new URL(c.googleCalUrl());
-    expect(calendar.searchParams.get('text')).toBe('Tiệc cưới — Duy Mạnh & Nhật An');
+    expect(calendar.searchParams.get('text')).toBe('Tiệc cưới — Nhật An & Duy Mạnh');
     expect(calendar.searchParams.get('location'))
       .toBe('Số 02 Nguyễn Văn Cừ (Cồn Khương), phường Cái Khế, TP Cần Thơ');
-    const ics = c.icsText();
-    expect(ics).toContain('BEGIN:VEVENT');
-    expect(ics).toContain('END:VCALENDAR');
   });
 
   it('uses the supplied Vạn Phát Riverside directions link', async () => {
@@ -39,16 +36,19 @@ describe('MapCalendarComponent', () => {
     expect(fixture.nativeElement.querySelector('.apple-calendar-icon')).not.toBeNull();
   });
 
-  it('offers 11:00–13:30 calendar entries without an embedded map', async () => {
+  it('offers 11:00–13:30 calendar entries and a Safari-compatible ICS file', async () => {
     const fixture = await createComponent();
     const c = fixture.componentInstance;
     const google = new URL(c.googleCalUrl());
     expect(google.searchParams.get('dates'))
       .toBe('20261017T040000Z/20261017T063000Z');
-    expect(c.icsText()).toContain('DTSTART:20261017T040000Z');
-    expect(c.icsText()).toContain('DTEND:20261017T063000Z');
 
     fixture.detectChanges();
+    const appleLink: HTMLAnchorElement =
+      fixture.nativeElement.querySelectorAll('a')[2];
+    expect(appleLink.getAttribute('href')).toBe('/assets/wedding.ics');
+    expect(appleLink.hasAttribute('download')).toBe(false);
+    expect(appleLink.getAttribute('href')).not.toContain('data:');
     expect(fixture.nativeElement.querySelector('iframe')).toBeNull();
     expect(fixture.nativeElement.querySelectorAll('a')).toHaveLength(3);
   });

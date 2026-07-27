@@ -50,7 +50,7 @@ export const WEDDING: WeddingConfig = {
       departTime: '7:30 17.10.2026',
       restaurantArrivalTime: '10:30',
       returnDepartTime: '13:30',
-      hotelArrivalTime: '17:30',
+      hotelArrivalTime: '17:00',
     },
   },
   gift: {

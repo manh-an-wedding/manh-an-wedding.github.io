@@ -1,4 +1,12 @@
-import { ChangeDetectorRef, Component, Inject, inject, Input } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Inject,
+  inject,
+  Input,
+  ViewChild,
+} from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -22,6 +30,11 @@ export class RsvpFormComponent {
   private guests = inject(GuestsService);
   private device = inject(DeviceIdService);
   private cdr = inject(ChangeDetectorRef);
+  @ViewChild('busInfoButton') private busInfoButton?: ElementRef<HTMLButtonElement>;
+  @ViewChild('busInfoPanel') private busInfoPanel?: ElementRef<HTMLElement>;
+  @ViewChild('confirmationPanel') private confirmationPanel?: ElementRef<HTMLElement>;
+  @ViewChild('guestNameInput') private guestNameInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('submitError') private submitError?: ElementRef<HTMLElement>;
   @Input() lang: 'vi' | 'en' = 'vi';
 
   model: { guestName: string; category: string;
@@ -47,6 +60,15 @@ export class RsvpFormComponent {
 
   onStatusChange(status: '' | 'self_transport' | 'bus' | 'cannot_attend') {
     if (status !== 'bus') this.showBusInfo = false;
+  }
+
+  toggleBusInfo() {
+    this.showBusInfo = !this.showBusInfo;
+    this.cdr.detectChanges();
+    const target = this.showBusInfo
+      ? this.busInfoPanel?.nativeElement
+      : this.busInfoButton?.nativeElement;
+    this.focusAndCenter(target);
   }
 
   valid(): boolean {
@@ -79,11 +101,39 @@ export class RsvpFormComponent {
     } finally {
       this.submitting = false;
       this.cdr.detectChanges();
+      if (this.done) {
+        this.focusAndCenter(this.confirmationPanel?.nativeElement);
+      } else if (this.submitFailed) {
+        this.focusAndCenter(this.submitError?.nativeElement);
+      }
     }
   }
 
   editResponse() {
     this.done = false;
     this.submitFailed = false;
+    this.cdr.detectChanges();
+    this.focusAndCenter(this.guestNameInput?.nativeElement);
+  }
+
+  private focusAndCenter(target?: HTMLElement) {
+    if (!target) return;
+
+    target.focus({ preventScroll: true });
+    const view = target.ownerDocument.defaultView;
+    const centerTarget = () => {
+      if (typeof target.scrollIntoView !== 'function') return;
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest',
+      });
+    };
+
+    if (view?.requestAnimationFrame) {
+      view.requestAnimationFrame(centerTarget);
+    } else {
+      centerTarget();
+    }
   }
 }

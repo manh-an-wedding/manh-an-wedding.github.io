@@ -1,7 +1,7 @@
 {
   "cover": { "open": "Mở thiệp" },
   "controls": { "play_music": "Phát nhạc", "pause_music": "Tạm dừng nhạc" },
-  "map": { "directions": "Chỉ đường", "gcal": "Thêm vào Google Calendar", "ics": "Thêm vào lịch Apple" },
+  "map": { "directions": "Chỉ đường", "gcal": "Thêm vào lịch Google", "ics": "Thêm vào lịch Apple" },
   "invite": { "invite_you": "Trân trọng kính mời", "confirm": "Xác nhận tham dự", "agenda": "Chương trình" },
   "details": {
     "cover_invitation": "Thư mời",
@@ -14,6 +14,8 @@
     "bride_family": "Nhà gái",
     "groom_role": "Chú rể",
     "bride_role": "Cô dâu",
+    "groom_birth_order": "Trưởng Nam",
+    "bride_birth_order": "Trưởng Nữ",
     "father": "Ông",
     "mother": "Bà",
     "ceremony_eyebrow": "Hôn lễ được cử hành tại",
@@ -49,6 +51,7 @@
             "bus_return_departure_time": "13:30 (dự kiến)",
             "bus_return_location": "Sảnh 01 Vạn Phát",
             "bus_hotel_arrival": "Dự kiến về đến IBIS",
+            "bus_return_traffic_note": "(chiều về có thể kẹt xe trên cao tốc)",
             "bus_deadline_prefix": "Danh sách đi xe sẽ được chốt vào",
             "bus_deadline_detail": "11:30 AM thứ 7, 10.10.2026",
             "deadline_passed": "Đã qua hạn xác nhận — gia đình có thể đã chốt số lượng, mong bạn thông cảm.",

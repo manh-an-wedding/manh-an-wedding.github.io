@@ -129,6 +129,7 @@ describe('RsvpFormComponent', () => {
       bus_return_departure_time: '13:30 (dự kiến)',
       bus_return_location: 'Sảnh 01 Vạn Phát',
       bus_hotel_arrival: 'Dự kiến về đến IBIS',
+      bus_return_traffic_note: '(chiều về có thể kẹt xe trên cao tốc)',
       bus_deadline_prefix: 'Danh sách đi xe sẽ được chốt vào',
       bus_deadline_detail: '11:30 AM thứ 7, 10.10.2026',
     } });
@@ -157,7 +158,8 @@ describe('RsvpFormComponent', () => {
     expect(busText).toContain('07:30 - 17.10.2026');
     expect(busText).toContain('10:30');
     expect(busText).toContain('13:30');
-    expect(busText).toContain('17:30');
+    expect(busText).toContain('17:00');
+    expect(busText).toContain('chiều về có thể kẹt xe trên cao tốc');
     expect(busText)
       .toContain('Danh sách đi xe sẽ được chốt vào 11:30 AM thứ 7, 10.10.2026');
     expect(element.querySelector('.bus-registration-deadline > em')).not.toBeNull();
@@ -166,6 +168,23 @@ describe('RsvpFormComponent', () => {
       (item: Element) => item.textContent?.trim(),
     )).toEqual(['11:30 AM thứ 7, 10.10.2026']);
     expect(element.querySelectorAll('.bus-info p')).toHaveLength(7);
+  });
+
+  it('moves focus into the bus information and back to its trigger when closed', () => {
+    const fixture = TestBed.createComponent(RsvpFormComponent);
+    fixture.detectChanges();
+
+    const infoButton: HTMLButtonElement =
+      fixture.nativeElement.querySelector('.bus-info-button');
+    infoButton.click();
+
+    expect(document.activeElement)
+      .toBe(fixture.nativeElement.querySelector('.bus-info-focus-target'));
+
+    infoButton.click();
+
+    expect(fixture.nativeElement.querySelector('.bus-info-focus-target')).toBeNull();
+    expect(document.activeElement).toBe(infoButton);
   });
 
   it('renders the English bus schedule from translations', async () => {
@@ -181,6 +200,7 @@ describe('RsvpFormComponent', () => {
       bus_return_departure_time: '13:30 (estimated)',
       bus_return_location: 'Van Phat Hall 01',
       bus_hotel_arrival: 'Estimated arrival at IBIS',
+      bus_return_traffic_note: '(return traffic may be congested on the expressway)',
       bus_deadline_prefix: 'The shuttle list will be finalized at',
       bus_deadline_detail: '11:30 AM Saturday, 10.10.2026',
     } });
@@ -241,6 +261,8 @@ describe('RsvpFormComponent', () => {
     expect(submissionState.submitFailed).toBe(true);
     expect(fixture.nativeElement.querySelector('[role="alert"]')?.textContent)
       .toContain('Không thể gửi xác nhận');
+    expect(document.activeElement)
+      .toBe(fixture.nativeElement.querySelector('[role="alert"]'));
     expect(fixture.nativeElement.querySelector('button[type="submit"]')?.disabled)
       .toBe(false);
   });
@@ -263,6 +285,8 @@ describe('RsvpFormComponent', () => {
     await Promise.resolve();
 
     expect(fixture.nativeElement.querySelector('.thanks')).not.toBeNull();
+    expect(document.activeElement)
+      .toBe(fixture.nativeElement.querySelector('.rsvp-confirmation'));
   });
 
   it('confirms a bus RSVP with the personalized thanks, named guest list, and bus details', async () => {
@@ -281,6 +305,7 @@ describe('RsvpFormComponent', () => {
         bus_return_departure_time: '13:30 (dự kiến)',
         bus_return_location: 'Sảnh 01 Vạn Phát',
         bus_hotel_arrival: 'Dự kiến về đến IBIS',
+        bus_return_traffic_note: '(chiều về có thể kẹt xe trên cao tốc)',
         bus_deadline_prefix: 'Danh sách đi xe sẽ được chốt vào',
         bus_deadline_detail: '11:30 AM thứ 7, 10.10.2026',
         edit_response: 'Chỉnh sửa',
@@ -326,7 +351,9 @@ describe('RsvpFormComponent', () => {
     expect(confirmedBusInfo?.textContent).toContain('07:30 - 17.10.2026');
     expect(confirmedBusInfo?.textContent).toContain('10:30');
     expect(confirmedBusInfo?.textContent).toContain('13:30');
-    expect(confirmedBusInfo?.textContent).toContain('17:30');
+    expect(confirmedBusInfo?.textContent).toContain('17:00');
+    expect(confirmedBusInfo?.textContent)
+      .toContain('chiều về có thể kẹt xe trên cao tốc');
     expect(confirmedBusInfo?.textContent)
       .toContain('Danh sách đi xe sẽ được chốt vào');
     expect(Array.from(
@@ -345,6 +372,8 @@ describe('RsvpFormComponent', () => {
 
     const form: HTMLFormElement | null = fixture.nativeElement.querySelector('form');
     expect(form?.hidden).toBe(false);
+    expect(document.activeElement)
+      .toBe(fixture.nativeElement.querySelector('input[name="name"]'));
     expect(c.model.guestName).toBe('Duy Mạnh');
     expect(c.companions).toEqual([{ name: 'Bé An' }]);
   });

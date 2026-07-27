@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Manh and An Wedding//Wedding Invitation//VI
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:20261017T040000Z-wedding@manh-an-wedding.github.io
+DTSTAMP:20260727T000000Z
+DTSTART:20261017T040000Z
+DTEND:20261017T063000Z
+SUMMARY:Tiệc cưới - Nhật An & Duy Mạnh
+LOCATION:Số 02 Nguyễn Văn Cừ (Cồn Khương)\, phường Cái Khế\, TP Cần Thơ
+DESCRIPTION:Tiệc cưới tại Vạn Phát Riverside - Sảnh 01
+URL:https://manh-an-wedding.github.io/
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR
