@@ -22,7 +22,7 @@ describe('wedding config', () => {
     expect(WEDDING.families.bride.address).toBe('Bình Thủy, Cần Thơ');
     expect(WEDDING.ceremony.datetime).toBe('2026-10-17T08:00:00+07:00');
     expect(WEDDING.ceremony.address).toBe('Bình Thủy, Cần Thơ');
-    expect(WEDDING.reception.welcomeTime).toBe('10:15');
+    expect(WEDDING.reception.welcomeTime).toBe('10:30');
     expect(WEDDING.reception.datetime).toBe('2026-10-17T11:00:00+07:00');
     expect(WEDDING.reception.venue).toBe('VẠN PHÁT RIVERSIDE - SẢNH 01');
     expect(WEDDING.reception.shortVenue).toBe('Vạn Phát Riverside, Cần Thơ');
@@ -33,10 +33,10 @@ describe('wedding config', () => {
     expect(WEDDING.rsvp.deadlineISO).toBe('2026-10-10T11:30:00+07:00');
     expect(WEDDING.rsvp.bus).toEqual({
       pickup: 'Ibis hotel, 2 Hồng Hà, Tân Sơn Hòa, Hồ Chí Minh',
-      departTime: '7:30 17.10.2026',
-      restaurantArrivalTime: '10:30',
+      departTime: '7:15 17.10.2026',
+      restaurantArrivalTime: '10:45',
       returnDepartTime: '13:30',
-      hotelArrivalTime: '17:00',
+      hotelArrivalTime: '17:30',
     });
     expect(WEDDING.event.venue).toBe('VẠN PHÁT RIVERSIDE - SẢNH 01');
   });

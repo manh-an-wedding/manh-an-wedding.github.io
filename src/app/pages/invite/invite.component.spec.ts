@@ -203,7 +203,7 @@ describe('InviteComponent', () => {
       .toContain('VẠN PHÁT RIVERSIDE - SẢNH 01');
     expect(element.querySelector('.reception-card .event-place')).not.toBeNull();
     expect(element.querySelector('.reception-card .event-place .reception-venue-name')).not.toBeNull();
-    expect(sectionText('.reception-card')).toContain('10:15');
+    expect(sectionText('.reception-card')).toContain('10:30');
     expect(sectionText('.reception-card')).toContain('11:00');
     expect(sectionText('.reception-card')).toContain(
       'Sự hiện diện của quý khách là niềm vinh hạnh cho gia đình chúng tôi.',

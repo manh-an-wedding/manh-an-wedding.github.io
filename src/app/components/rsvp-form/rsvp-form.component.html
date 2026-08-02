@@ -30,6 +30,9 @@
         <strong>{{ 'rsvp.bus_deadline_detail' | translate }}</strong>.
       </em>
     </p>
+    <p class="bus-driver-update-note">
+      {{ 'rsvp.bus_driver_update_note' | translate }}
+    </p>
   </div>
 </ng-template>
 
@@ -101,6 +104,7 @@
                 (click)="toggleBusInfo()" aria-label="info"
                 aria-controls="bus-information"
                 [attr.aria-expanded]="showBusInfo">i</button>
+        <em class="bus-info-hint">{{ 'rsvp.bus_info_hint' | translate }}</em>
       </label>
       @if (showBusInfo) {
         <div #busInfoPanel id="bus-information" class="bus-info-focus-target"
@@ -125,7 +129,6 @@
         {{ 'rsvp.submit_error' | translate }}
       </p>
     }
-    <p class="rsvp-privacy-note">{{ 'rsvp.privacy_note' | translate }}</p>
     <button type="submit" [disabled]="!valid() || submitting">
       {{ (submitting ? 'rsvp.submitting' : 'rsvp.submit') | translate }}
     </button>

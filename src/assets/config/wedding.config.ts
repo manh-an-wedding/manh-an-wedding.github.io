@@ -23,7 +23,7 @@ export const WEDDING: WeddingConfig = {
   },
   reception: {
     name: 'Tiệc cưới',
-    welcomeTime: '10:15',
+    welcomeTime: '10:30',
     datetime: '2026-10-17T11:00:00+07:00',
     lunarDate: '08 tháng 09 năm Bính Ngọ',
     venue: 'VẠN PHÁT RIVERSIDE - SẢNH 01',
@@ -47,10 +47,10 @@ export const WEDDING: WeddingConfig = {
     deadlineISO: '2026-10-10T11:30:00+07:00',
     bus: {
       pickup: 'Ibis hotel, 2 Hồng Hà, Tân Sơn Hòa, Hồ Chí Minh',
-      departTime: '7:30 17.10.2026',
-      restaurantArrivalTime: '10:30',
+      departTime: '7:15 17.10.2026',
+      restaurantArrivalTime: '10:45',
       returnDepartTime: '13:30',
-      hotelArrivalTime: '17:00',
+      hotelArrivalTime: '17:30',
     },
   },
   gift: {
