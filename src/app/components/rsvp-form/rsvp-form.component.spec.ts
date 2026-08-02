@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { RsvpFormComponent } from './rsvp-form.component';
 import { RsvpService } from '../../core/rsvp.service';
-import { GuestsService } from '../../core/guests.service';
 import { DeviceIdService } from '../../core/device-id.service';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
@@ -25,8 +24,6 @@ class RsvpStub {
     this.submitted = d;
   };
 }
-class GuestsStub { suggest = async () => ['Duy Mạnh']; }
-
 describe('RsvpFormComponent', () => {
   let rsvp: RsvpStub;
   beforeEach(async () => {
@@ -36,7 +33,6 @@ describe('RsvpFormComponent', () => {
       providers: [
         provideTranslateService({}),
         { provide: RsvpService, useValue: rsvp },
-        { provide: GuestsService, useValue: new GuestsStub() },
         { provide: DeviceIdService, useValue: { get: () => 'dev-1' } },
       ],
     }).compileComponents();
@@ -55,6 +51,30 @@ describe('RsvpFormComponent', () => {
     expect(c.valid()).toBe(false);
     c.model.phone = '0900';
     expect(c.valid()).toBe(true);
+  });
+
+  it('closes only shuttle registration after the local deadline', () => {
+    const c = TestBed.createComponent(RsvpFormComponent).componentInstance;
+    Object.defineProperty(c, 'deadlinePassed', { configurable: true, get: () => true });
+    c.model.guestName = 'A';
+    c.model.category = 'IAS';
+    c.model.phone = '0900000000';
+
+    c.model.status = 'bus';
+    expect(c.valid()).toBe(false);
+
+    c.model.status = 'self_transport';
+    expect(c.valid()).toBe(true);
+  });
+
+  it('does not expose the guest list through browser autocomplete', () => {
+    const fixture = TestBed.createComponent(RsvpFormComponent);
+    fixture.detectChanges();
+
+    const input: HTMLInputElement | null =
+      fixture.nativeElement.querySelector('input[name="name"]');
+    expect(input?.hasAttribute('list')).toBe(false);
+    expect(fixture.nativeElement.querySelector('datalist')).toBeNull();
   });
 
   it('uses the inset-arrow style for the group selector', () => {

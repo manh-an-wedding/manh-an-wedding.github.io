@@ -73,11 +73,8 @@
     @if (deadlinePassed) { <p class="warn">{{ 'rsvp.deadline_passed' | translate }}</p> }
 
     <label class="rsvp-name-label">{{ 'rsvp.your_name' | translate }}
-      <input name="name" [(ngModel)]="model.guestName" (ngModelChange)="onNameInput()"
-             #guestNameInput list="guest-suggest" autocomplete="off" required>
-      <datalist id="guest-suggest">
-        @for (s of suggestions; track s) { <option [value]="s"></option> }
-      </datalist>
+      <input name="name" [(ngModel)]="model.guestName"
+             #guestNameInput autocomplete="name" maxlength="120" required>
     </label>
 
     <label class="rsvp-group-label">{{ 'rsvp.group' | translate }}
@@ -97,6 +94,7 @@
     }
     <fieldset>
       <label class="bus-option-label"><input type="radio" name="st" value="bus" [(ngModel)]="model.status"
+                    [disabled]="deadlinePassed"
                     (ngModelChange)="onStatusChange($event)">
         {{ 'rsvp.bus' | translate:{ count: formattedBusPartySize } }}
         <button #busInfoButton type="button" class="bus-info-button"
@@ -127,6 +125,7 @@
         {{ 'rsvp.submit_error' | translate }}
       </p>
     }
+    <p class="rsvp-privacy-note">{{ 'rsvp.privacy_note' | translate }}</p>
     <button type="submit" [disabled]="!valid() || submitting">
       {{ (submitting ? 'rsvp.submitting' : 'rsvp.submit') | translate }}
     </button>

@@ -45,43 +45,53 @@
 
 <main class="invite">
   <section class="invitation-sheet announcement-section">
-    <section class="families" appRevealOnScroll
+    <section class="families reveal-stagger" appRevealOnScroll
              [attr.aria-label]="'details.families' | translate">
       <article class="family-card">
-        <p class="eyebrow">{{ 'details.groom_family' | translate }}</p>
-        <p class="family-line">{{ 'details.father' | translate }} {{ cfg.families.groom.father }}</p>
-        <p class="family-line">{{ 'details.mother' | translate }} {{ cfg.families.groom.mother }}</p>
-        <address>{{ cfg.families.groom.address }}</address>
+        <div class="reveal-step">
+          <p class="eyebrow">{{ 'details.bride_family' | translate }}</p>
+          <p class="family-line">{{ 'details.father' | translate }} {{ cfg.families.bride.father }}</p>
+        </div>
+        <div class="reveal-step" style="--reveal-delay: .15s">
+          <p class="family-line">{{ 'details.mother' | translate }} {{ cfg.families.bride.mother }}</p>
+          <address>{{ cfg.families.bride.address }}</address>
+        </div>
       </article>
       <article class="family-card">
-        <p class="eyebrow">{{ 'details.bride_family' | translate }}</p>
-        <p class="family-line">{{ 'details.father' | translate }} {{ cfg.families.bride.father }}</p>
-        <p class="family-line">{{ 'details.mother' | translate }} {{ cfg.families.bride.mother }}</p>
-        <address>{{ cfg.families.bride.address }}</address>
+        <div class="reveal-step">
+          <p class="eyebrow">{{ 'details.groom_family' | translate }}</p>
+          <p class="family-line">{{ 'details.father' | translate }} {{ cfg.families.groom.father }}</p>
+        </div>
+        <div class="reveal-step" style="--reveal-delay: .15s">
+          <p class="family-line">{{ 'details.mother' | translate }} {{ cfg.families.groom.mother }}</p>
+          <address>{{ cfg.families.groom.address }}</address>
+        </div>
       </article>
     </section>
 
     <div class="sheet-divider" appRevealOnScroll aria-hidden="true">♡</div>
 
-    <section class="invitation-intro" appRevealOnScroll>
-      <p class="eyebrow">{{ 'details.announcement' | translate }}</p>
+    <section class="invitation-intro reveal-stagger" appRevealOnScroll>
+      <p class="eyebrow reveal-step">{{ 'details.announcement' | translate }}</p>
       <div class="couple-full-names">
-        <div class="couple-person">
+        <div class="couple-person reveal-step" style="--reveal-delay: .15s">
           <strong>{{ cfg.couple.bride }}</strong>
           <small>{{ 'details.bride_birth_order' | translate }}</small>
         </div>
-        <span>&amp;</span>
-        <div class="couple-person">
+        <span class="reveal-step" style="--reveal-delay: .3s">&amp;</span>
+        <div class="couple-person reveal-step" style="--reveal-delay: .45s">
           <strong>{{ cfg.couple.groom }}</strong>
           <small>{{ 'details.groom_birth_order' | translate }}</small>
         </div>
       </div>
     </section>
 
-    <section class="event-card ceremony-card" appRevealOnScroll>
-      <p class="eyebrow">{{ 'details.ceremony_eyebrow' | translate }}</p>
-      <h2 class="ceremony-venue-title">{{ 'details.ceremony_venue' | translate }}</h2>
-      <div class="event-time-grid">
+    <section class="event-card ceremony-card reveal-stagger" appRevealOnScroll>
+      <div class="reveal-step">
+        <p class="eyebrow">{{ 'details.ceremony_eyebrow' | translate }}</p>
+        <h2 class="ceremony-venue-title">{{ 'details.ceremony_venue' | translate }}</h2>
+      </div>
+      <div class="event-time-grid reveal-step" style="--reveal-delay: .15s">
         <div>
           <span>{{ 'details.time' | translate }}</span>
           <strong>{{ cfg.ceremony.datetime | date:'HH:mm':'+0700' }}</strong>
@@ -91,40 +101,48 @@
           <strong>{{ cfg.ceremony.datetime | date:'dd.MM.yyyy':'+0700' }}</strong>
         </div>
       </div>
-      <p class="lunar-date">{{ 'details.lunar' | translate }} {{ 'details.ceremony_lunar_date' | translate }}</p>
+      <p class="lunar-date reveal-step" style="--reveal-delay: .3s">
+        {{ 'details.lunar' | translate }} {{ 'details.ceremony_lunar_date' | translate }}
+      </p>
     </section>
   </section>
 
   <div class="section-separator" aria-hidden="true"><span>♡</span></div>
 
   <section class="invitation-sheet reception-section">
-    <section class="event-card reception-card" appRevealOnScroll>
-      <p class="eyebrow reception-title">{{ 'details.reception_title' | translate }}</p>
-      <p class="reception-invitation">{{ 'details.reception_invitation' | translate }}</p>
-      <div class="event-place">
+    <section class="event-card reception-card reveal-stagger" appRevealOnScroll>
+      <div class="reveal-step">
+        <p class="eyebrow reception-title">{{ 'details.reception_title' | translate }}</p>
+        <p class="reception-invitation">{{ 'details.reception_invitation' | translate }}</p>
+      </div>
+      <div class="event-place reveal-step" style="--reveal-delay: .15s">
         <span class="reception-venue-label">{{ 'details.reception_venue_label' | translate }}</span>
         <strong class="reception-venue-name">{{ 'details.reception_venue' | translate }}</strong>
         <address>{{ 'details.reception_address' | translate }}</address>
       </div>
-      <div class="event-time-grid">
-        <div>
-          <span>{{ 'details.welcome' | translate }}</span>
-          <strong class="event-value">{{ cfg.reception.welcomeTime }}</strong>
+      <div class="reveal-step" style="--reveal-delay: .3s">
+        <div class="event-time-grid">
+          <div>
+            <span>{{ 'details.welcome' | translate }}</span>
+            <strong class="event-value">{{ cfg.reception.welcomeTime }}</strong>
+          </div>
+          <div>
+            <span>{{ 'details.start' | translate }}</span>
+            <strong class="event-value">{{ cfg.reception.datetime | date:'HH:mm':'+0700' }}</strong>
+          </div>
         </div>
-        <div>
-          <span>{{ 'details.start' | translate }}</span>
-          <strong class="event-value">{{ cfg.reception.datetime | date:'HH:mm':'+0700' }}</strong>
+        <div class="reception-date-row">
+          <span class="event-label">{{ 'details.date' | translate }}</span>
+          <strong class="event-value">{{ cfg.reception.datetime | date:'dd.MM.yyyy':'+0700' }}</strong>
         </div>
       </div>
-      <div class="reception-date-row">
-        <span class="event-label">{{ 'details.date' | translate }}</span>
-        <strong class="event-value">{{ cfg.reception.datetime | date:'dd.MM.yyyy':'+0700' }}</strong>
+      <div class="reveal-step" style="--reveal-delay: .45s">
+        <p class="lunar-date">{{ 'details.lunar' | translate }} {{ 'details.ceremony_lunar_date' | translate }}</p>
+        <p>{{ 'details.rsvp_intro' | translate }}</p>
       </div>
-      <p class="lunar-date">{{ 'details.lunar' | translate }} {{ 'details.ceremony_lunar_date' | translate }}</p>
-      <p>{{ 'details.rsvp_intro' | translate }}</p>
     </section>
 
-    <app-map-calendar appRevealOnScroll></app-map-calendar>
+    <app-map-calendar class="reveal-stagger" appRevealOnScroll></app-map-calendar>
   </section>
 
   <div class="section-separator" aria-hidden="true"><span>♡</span></div>
@@ -133,10 +151,11 @@
 
   <div class="section-separator" aria-hidden="true"><span>♡</span></div>
 
-  <section class="album" appRevealOnScroll>
-    <p class="eyebrow">{{ 'details.album_eyebrow' | translate }}</p>
+  <section class="album reveal-stagger" appRevealOnScroll>
+    <p class="eyebrow reveal-step">{{ 'details.album_eyebrow' | translate }}</p>
     @if (visiblePhotos.length) {
-      <div class="album-slider" aria-roledescription="carousel"
+      <div class="album-slider reveal-step" style="--reveal-delay: .15s"
+           aria-roledescription="carousel"
            [attr.aria-label]="'details.album_eyebrow' | translate">
         <div class="album-stage">
           <div class="album-track"

@@ -43,6 +43,6 @@ export interface WeddingConfig {
   faq: FaqItem[];
   theme: { primary: string; accent: string; fontHeading: string; fontBody: string; music: string };
   supabase: { url: string; anonKey: string };
-  media: { coverImg: string; couplePhotos: string[]; photos: string[] };
+  media: { coverImg: string; photos: string[] };
   sections: { wishes: boolean; faq: boolean };
 }

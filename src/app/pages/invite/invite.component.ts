@@ -54,6 +54,7 @@ export class InviteComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     // Option C: lang comes from route data ({ lang: 'vi' } at '/', { lang: 'en' } at '/en')
     this.lang = this.route.snapshot.data['lang'] === 'en' ? 'en' : 'vi';
+    this.document.documentElement.lang = this.lang;
     this.translate.use(this.lang);
     this.startSlideshow();
     this.music.initializeAutoScroll();
@@ -225,7 +226,7 @@ export class InviteComponent implements OnInit, OnDestroy {
 
       const elapsed = Math.min(timestamp - this.lastAutoScrollTime, 50);
       this.lastAutoScrollTime = timestamp;
-      this.autoScrollPosition = Math.min(maxScroll, this.autoScrollPosition + elapsed * 0.03);
+      this.autoScrollPosition = Math.min(maxScroll, this.autoScrollPosition + elapsed * 0.04);
       view.scrollTo(0, this.autoScrollPosition);
       this.autoScrollFrame = view.requestAnimationFrame(scrollStep);
     };

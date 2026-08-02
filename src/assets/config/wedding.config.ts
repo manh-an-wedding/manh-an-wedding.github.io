@@ -43,8 +43,8 @@ export const WEDDING: WeddingConfig = {
     agendaKeys: ['agenda.welcome', 'agenda.ceremony', 'agenda.lunch', 'agenda.party'],
   },
   rsvp: {
-    groups: ['Họ hàng nhà gái', 'Bạn cha Năm', 'Bạn mẹ Bắc', 'Tiến bước', 'IAS', 'ZAD', 'MWG', 'RVC', 'Bạn của An'],
-    deadlineISO: '2026-10-10',
+    groups: ['Họ hàng nhà gái', 'Bạn cha Năm', 'Bạn mẹ Bắc', 'Tiến bước', 'IAS', 'ZAD', 'MWG', 'RVC', 'Bạn của An', 'Bạn của Tâm'],
+    deadlineISO: '2026-10-10T11:30:00+07:00',
     bus: {
       pickup: 'Ibis hotel, 2 Hồng Hà, Tân Sơn Hòa, Hồ Chí Minh',
       departTime: '7:30 17.10.2026',
@@ -54,11 +54,11 @@ export const WEDDING: WeddingConfig = {
     },
   },
   gift: {
-    bride: { name: 'Nhật An', bank: 'VCB [GIẢ]', account: '0000000000', qr: 'assets/img/qr-bride.png' },
-    groom: { name: 'Duy Mạnh', bank: 'TCB [GIẢ]', account: '1111111111', qr: 'assets/img/qr-groom.png' },
+    bride: { name: 'Nhật An', bank: '', account: '', qr: '' },
+    groom: { name: 'Duy Mạnh', bank: '', account: '', qr: '' },
   },
   faq: [
-    { qKey: 'faq.gift.q', aKey: 'faq.gift.a', showGiftQr: true },
+    { qKey: 'faq.gift.q', aKey: 'faq.gift.a', showGiftQr: false },
     { qKey: 'faq.bus.q', aKey: 'faq.bus.a' },
     { qKey: 'faq.oneway.q', aKey: 'faq.oneway.a' },
     { qKey: 'faq.returnonly.q', aKey: 'faq.returnonly.a' },
@@ -71,7 +71,6 @@ export const WEDDING: WeddingConfig = {
               anonKey: 'sb_publishable_-O11WC89Xynpmtj6BiFseQ_iubAJjFy' },
   media: {
     coverImg: 'assets/img/demo-couple.png',
-    couplePhotos: ['assets/img/demo-couple.png'],
     photos: Array(4).fill('assets/img/demo-couple.png'),
   },
   // Bật/tắt từng phần. Tạm ẩn Q&A + Lời chúc (đổi thành true để hiện lại).

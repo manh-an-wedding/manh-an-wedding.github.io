@@ -3,7 +3,7 @@ import { provideTranslateService } from '@ngx-translate/core';
 import { FaqComponent } from './faq.component';
 
 describe('FaqComponent', () => {
-  it('toggles a panel open/closed and marks the gift item', async () => {
+  it('toggles a panel open/closed while gift QR stays disabled until configured', async () => {
     await TestBed.configureTestingModule({
       imports: [FaqComponent],
       providers: [provideTranslateService({})],
@@ -14,6 +14,6 @@ describe('FaqComponent', () => {
     expect(c.openIndex).toBe(0);
     c.toggle(0);
     expect(c.openIndex).toBe(-1);
-    expect(c.items[0].showGiftQr).toBe(true); // first item is the gift question
+    expect(c.items[0].showGiftQr).toBe(false);
   });
 });

@@ -20,6 +20,10 @@ Thumbs.db
 # Brainstorm visual companion
 .superpowers/
 
+# Local Supabase metadata and print-only QR exports
+supabase/.temp/
+public/assets/qr/
+
 # Logs
 *.log
 npm-debug.log*

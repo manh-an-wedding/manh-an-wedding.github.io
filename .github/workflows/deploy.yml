@@ -19,10 +19,11 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - run: npm test -- --watch=false
       - run: npx ng build --base-href /
-      # SPA fallback so deep links (/en) resolve on GitHub Pages
-      - name: SPA 404 fallback
-        run: cp dist/manhan-web/browser/index.html dist/manhan-web/browser/404.html
+      # Emit localized /en/ metadata plus the SPA fallback.
+      - name: Static route documents
+        run: node scripts/create-static-routes.mjs
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist/manhan-web/browser

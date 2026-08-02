@@ -37,7 +37,7 @@ h1, h2, h3 { font-family: var(--font-head); color: var(--red); font-weight: 600;
 
 /* ---- continuous invitation canvas ---- */
 main.invite {
-  --section-boundary-gap: clamp(1.9125rem, calc(4.5vw + .7125rem), 2.8125rem);
+  --section-boundary-gap: 55px;
   --section-boundary-padding: calc(var(--section-boundary-gap) - .95rem);
   max-width: var(--maxw);
   margin: 0 auto;
@@ -84,7 +84,7 @@ main.invite {
   max-width: 100%;
   text-align: right;
   text-shadow: 0 2px 14px rgba(0, 0, 0, .72);
-  animation: cover-copy-fade-in 1.2s cubic-bezier(.22, .61, .36, 1) .12s both;
+  animation: cover-copy-fade-in 1.2s cubic-bezier(.22, .61, .36, 1) .5s both;
 }
 .save-the-day {
   position: absolute;
@@ -187,7 +187,7 @@ main.invite h2 { text-align: center; font-size: 1.5rem; margin: 0 0 1.1rem; }
   box-shadow: none;
 }
 .announcement-section {
-  --announcement-edge-space: clamp(1.2rem, 4.5vw, 2.1rem);
+  --announcement-edge-space: calc(var(--section-boundary-gap) - .7125rem);
   padding-top: calc(var(--announcement-edge-space) + .2625rem);
   padding-bottom: var(--section-boundary-padding);
 }
@@ -200,9 +200,9 @@ main.invite h2 { text-align: center; font-size: 1.5rem; margin: 0 0 1.1rem; }
 }
 .sheet-divider {
   margin:
-    calc(var(--announcement-edge-space, clamp(1.2rem, 4.5vw, 2.1rem)) - .5rem)
+    calc(var(--announcement-edge-space) - .5rem)
     0
-    calc(var(--announcement-edge-space, clamp(1.2rem, 4.5vw, 2.1rem)) - .05rem);
+    calc(var(--announcement-edge-space) - .05rem);
   color: var(--gold);
   font-size: .95rem;
   letter-spacing: .35rem;
@@ -575,6 +575,23 @@ body.album-lightbox-open { overflow: hidden; }
   opacity: 1;
   transform: translate3d(0, 0, 0);
 }
+.scroll-reveal.reveal-stagger {
+  opacity: 1;
+  transform: none;
+  transition: none;
+  will-change: auto;
+}
+.scroll-reveal.reveal-stagger .reveal-step {
+  opacity: 0;
+  transform: translate3d(0, 1.2rem, 0);
+  transition:
+    opacity 1.2s ease var(--reveal-delay, 0s),
+    transform 1.2s cubic-bezier(.22, .61, .36, 1) var(--reveal-delay, 0s);
+}
+.scroll-reveal.reveal-stagger.is-visible .reveal-step {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
 
 .happiness-rain {
   position: fixed;
@@ -652,7 +669,9 @@ body.album-lightbox-open { overflow: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
   .scroll-reveal,
-  .scroll-reveal.is-visible {
+  .scroll-reveal.is-visible,
+  .scroll-reveal.reveal-stagger .reveal-step,
+  .scroll-reveal.reveal-stagger.is-visible .reveal-step {
     opacity: 1;
     transform: none;
     transition: none;
@@ -797,6 +816,14 @@ fieldset label { font-weight: 400; }
   background: #fbeaea;
   border-radius: 8px;
   font-size: .9rem;
+  text-align: center;
+}
+.rsvp-privacy-note {
+  margin: -.2rem 0 0;
+  color: var(--muted);
+  font-size: .7rem;
+  font-style: italic;
+  line-height: 1.5;
   text-align: center;
 }
 
@@ -976,6 +1003,12 @@ app-companions-editor > button { background: transparent; color: var(--red); bor
   .cover-hero {
     margin-top: 1.5rem;
     border: 1px solid rgba(201, 162, 75, .55);
+  }
+}
+
+@media (max-width: 699px) {
+  main.invite {
+    --section-boundary-gap: 40px;
   }
 }
 

@@ -1,13 +1,15 @@
 import { WEDDING } from '../../assets/config/wedding.config';
 
 describe('wedding config', () => {
-  it('has both names, one event, groups, gift QRs and faq', () => {
+  it('has both names, RSVP groups, disabled placeholder gifts, and FAQ config', () => {
     expect(WEDDING.couple.bride).toBe('Nhật An');
     expect(WEDDING.couple.groom).toBe('Duy Mạnh');
     expect(WEDDING.ceremony.name).toContain('Vu Quy');
     expect(WEDDING.rsvp.groups.length).toBeGreaterThan(0);
-    expect(WEDDING.gift.bride.account).toBeTruthy();
-    expect(WEDDING.gift.groom.account).toBeTruthy();
+    expect(WEDDING.rsvp.groups).toContain('Bạn của Tâm');
+    expect(WEDDING.gift.bride.account).toBe('');
+    expect(WEDDING.gift.groom.account).toBe('');
+    expect(WEDDING.faq[0].showGiftQr).toBe(false);
     expect(WEDDING.faq.length).toBeGreaterThanOrEqual(6);
     expect(WEDDING.supabase.url).toBeTruthy();
   });
@@ -28,6 +30,7 @@ describe('wedding config', () => {
     expect(WEDDING.reception.mapEmbedUrl).toContain('hl=vi');
     expect(WEDDING.reception.mapDirUrl)
       .toBe('https://maps.app.goo.gl/of7FJD3HC6WWPuv7A');
+    expect(WEDDING.rsvp.deadlineISO).toBe('2026-10-10T11:30:00+07:00');
     expect(WEDDING.rsvp.bus).toEqual({
       pickup: 'Ibis hotel, 2 Hồng Hà, Tân Sơn Hòa, Hồ Chí Minh',
       departTime: '7:30 17.10.2026',

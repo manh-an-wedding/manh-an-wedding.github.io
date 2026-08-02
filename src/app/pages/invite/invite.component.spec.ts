@@ -1,15 +1,18 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { InviteComponent } from './invite.component';
 import { VisitService } from '../../core/visit.service';
 import { DeviceIdService } from '../../core/device-id.service';
 import { MusicService } from '../../core/music.service';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
+import { vi } from 'vitest';
 
 class VisitStub { count = 0; log = async () => { this.count++; }; }
 
 const testTranslations = {
   details: {
+    groom_family: 'Nhà trai',
+    bride_family: 'Nhà gái',
     father: 'Ông',
     mother: 'Bà',
     announcement: 'Trân trọng báo tin Lễ Vu Quy của',
@@ -79,9 +82,62 @@ describe('InviteComponent', () => {
     expect(f.componentInstance.lang).toBe('vi');
   });
 
+  it('updates the document language for the English route', async () => {
+    const route = TestBed.inject(ActivatedRoute);
+    (route.snapshot as { data: Record<string, unknown> }).data = { lang: 'en' };
+    const fixture = TestBed.createComponent(InviteComponent);
+
+    await fixture.componentInstance.ngOnInit();
+
+    expect((fixture.nativeElement as HTMLElement).ownerDocument.documentElement.lang).toBe('en');
+  });
+
   it('music starts off (no cover click to auto-start)', () => {
     const c = TestBed.createComponent(InviteComponent).componentInstance;
     expect(c.musicOn()).toBe(false);
+  });
+
+  it('auto-scrolls at about 0.67 pixels per 60Hz frame', () => {
+    const fixture = TestBed.createComponent(InviteComponent);
+    const component = fixture.componentInstance;
+    const music = TestBed.inject(MusicService);
+    const view = (fixture.nativeElement as HTMLElement).ownerDocument.defaultView!;
+    const documentElement = view.document.documentElement;
+    const originalScrollHeight = Object.getOwnPropertyDescriptor(documentElement, 'scrollHeight');
+    const callbacks: FrameRequestCallback[] = [];
+
+    Object.defineProperty(documentElement, 'scrollHeight', {
+      configurable: true,
+      value: 2000,
+    });
+    const nowSpy = vi.spyOn(view.performance, 'now').mockReturnValue(100);
+    const frameSpy = vi.spyOn(view, 'requestAnimationFrame').mockImplementation(callback => {
+      callbacks.push(callback);
+      return callbacks.length;
+    });
+    const cancelFrameSpy = vi.spyOn(view, 'cancelAnimationFrame').mockImplementation(() => undefined);
+    const scrollSpy = vi.spyOn(view, 'scrollTo').mockImplementation(() => undefined);
+
+    try {
+      music.enableAutoScroll();
+      component['startAutoScroll']();
+      callbacks.shift()?.(150);
+
+      expect(scrollSpy).toHaveBeenCalledTimes(1);
+      expect(scrollSpy.mock.calls[0][0]).toBe(0);
+      expect(scrollSpy.mock.calls[0][1]).toBeCloseTo(2, 5);
+    } finally {
+      component.ngOnDestroy();
+      nowSpy.mockRestore();
+      frameSpy.mockRestore();
+      cancelFrameSpy.mockRestore();
+      scrollSpy.mockRestore();
+      if (originalScrollHeight) {
+        Object.defineProperty(documentElement, 'scrollHeight', originalScrollHeight);
+      } else {
+        Reflect.deleteProperty(documentElement, 'scrollHeight');
+      }
+    }
   });
 
   it('exposes section toggles (wishes + faq hidden by default)', () => {
@@ -155,6 +211,26 @@ describe('InviteComponent', () => {
     expect(element.querySelector('.album h2')).toBeNull();
   });
 
+  it('shows the bride family before the groom family', async () => {
+    const fixture = TestBed.createComponent(InviteComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const familyCards = Array.from(
+      fixture.nativeElement.querySelectorAll('.families .family-card'),
+    ) as HTMLElement[];
+    const cardText = familyCards.map(card =>
+      card.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+    );
+
+    expect(cardText).toHaveLength(2);
+    expect(cardText[0]).toContain('Nhà gái');
+    expect(cardText[0]).toContain('Lê Văn Năm');
+    expect(cardText[1]).toContain('Nhà trai');
+    expect(cardText[1]).toContain('Lê Duy Tuấn');
+  });
+
   it('renders the requested English ceremony and reception wording', async () => {
     const fixture = TestBed.createComponent(InviteComponent);
     fixture.detectChanges();
@@ -224,6 +300,24 @@ describe('InviteComponent', () => {
       'rsvp',
       'separator',
     ]);
+  });
+
+  it('stagger-reveals static invitation groups while keeping RSVP as one interactive block', async () => {
+    const fixture = TestBed.createComponent(InviteComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const element = fixture.nativeElement as HTMLElement;
+    const staggeredSections = Array.from(element.querySelectorAll('.reveal-stagger'));
+
+    expect(staggeredSections.length).toBeGreaterThanOrEqual(6);
+    for (const section of staggeredSections) {
+      expect(section.querySelectorAll('.reveal-step').length).toBeGreaterThan(1);
+    }
+    expect(element.querySelector('app-rsvp-form')?.classList.contains('reveal-stagger')).toBe(false);
+    expect(element.querySelector('.families .family-card .reveal-step')).not.toBeNull();
+    expect(element.querySelector('.album .album-slider.reveal-step')).not.toBeNull();
   });
 
   it('keeps all three reception actions inside the reception section', async () => {

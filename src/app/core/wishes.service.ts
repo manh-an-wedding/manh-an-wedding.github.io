@@ -8,8 +8,12 @@ export interface WishDraft { name: string; message: string; isPublic: boolean; d
 export class WishesService {
   constructor(@Inject(SUPABASE) private sb: SupabaseClient) {}
   async add(w: WishDraft) {
-    const { error } = await this.sb.from('wishes').insert({
-      name: w.name, message: w.message, is_public: w.isPublic, device_id: w.deviceId });
+    const { error } = await this.sb.rpc('submit_wish', {
+      p_name: w.name,
+      p_message: w.message,
+      p_is_public: w.isPublic,
+      p_device_id: w.deviceId,
+    });
     if (error) throw error;
   }
   async listPublic() {

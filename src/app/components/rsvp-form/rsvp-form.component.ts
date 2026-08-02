@@ -11,7 +11,6 @@ import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { RsvpService, RsvpDraft, CompanionDraft } from '../../core/rsvp.service';
-import { GuestsService } from '../../core/guests.service';
 import { DeviceIdService } from '../../core/device-id.service';
 import { WEDDING_CONFIG } from '../../core/wedding-config.token';
 import { WeddingConfig } from '../../core/wedding-config';
@@ -27,7 +26,6 @@ export class RsvpFormComponent {
   readonly maxPartySize = 10;
 
   private rsvp = inject(RsvpService);
-  private guests = inject(GuestsService);
   private device = inject(DeviceIdService);
   private cdr = inject(ChangeDetectorRef);
   @ViewChild('busInfoButton') private busInfoButton?: ElementRef<HTMLButtonElement>;
@@ -41,7 +39,6 @@ export class RsvpFormComponent {
            status: '' | 'self_transport' | 'bus' | 'cannot_attend'; phone: string } =
     { guestName: '', category: '', status: '', phone: '' };
   companions: CompanionDraft[] = [];
-  suggestions: string[] = [];
   showBusInfo = false;
   done = false;
   submitting = false;
@@ -55,8 +52,6 @@ export class RsvpFormComponent {
     return String(this.busPartySize).padStart(2, '0');
   }
   get hasFullTable(): boolean { return this.busPartySize === this.maxPartySize; }
-
-  async onNameInput() { this.suggestions = await this.guests.suggest(this.model.guestName); }
 
   onStatusChange(status: '' | 'self_transport' | 'bus' | 'cannot_attend') {
     if (status !== 'bus') this.showBusInfo = false;
@@ -74,6 +69,7 @@ export class RsvpFormComponent {
   valid(): boolean {
     if (!this.model.guestName.trim() || !this.model.category || !this.model.status) return false;
     if (this.model.status === 'bus' && !this.model.phone.trim()) return false;
+    if (this.model.status === 'bus' && this.deadlinePassed) return false;
     return true;
   }
 
