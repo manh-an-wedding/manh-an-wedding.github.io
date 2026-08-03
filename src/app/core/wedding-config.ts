@@ -1,5 +1,16 @@
 export interface Party { name: string; bank: string; account: string; qr: string; }
-export interface FaqItem { qKey: string; aKey: string; showGiftQr?: boolean; }
+export interface FaqAnswerItem {
+  textKey: string;
+  href?: string;
+  linkLabelKey?: string;
+}
+
+export interface FaqItem {
+  qKey: string;
+  aKey?: string;
+  items?: FaqAnswerItem[];
+  showGiftQr?: boolean;
+}
 export interface FamilyInfo {
   father: string;
   mother: string;

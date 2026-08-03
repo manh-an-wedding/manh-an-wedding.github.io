@@ -61,12 +61,35 @@ export const WEDDING: WeddingConfig = {
     groom: { name: 'Duy Mạnh', bank: '', account: '', qr: '' },
   },
   faq: [
-    { qKey: 'faq.gift.q', aKey: 'faq.gift.a', showGiftQr: false },
-    { qKey: 'faq.bus.q', aKey: 'faq.bus.a' },
-    { qKey: 'faq.oneway.q', aKey: 'faq.oneway.a' },
-    { qKey: 'faq.returnonly.q', aKey: 'faq.returnonly.a' },
-    { qKey: 'faq.cantho.q', aKey: 'faq.cantho.a' },
-    { qKey: 'faq.daklak.q', aKey: 'faq.daklak.a' },
+    { qKey: 'faq.parking.q', aKey: 'faq.parking.a', showGiftQr: false },
+    {
+      qKey: 'faq.activities.q',
+      items: [
+        { textKey: 'faq.activities.items.loto' },
+        {
+          textKey: 'faq.activities.items.mykhanh',
+          href: 'https://mykhanh.com/tat-muong-bat-ca-ms010',
+          linkLabelKey: 'faq.actions.details',
+        },
+        { textKey: 'faq.activities.items.floating_market' },
+        {
+          textKey: 'faq.activities.items.conson',
+          href: 'https://consoncantho.com/',
+          linkLabelKey: 'faq.actions.details',
+        },
+        { textKey: 'faq.activities.items.nearby' },
+      ],
+    },
+    {
+      qKey: 'faq.food.q',
+      items: [
+        { textKey: 'faq.food.items.banh_xeo', href: 'https://share.google/bliD4Luw6Gk1YEDLM', linkLabelKey: 'faq.actions.directions' },
+        { textKey: 'faq.food.items.banh_tam', href: 'https://share.google/vE7Bv11h9WXlFnpfh', linkLabelKey: 'faq.actions.directions' },
+        { textKey: 'faq.food.items.vit_nau_chao', href: 'https://share.google/dUOicOilbGwt5YMA8', linkLabelKey: 'faq.actions.directions' },
+        { textKey: 'faq.food.items.ca_loc', href: 'https://share.google/qK6D7FF1kF5aabX20', linkLabelKey: 'faq.actions.directions' },
+        { textKey: 'faq.food.items.lua_nep', href: 'https://share.google/nskq5HvezlQbwMowm', linkLabelKey: 'faq.actions.directions' },
+      ],
+    },
   ],
   theme: { primary: '#9E1B1B', accent: '#C9A24B', fontHeading: 'serif', fontBody: 'sans-serif',
            music: 'assets/audio/bg-music.mp3' },
@@ -84,6 +107,6 @@ export const WEDDING: WeddingConfig = {
       `${WEDDING_MEDIA_BASE_URL}/2026.jpg`,
     ],
   },
-  // Bật/tắt từng phần. Tạm ẩn Q&A + Lời chúc (đổi thành true để hiện lại).
-  sections: { wishes: false, faq: false },
+  // Bật/tắt từng phần. Q&A đang hiển thị; Lời chúc tiếp tục được ẩn.
+  sections: { wishes: false, faq: true },
 };

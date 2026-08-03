@@ -2,7 +2,11 @@ import { Injectable, Inject } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SUPABASE } from './supabase.client';
 
-export interface WishDraft { name: string; message: string; isPublic: boolean; deviceId: string; }
+export interface WishDraft {
+  name: string;
+  message: string;
+  isPublic: boolean;
+}
 
 @Injectable({ providedIn: 'root' })
 export class WishesService {
@@ -12,7 +16,6 @@ export class WishesService {
       p_name: w.name,
       p_message: w.message,
       p_is_public: w.isPublic,
-      p_device_id: w.deviceId,
     });
     if (error) throw error;
   }

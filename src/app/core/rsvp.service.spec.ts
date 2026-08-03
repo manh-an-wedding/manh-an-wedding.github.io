@@ -33,14 +33,17 @@ function fakeSupabase(responses: Record<string, { data: unknown; error: unknown 
 
 const draft: RsvpDraft = {
   guestName: 'Duy Mạnh', category: 'IAS', status: 'bus', phone: '0900',
-  companions: [{ name: 'Vợ', joinsBus: true, relation: '' }], deviceId: 'dev-1',
+  companions: [{ name: 'Vợ', joinsBus: true, relation: '' }],
 };
 
 describe('RsvpService', () => {
-  it('submits the normalized RSVP and companions through the protected RPC', async () => {
-    const sb = fakeSupabase();
+  it('creates an RSVP with an in-memory edit token and returns its edit handle', async () => {
+    const sb = fakeSupabase({ submit_rsvp: { data: 27, error: null } });
     const svc = new RsvpService(sb);
-    await svc.submit(draft);
+    const handle = await svc.submit(draft);
+
+    expect(handle.rsvpId).toBe(27);
+    expect(handle.editToken).toMatch(/^[0-9a-f]{64}$/);
     expect(sb.calls).toEqual([{
       functionName: 'submit_rsvp',
       args: {
@@ -50,7 +53,32 @@ describe('RsvpService', () => {
         p_status: 'bus',
         p_phone: '0900',
         p_companions: [{ name: 'Vợ', joinsBus: true, relation: '' }],
-        p_device_id: 'dev-1',
+        p_edit_token: handle.editToken,
+      },
+    }]);
+  });
+
+  it('updates the RSVP identified by its edit handle instead of inserting again', async () => {
+    const sb = fakeSupabase({ update_rsvp: { data: 27, error: null } });
+    const svc = new RsvpService(sb);
+
+    await svc.update({ rsvpId: 27, editToken: 'a'.repeat(64) }, {
+      ...draft,
+      status: 'self_transport',
+      phone: '',
+    });
+
+    expect(sb.calls).toEqual([{
+      functionName: 'update_rsvp',
+      args: {
+        p_rsvp_id: 27,
+        p_edit_token: 'a'.repeat(64),
+        p_guest_name: 'Duy Mạnh',
+        p_name_norm: 'duy manh',
+        p_category: 'IAS',
+        p_status: 'self_transport',
+        p_phone: null,
+        p_companions: [{ name: 'Vợ', joinsBus: true, relation: '' }],
       },
     }]);
   });
@@ -71,12 +99,12 @@ describe('RsvpService', () => {
     });
     const svc = new RsvpService(sb);
 
-    const result = await (svc as any).getPublicGroupRsvps('tien-buoc');
+    const result = await (svc as any).getPublicGroupRsvps('tien-buoc', 'abcxyz');
 
     expect(result).toEqual(rows);
     expect(sb.calls).toEqual([{
       functionName: 'get_public_group_rsvps',
-      args: { p_slug: 'tien-buoc' },
+      args: { p_slug: 'tien-buoc', p_token: 'abcxyz' },
     }]);
   });
 
@@ -162,6 +190,25 @@ describe('RsvpService', () => {
       functionName: 'admin_review_rsvp_duplicate',
       args: { p_candidate_id: 7, p_target_id: 11, p_status: 'confirmed' },
     }]);
+  });
+
+  it('invalidates and restores an RSVP through admin-only RPCs', async () => {
+    const sb = fakeSupabase();
+    const svc = new RsvpService(sb);
+
+    await svc.setRsvpInvalidated(21, true, 'Dữ liệu test');
+    await svc.setRsvpInvalidated(21, false);
+
+    expect(sb.calls).toEqual([
+      {
+        functionName: 'admin_set_rsvp_invalidated',
+        args: { p_rsvp_id: 21, p_invalidated: true, p_reason: 'Dữ liệu test' },
+      },
+      {
+        functionName: 'admin_set_rsvp_invalidated',
+        args: { p_rsvp_id: 21, p_invalidated: false, p_reason: null },
+      },
+    ]);
   });
 
   it('restores an allowlisted admin session and loads the complete dashboard', async () => {

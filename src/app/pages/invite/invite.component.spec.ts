@@ -1,13 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 import { InviteComponent } from './invite.component';
-import { VisitService } from '../../core/visit.service';
-import { DeviceIdService } from '../../core/device-id.service';
 import { MusicService } from '../../core/music.service';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { vi } from 'vitest';
-
-class VisitStub { count = 0; log = async () => { this.count++; }; }
 
 const testTranslations = {
   details: {
@@ -58,22 +54,21 @@ const englishTranslations = {
 };
 
 describe('InviteComponent', () => {
-  let visit: VisitStub;
   beforeEach(async () => {
-    visit = new VisitStub();
     await TestBed.configureTestingModule({
       imports: [InviteComponent],
-      providers: [ provideRouter([]), provideTranslateService({}),
-        { provide: VisitService, useValue: visit },
-        { provide: DeviceIdService, useValue: { get: () => 'dev-1' } } ],
+      providers: [provideRouter([]), provideTranslateService({})],
     }).compileComponents();
     TestBed.inject(TranslateService).setTranslation('vi', testTranslations);
   });
 
-  it('logs a visit on init', async () => {
-    const f = TestBed.createComponent(InviteComponent);
-    await f.componentInstance.ngOnInit();
-    expect(visit.count).toBe(1);
+  it('removes the legacy browser identifier on load', async () => {
+    localStorage.setItem('manhan_device_id', 'legacy-device');
+    const fixture = TestBed.createComponent(InviteComponent);
+
+    await fixture.componentInstance.ngOnInit();
+
+    expect(localStorage.getItem('manhan_device_id')).toBeNull();
   });
 
   it('reads lang from route data (defaults to vi)', async () => {
@@ -171,10 +166,10 @@ describe('InviteComponent', () => {
     }
   });
 
-  it('exposes section toggles (wishes + faq hidden by default)', () => {
+  it('shows Q&A while keeping wishes hidden', () => {
     const c = TestBed.createComponent(InviteComponent).componentInstance;
     expect(c.cfg.sections.wishes).toBe(false);
-    expect(c.cfg.sections.faq).toBe(false);
+    expect(c.cfg.sections.faq).toBe(true);
   });
 
   it('opens with the invitation details over the cover image and uses configured music', async () => {

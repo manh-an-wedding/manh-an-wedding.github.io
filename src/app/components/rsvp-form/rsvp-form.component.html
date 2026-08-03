@@ -2,24 +2,24 @@
   <div class="bus-info">
     <section class="bus-leg">
       <h3 class="bus-leg-title">{{ 'rsvp.bus_outbound_title' | translate }}</h3>
-      <p><strong>{{ 'rsvp.departure_label' | translate }}:</strong>
+      <p><strong class="bus-info-label">{{ 'rsvp.departure_label' | translate }}:</strong>
         {{ 'rsvp.bus_outbound_departure' | translate }}</p>
-      <p><strong>{{ 'rsvp.location_label' | translate }}:</strong>
+      <p><strong class="bus-info-label">{{ 'rsvp.location_label' | translate }}:</strong>
         <a [href]="busPickupMapUrl" target="_blank" rel="noopener">
           <span aria-hidden="true">&#128205;</span>
           {{ 'rsvp.bus_outbound_location' | translate }}
         </a>
       </p>
-      <p><strong>{{ 'rsvp.bus_restaurant_arrival' | translate }}:</strong>
+      <p><strong class="bus-info-label">{{ 'rsvp.bus_restaurant_arrival' | translate }}:</strong>
         {{ cfg.rsvp.bus.restaurantArrivalTime }}</p>
     </section>
     <section class="bus-leg">
       <h3 class="bus-leg-title">{{ 'rsvp.bus_return_title' | translate }}</h3>
-      <p><strong>{{ 'rsvp.departure_label' | translate }}:</strong>
+      <p><strong class="bus-info-label">{{ 'rsvp.departure_label' | translate }}:</strong>
         {{ 'rsvp.bus_return_departure_time' | translate }}</p>
-      <p><strong>{{ 'rsvp.location_label' | translate }}:</strong>
+      <p><strong class="bus-info-label">{{ 'rsvp.location_label' | translate }}:</strong>
         {{ 'rsvp.bus_return_location' | translate }}</p>
-      <p><strong>{{ 'rsvp.bus_hotel_arrival' | translate }}:</strong>
+      <p><strong class="bus-info-label">{{ 'rsvp.bus_hotel_arrival' | translate }}:</strong>
         {{ cfg.rsvp.bus.hotelArrivalTime }}
         <span class="bus-traffic-note">{{ 'rsvp.bus_return_traffic_note' | translate }}</span>
       </p>
@@ -86,11 +86,13 @@
 
     <label class="rsvp-name-label">{{ 'rsvp.your_name' | translate }}
       <input name="name" [(ngModel)]="model.guestName"
-             #guestNameInput autocomplete="name" maxlength="120" required>
+             #guestNameInput autocomplete="name" maxlength="120" required
+             [disabled]="editingExisting">
     </label>
 
     <label class="rsvp-group-label">{{ 'rsvp.group' | translate }}
-      <select class="rsvp-group-select" name="group" [(ngModel)]="model.category" required>
+      <select class="rsvp-group-select" name="group" [(ngModel)]="model.category" required
+              [disabled]="editingExisting">
         <option value="" disabled selected></option>
         @for (g of cfg.rsvp.groups; track g) { <option [value]="g">{{ g }}</option> }
       </select>
@@ -137,7 +139,7 @@
         <label class="bus-phone">{{ 'rsvp.phone' | translate }}
           <input name="phone" [(ngModel)]="model.phone" inputmode="tel"></label>
       }
-      <label><input type="radio" name="st" value="self_transport" [(ngModel)]="model.status"
+      <label><input #editFocusTarget type="radio" name="st" value="self_transport" [(ngModel)]="model.status"
                     (ngModelChange)="onStatusChange($event)">
         {{ 'rsvp.self_transport' | translate }}</label>
       <label><input type="radio" name="st" value="cannot_attend" [(ngModel)]="model.status"

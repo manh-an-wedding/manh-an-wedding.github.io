@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { WishesComponent } from './wishes.component';
 import { WishesService } from '../../core/wishes.service';
-import { DeviceIdService } from '../../core/device-id.service';
 import { provideTranslateService } from '@ngx-translate/core';
 
 class WishesStub { added: any = null; list = [{ id: 1, name: 'X', message: 'hi' }];
@@ -17,7 +16,6 @@ describe('WishesComponent', () => {
       providers: [
         provideTranslateService({}),
         { provide: WishesService, useValue: stub },
-        { provide: DeviceIdService, useValue: { get: () => 'dev-1' } },
       ],
     }).compileComponents();
   });
@@ -32,6 +30,6 @@ describe('WishesComponent', () => {
     const c = TestBed.createComponent(WishesComponent).componentInstance;
     c.name = 'Me'; c.message = 'Chúc mừng'; c.isPublic = true;
     await c.send();
-    expect(stub.added).toEqual({ name: 'Me', message: 'Chúc mừng', isPublic: true, deviceId: 'dev-1' });
+    expect(stub.added).toEqual({ name: 'Me', message: 'Chúc mừng', isPublic: true });
   });
 });

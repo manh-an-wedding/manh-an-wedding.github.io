@@ -17,12 +17,13 @@ const currentRow: AdminRsvpRow = {
   status: 'bus',
   phone: '0900000000',
   party_size: 2,
-  device_id: 'device-a',
-  ip: '127.0.0.1',
   created_at: '2026-08-02T10:00:00Z',
   superseded_by_id: null,
   duplicate_of_id: null,
   duplicate_status: null,
+  invalidated_at: null,
+  invalidated_by: null,
+  invalid_reason: null,
   data_check: false,
   companions: [{
     id: 31, name: 'Duy Mạnh', joins_bus: true, relation: null,
@@ -35,7 +36,6 @@ const duplicate: AdminDuplicateRow = {
   candidate_category: 'IAS',
   candidate_status: 'self_transport',
   candidate_phone: null,
-  candidate_device_id: 'device-b',
   candidate_party_size: 1,
   candidate_created_at: '2026-08-01T10:00:00Z',
   target_id: 21,
@@ -43,7 +43,6 @@ const duplicate: AdminDuplicateRow = {
   target_category: 'Tiến bước',
   target_status: 'bus',
   target_phone: '0900000000',
-  target_device_id: 'device-a',
   target_party_size: 2,
   target_created_at: '2026-08-02T10:00:00Z',
   candidate_duplicate_status: 'pending',
@@ -90,6 +89,9 @@ function fakeAdminService(hasSession: boolean) {
         method: 'reviewDuplicate', args: [candidateId, targetId, status],
       });
     },
+    async setRsvpInvalidated(id: number, invalidated: boolean, reason?: string) {
+      calls.push({ method: 'setRsvpInvalidated', args: [id, invalidated, reason] });
+    },
   };
 }
 
@@ -133,12 +135,30 @@ describe('AdminComponent', () => {
     const element = fixture.nativeElement as HTMLElement;
 
     expect(element.textContent).toContain('Tổng quan');
-    expect(element.querySelector('.summary article strong')?.textContent).toBe('3');
+    const processedCard = Array.from(element.querySelectorAll('.summary article'))
+      .find(card => card.textContent?.includes('xác nhận đã xử lý'));
+    expect(processedCard?.querySelector('strong')?.textContent).toBe('3');
     expect(element.textContent).toContain('xác nhận đã xử lý');
     expect(element.textContent).toContain('ghế đã xử lý');
     expect(element.textContent).not.toContain('ghế xe hiện hành');
     expect(element.textContent).toContain('Nhật An');
     expect(element.textContent).toContain('Tiến bước');
+  });
+
+  it('orders overview statistics by attendance, seats, processed, raw, then duplicates', async () => {
+    const { fixture } = await render(true);
+    const labels = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('.summary article span'),
+      item => item.textContent?.trim(),
+    );
+
+    expect(labels).toEqual([
+      'người tham dự',
+      'ghế đã xử lý',
+      'xác nhận đã xử lý',
+      'bản ghi raw',
+      'trùng chờ duyệt',
+    ]);
   });
 
   it('logs in then opens the dashboard', async () => {
@@ -251,6 +271,68 @@ describe('AdminComponent', () => {
     expect(element.querySelectorAll('.duplicate-card')).toHaveLength(1);
   });
 
+  it('exports the processed shuttle list as one driver-friendly row per passenger', async () => {
+    const { fixture } = await render(true);
+    const component = fixture.componentInstance as any;
+    const firstBusRsvp: AdminRsvpRow = {
+      ...currentRow,
+      id: 32,
+      guest_name: 'Khách chính 1',
+      phone: '0900000032',
+      companions: [{
+        id: 3201,
+        name: 'Khách đính kèm 1',
+        joins_bus: true,
+        relation: null,
+      }],
+    };
+    const secondBusRsvp: AdminRsvpRow = {
+      ...currentRow,
+      id: 39,
+      guest_name: 'Khách chính 2',
+      phone: '0900000039',
+      companions: [
+        { id: 3901, name: 'Khách kèm 2', joins_bus: true, relation: null },
+        { id: 3902, name: 'Khách kèm 3', joins_bus: true, relation: null },
+      ],
+    };
+    component.selectTab('busCurrent');
+
+    const csv = component.buildCsv([firstBusRsvp, secondBusRsvp]);
+
+    expect(csv.split('\r\n')).toEqual([
+      '"STT","Tên","SĐT","ID"',
+      '"1","Khách chính 1","0900000032","32"',
+      '"2","Khách đính kèm 1","-","32"',
+      '"3","Khách chính 2","0900000039","39"',
+      '"4","Khách kèm 2","-","39"',
+      '"5","Khách kèm 3","-","39"',
+    ]);
+  });
+
+  it('neutralizes spreadsheet formulas in exported guest data', async () => {
+    const { fixture } = await render(true);
+    const component = fixture.componentInstance as any;
+    component.selectTab('busCurrent');
+
+    const csv = component.buildCsv([{
+      ...currentRow,
+      guest_name: '=HYPERLINK("https://example.com")',
+      phone: '+84900000000',
+      status: 'bus',
+      companions: [{
+        id: 2201,
+        name: '@SUM(1+1)',
+        joins_bus: true,
+        relation: null,
+      }],
+    }]);
+
+    expect(csv).toContain('"\t=HYPERLINK(""https://example.com"")"');
+    expect(csv).toContain('"\t+84900000000"');
+    expect(csv).toContain('"\t@SUM(1+1)"');
+  });
+
   it('colors raw rows by new, superseded, pending duplicate, and reviewed state', async () => {
     const { fixture } = await render(true);
     const component = fixture.componentInstance as any;
@@ -281,6 +363,51 @@ describe('AdminComponent', () => {
     expect(element.querySelector('.raw-status.reviewed-duplicate')?.textContent?.trim())
       .toBe('Đã xử lý (bị trùng)');
     expect(element.querySelectorAll('.data-check-toggle')).toHaveLength(5);
+  });
+
+  it('shows invalidated raw RSVP rows in gray and restores them through the admin RPC', async () => {
+    const { fixture, service } = await render(true);
+    const component = fixture.componentInstance as any;
+    const invalidated = {
+      ...currentRow,
+      invalidated_at: '2026-08-03T10:00:00Z',
+      invalidated_by: '00000000-0000-0000-0000-000000000001',
+      invalid_reason: 'Dữ liệu test',
+    };
+    component.dashboard.set({ ...dashboard, history: [invalidated] });
+    component.selectTab('history');
+    fixture.detectChanges();
+
+    const element = fixture.nativeElement as HTMLElement;
+    expect(element.querySelector('tr.raw-state-invalidated')).not.toBeNull();
+    expect(element.querySelector('.raw-status.invalidated')?.textContent?.trim())
+      .toBe('Đã loại');
+    expect(element.textContent).toContain('Dữ liệu test');
+
+    await component.restoreRsvp(invalidated);
+    expect(service.calls).toContainEqual({
+      method: 'setRsvpInvalidated', args: [21, false, undefined],
+    });
+  });
+
+  it('does not treat pre-migration rows without invalidation fields as invalidated', async () => {
+    const { fixture } = await render(true);
+    const legacyRow = { ...currentRow } as Partial<AdminRsvpRow>;
+    delete legacyRow.invalidated_at;
+    delete legacyRow.invalidated_by;
+    delete legacyRow.invalid_reason;
+
+    expect((fixture.componentInstance as any).rowState(legacyRow)).toBe('new');
+  });
+
+  it('invalidates an RSVP with the admin reason', async () => {
+    const { fixture, service } = await render(true);
+
+    await (fixture.componentInstance as any).invalidateRsvp(currentRow, 'Khách nhập sai');
+
+    expect(service.calls).toContainEqual({
+      method: 'setRsvpInvalidated', args: [21, true, 'Khách nhập sai'],
+    });
   });
 
   it('renders a concise Check column and concise RSVP choices in raw lists', async () => {

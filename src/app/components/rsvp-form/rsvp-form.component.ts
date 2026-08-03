@@ -10,8 +10,12 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
-import { RsvpService, RsvpDraft, CompanionDraft } from '../../core/rsvp.service';
-import { DeviceIdService } from '../../core/device-id.service';
+import {
+  RsvpService,
+  RsvpDraft,
+  RsvpEditHandle,
+  CompanionDraft,
+} from '../../core/rsvp.service';
 import { WEDDING_CONFIG } from '../../core/wedding-config.token';
 import { WeddingConfig } from '../../core/wedding-config';
 import { CompanionsEditorComponent } from '../companions-editor/companions-editor.component';
@@ -26,12 +30,12 @@ export class RsvpFormComponent {
   readonly maxPartySize = 10;
 
   private rsvp = inject(RsvpService);
-  private device = inject(DeviceIdService);
   private cdr = inject(ChangeDetectorRef);
   @ViewChild('busInfoHintButton') private busInfoHintButton?: ElementRef<HTMLButtonElement>;
   @ViewChild('busInfoPanel') private busInfoPanel?: ElementRef<HTMLElement>;
   @ViewChild('confirmationPanel') private confirmationPanel?: ElementRef<HTMLElement>;
   @ViewChild('guestNameInput') private guestNameInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('editFocusTarget') private editFocusTarget?: ElementRef<HTMLInputElement>;
   @ViewChild('submitError') private submitError?: ElementRef<HTMLElement>;
   @Input() lang: 'vi' | 'en' = 'vi';
 
@@ -43,10 +47,12 @@ export class RsvpFormComponent {
   done = false;
   submitting = false;
   submitFailed = false;
+  private editHandle: RsvpEditHandle | null = null;
 
   constructor(@Inject(WEDDING_CONFIG) public cfg: WeddingConfig) {}
 
   get deadlinePassed(): boolean { return new Date() > new Date(this.cfg.rsvp.deadlineISO); }
+  get editingExisting(): boolean { return this.editHandle !== null; }
   get busPartySize(): number { return 1 + this.companions.length; }
   get formattedBusPartySize(): string {
     return String(this.busPartySize).padStart(2, '0');
@@ -81,7 +87,7 @@ export class RsvpFormComponent {
         joinsBus: this.model.status === 'bus',
         ...(companion.relation ? { relation: companion.relation } : {}),
       })),
-      deviceId: this.device.get() };
+    };
   }
 
   async trySubmit() {
@@ -89,10 +95,18 @@ export class RsvpFormComponent {
     this.submitting = true;
     this.submitFailed = false;
     try {
-      await this.rsvp.submit(this.draft());
+      const draft = this.draft();
+      if (this.editHandle) {
+        await this.rsvp.update(this.editHandle, draft);
+      } else {
+        this.editHandle = await this.rsvp.submit(draft);
+      }
       this.done = true;
     } catch (error) {
       console.error('RSVP submission failed', error);
+      if (this.editHandle && this.isUnauthorizedEdit(error)) {
+        this.editHandle = null;
+      }
       this.submitFailed = true;
     } finally {
       this.submitting = false;
@@ -109,7 +123,11 @@ export class RsvpFormComponent {
     this.done = false;
     this.submitFailed = false;
     this.cdr.detectChanges();
-    this.focusAndCenter(this.guestNameInput?.nativeElement);
+    this.focusAndCenter(
+      this.editingExisting
+        ? this.editFocusTarget?.nativeElement
+        : this.guestNameInput?.nativeElement,
+    );
   }
 
   private focusAndCenter(target?: HTMLElement) {
@@ -131,5 +149,12 @@ export class RsvpFormComponent {
     } else {
       centerTarget();
     }
+  }
+
+  private isUnauthorizedEdit(error: unknown): boolean {
+    if (typeof error !== 'object' || error === null) return false;
+    const detail = error as { code?: unknown; message?: unknown };
+    return detail.code === '42501'
+      || detail.message === 'RSVP edit is not authorized';
   }
 }

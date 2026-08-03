@@ -66,11 +66,32 @@
             "edit_response": "Chỉnh sửa" },
   "wishes": { "title": "Số lưu bút", "public": "Công khai", "private": "Ẩn",
               "placeholder": "Lời chúc của bạn…", "send": "Gửi", "wall": "Lời chúc từ mọi người" },
-  "faq": { "title": "Hỏi & Đáp",
-           "gift": { "q": "Gửi tiền mừng online được không?", "a": "Bạn có thể chuyển khoản qua mã QR bên dưới." },
-           "bus": { "q": "Lịch trình xe đưa đón thế nào?", "a": "(Thông tin sẽ cập nhật sau.)" },
-           "oneway": { "q": "Nếu chỉ đi HCM → Cần Thơ, không quay về?", "a": "(Cập nhật sau.)" },
-           "returnonly": { "q": "Nếu chỉ ké chiều về HCM?", "a": "(Cập nhật sau.)" },
-           "cantho": { "q": "Cần Thơ có gì chơi?", "a": "(Cập nhật sau.)" },
-           "daklak": { "q": "Đắk Lắk có gì chơi?", "a": "(Cập nhật sau.)" } }
+  "faq": {
+    "title": "Hỏi & Đáp",
+    "actions": { "details": "Xem thông tin", "directions": "Chỉ đường" },
+    "parking": {
+      "q": "Có chỗ gửi xe ở IBIS không?",
+      "a": "Có. Giá gửi xe là 7.000đ nếu lấy xe trước 18:00 và 14.000đ nếu lấy xe sau 18:00."
+    },
+    "activities": {
+      "q": "Ghé Cần Thơ có thể chơi gì?",
+      "items": {
+        "loto": "Chương trình lô tô — thường tổ chức vào cuối tuần, khoảng 18:30 tại 45 Lê Lợi, phường Cái Khế.",
+        "mykhanh": "Trải nghiệm miệt vườn và tát mương bắt cá dành cho hội nhóm tại Mỹ Khánh.",
+        "floating_market": "Tham quan chợ nổi Cái Răng và lò pizza hủ tiếu — vé đi ghép từ bến Ninh Kiều khoảng 100.000–150.000đ/người.",
+        "conson": "Tham quan, trải nghiệm miệt vườn ở Cồn Sơn.",
+        "nearby": "Ghé thăm các tỉnh lân cận."
+      }
+    },
+    "food": {
+      "q": "Ăn gì ở Cần Thơ?",
+      "items": {
+        "banh_xeo": "Bánh xèo 7 Tới",
+        "banh_tam": "Bánh tằm bì",
+        "vit_nau_chao": "Vịt nấu chao",
+        "ca_loc": "Lẩu cháo cá lóc, cá lóc nướng",
+        "lua_nep": "Nhà hàng Lúa Nếp"
+      }
+    }
+  }
 }

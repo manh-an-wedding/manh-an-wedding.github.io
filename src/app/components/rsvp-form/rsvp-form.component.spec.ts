@@ -1,12 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { RsvpFormComponent } from './rsvp-form.component';
 import { RsvpService } from '../../core/rsvp.service';
-import { DeviceIdService } from '../../core/device-id.service';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
 class RsvpStub {
   submitted: any = null;
+  submitCount = 0;
+  updated: any = null;
   failure: Error | null = null;
   private submitGate: Promise<void> | null = null;
   private releaseSubmit: (() => void) | null = null;
@@ -21,7 +22,14 @@ class RsvpStub {
   submit = async (d: any) => {
     if (this.failure) throw this.failure;
     if (this.submitGate) await this.submitGate;
+    this.submitCount += 1;
     this.submitted = d;
+    return { rsvpId: 21, editToken: 'a'.repeat(64) };
+  };
+
+  update = async (handle: any, d: any) => {
+    if (this.failure) throw this.failure;
+    this.updated = { handle, draft: d };
   };
 }
 describe('RsvpFormComponent', () => {
@@ -33,7 +41,6 @@ describe('RsvpFormComponent', () => {
       providers: [
         provideTranslateService({}),
         { provide: RsvpService, useValue: rsvp },
-        { provide: DeviceIdService, useValue: { get: () => 'dev-1' } },
       ],
     }).compileComponents();
   });
@@ -283,6 +290,72 @@ describe('RsvpFormComponent', () => {
     await c.trySubmit();
 
     expect(rsvp.submitted?.guestName).toBe('Duy Mạnh');
+    expect(rsvp.submitted).not.toHaveProperty('deviceId');
+  });
+
+  it('updates the same RSVP after the guest opens the confirmation editor', async () => {
+    const c = TestBed.createComponent(RsvpFormComponent).componentInstance;
+    c.model.guestName = 'Duy Mạnh';
+    c.model.category = 'IAS';
+    c.model.status = 'self_transport';
+
+    await c.trySubmit();
+    c.editResponse();
+    c.model.status = 'cannot_attend';
+    await c.trySubmit();
+
+    expect(rsvp.submitCount).toBe(1);
+    expect(rsvp.updated).toEqual({
+      handle: { rsvpId: 21, editToken: 'a'.repeat(64) },
+      draft: expect.objectContaining({
+        guestName: 'Duy Mạnh',
+        category: 'IAS',
+        status: 'cannot_attend',
+      }),
+    });
+  });
+
+  it('locks the guest name and group while editing an existing RSVP', async () => {
+    const fixture = TestBed.createComponent(RsvpFormComponent);
+    const c = fixture.componentInstance;
+    c.model.guestName = 'Duy Manh';
+    c.model.category = 'IAS';
+    c.model.status = 'self_transport';
+
+    await c.trySubmit();
+    c.editResponse();
+    fixture.detectChanges();
+
+    const nameInput: HTMLInputElement = fixture.nativeElement.querySelector('input[name="name"]');
+    const groupSelect: HTMLSelectElement = fixture.nativeElement.querySelector('select[name="group"]');
+    const selfTransport: HTMLInputElement = fixture.nativeElement.querySelector(
+      'input[value="self_transport"]',
+    );
+
+    expect(nameInput.disabled).toBe(true);
+    expect(groupSelect.disabled).toBe(true);
+    expect(selfTransport.disabled).toBe(false);
+  });
+
+  it('unlocks identity fields when an existing RSVP can no longer be edited', async () => {
+    const fixture = TestBed.createComponent(RsvpFormComponent);
+    const c = fixture.componentInstance;
+    c.model.guestName = 'Duy Manh';
+    c.model.category = 'IAS';
+    c.model.status = 'self_transport';
+
+    await c.trySubmit();
+    c.editResponse();
+    rsvp.failure = Object.assign(new Error('RSVP edit is not authorized'), {
+      code: '42501',
+    });
+    await c.trySubmit();
+    fixture.detectChanges();
+
+    const nameInput: HTMLInputElement = fixture.nativeElement.querySelector('input[name="name"]');
+    const groupSelect: HTMLSelectElement = fixture.nativeElement.querySelector('select[name="group"]');
+    expect(nameInput.disabled).toBe(false);
+    expect(groupSelect.disabled).toBe(false);
   });
 
   it('shows an error and re-enables submission when the RSVP request fails', async () => {
@@ -419,6 +492,7 @@ describe('RsvpFormComponent', () => {
     expect(confirmedBusInfo?.querySelector('a')?.getAttribute('href'))
       .toBe('https://maps.app.goo.gl/A4G9MXVdHavg2cTq6');
     expect(confirmedBusInfo?.querySelectorAll('.bus-leg-title')).toHaveLength(2);
+    expect(confirmedBusInfo?.querySelectorAll('strong.bus-info-label')).toHaveLength(6);
 
     const editButton: HTMLButtonElement | null =
       fixture.nativeElement.querySelector('.rsvp-edit-response');
@@ -430,7 +504,7 @@ describe('RsvpFormComponent', () => {
     const form: HTMLFormElement | null = fixture.nativeElement.querySelector('form');
     expect(form?.hidden).toBe(false);
     expect(document.activeElement)
-      .toBe(fixture.nativeElement.querySelector('input[name="name"]'));
+      .toBe(fixture.nativeElement.querySelector('input[value="self_transport"]'));
     expect(c.model.guestName).toBe('Duy Mạnh');
     expect(c.companions).toEqual([{ name: 'Bé An' }]);
   });

@@ -33,7 +33,12 @@ describe('MapCalendarComponent', () => {
     fixture.detectChanges();
 
     expect(fixture.nativeElement.querySelector('.google-calendar-icon')).not.toBeNull();
-    expect(fixture.nativeElement.querySelector('.apple-calendar-icon')).not.toBeNull();
+    const appleIcon = fixture.nativeElement.querySelector('.apple-calendar-icon');
+    expect(appleIcon).not.toBeNull();
+    expect(appleIcon.getAttribute('fill')).toBe('currentColor');
+    expect(appleIcon.getAttribute('stroke')).toBe('none');
+    expect(appleIcon.querySelector('.apple-fruit')).not.toBeNull();
+    expect(appleIcon.querySelector('.apple-leaf')).not.toBeNull();
   });
 
   it('offers 11:00–13:30 calendar entries and a Safari-compatible ICS file', async () => {

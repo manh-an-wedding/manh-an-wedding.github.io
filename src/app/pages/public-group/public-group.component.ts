@@ -1,5 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { combineLatest } from 'rxjs';
 import {
   PublicGroupRsvp,
   RsvpService,
@@ -44,11 +45,18 @@ export class PublicGroupComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
+    combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(([params, query]) => {
       const requestedSlug = params.get('slug') ?? '';
       const slug = GROUP_SLUG_ALIASES[requestedSlug] ?? requestedSlug;
+      const token = query.get('t')?.trim() ?? '';
       this.title = GROUP_TITLES[slug] ?? this.title;
-      void this.load(slug);
+      if (!token) {
+        this.rows = [];
+        this.loading.set(false);
+        this.error = 'Liên kết xem danh sách không hợp lệ.';
+        return;
+      }
+      void this.load(slug, token);
     });
   }
 
@@ -67,14 +75,14 @@ export class PublicGroupComponent implements OnInit {
     this.page.set(Math.max(1, Math.min(page, this.pageCount)));
   }
 
-  private async load(slug: string): Promise<void> {
+  private async load(slug: string, token: string): Promise<void> {
     this.loading.set(true);
     this.error = '';
     try {
-      this.rows = await this.rsvp.getPublicGroupRsvps(slug);
+      this.rows = await this.rsvp.getPublicGroupRsvps(slug, token);
       this.page.set(1);
     } catch {
-      this.error = 'Không thể tải danh sách. Bác vui lòng thử lại sau.';
+      this.error = 'Liên kết xem danh sách không hợp lệ hoặc không còn hiệu lực.';
     } finally {
       this.loading.set(false);
     }

@@ -66,11 +66,32 @@
             "edit_response": "Edit" },
   "wishes": { "title": "Send your wishes", "public": "Public", "private": "Hidden",
               "placeholder": "Your wishes…", "send": "Send", "wall": "Wishes from guests" },
-  "faq": { "title": "Q&A",
-           "gift": { "q": "Can I send a gift online?", "a": "You can transfer via the QR codes below." },
-           "bus": { "q": "What's the shuttle schedule?", "a": "(To be updated.)" },
-           "oneway": { "q": "What if I only go HCM → Can Tho, no return?", "a": "(To be updated.)" },
-           "returnonly": { "q": "What if I only need the return leg to HCM?", "a": "(To be updated.)" },
-           "cantho": { "q": "What to do in Can Tho?", "a": "(To be updated.)" },
-           "daklak": { "q": "What to do in Dak Lak?", "a": "(To be updated.)" } }
+  "faq": {
+    "title": "Q&A",
+    "actions": { "details": "View details", "directions": "Directions" },
+    "parking": {
+      "q": "Is parking available at IBIS?",
+      "a": "Yes. Parking costs VND 7,000 if you collect your vehicle before 6:00 PM, and VND 14,000 after 6:00 PM."
+    },
+    "activities": {
+      "q": "What can I do while visiting Cần Thơ?",
+      "items": {
+        "loto": "Lô tô show — usually held on weekends around 6:30 PM at 45 Lê Lợi, Cái Khế Ward.",
+        "mykhanh": "A group orchard experience with traditional ditch fishing at Mỹ Khánh.",
+        "floating_market": "Visit Cái Răng Floating Market and the rice-noodle pizza workshop — shared boat tickets from Ninh Kiều Wharf are around VND 100,000–150,000 per person.",
+        "conson": "Visit Cồn Sơn for an orchard and local community experience.",
+        "nearby": "Explore the neighboring provinces."
+      }
+    },
+    "food": {
+      "q": "What should I eat in Cần Thơ?",
+      "items": {
+        "banh_xeo": "Bánh xèo 7 Tới",
+        "banh_tam": "Bánh tằm bì",
+        "vit_nau_chao": "Vịt nấu chao",
+        "ca_loc": "Lẩu cháo cá lóc, cá lóc nướng",
+        "lua_nep": "Nhà hàng Lúa Nếp"
+      }
+    }
+  }
 }

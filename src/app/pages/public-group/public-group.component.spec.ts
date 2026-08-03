@@ -5,8 +5,9 @@ import { RsvpService } from '../../core/rsvp.service';
 import { PublicGroupComponent } from './public-group.component';
 
 describe('PublicGroupComponent', () => {
-  async function render(rows: unknown[], slug = 'tien-buoc') {
+  async function render(rows: unknown[], slug = 'tien-buoc', token: string | null = 'abcxyz') {
     const requestedSlugs: string[] = [];
+    const requestedTokens: string[] = [];
     await TestBed.configureTestingModule({
       imports: [PublicGroupComponent],
       providers: [
@@ -14,13 +15,15 @@ describe('PublicGroupComponent', () => {
           provide: ActivatedRoute,
           useValue: {
             paramMap: of(convertToParamMap({ slug })),
+            queryParamMap: of(convertToParamMap(token ? { t: token } : {})),
           },
         },
         {
           provide: RsvpService,
           useValue: {
-            getPublicGroupRsvps: async (requestedSlug: string) => {
+            getPublicGroupRsvps: async (requestedSlug: string, requestedToken: string) => {
               requestedSlugs.push(requestedSlug);
+              requestedTokens.push(requestedToken);
               return rows;
             },
           },
@@ -32,7 +35,12 @@ describe('PublicGroupComponent', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     fixture.detectChanges();
-    return { fixture, element: fixture.nativeElement as HTMLElement, requestedSlugs };
+    return {
+      fixture,
+      element: fixture.nativeElement as HTMLElement,
+      requestedSlugs,
+      requestedTokens,
+    };
   }
 
   it('shows guest names, choices, and companions without edit controls', async () => {
@@ -81,11 +89,21 @@ describe('PublicGroupComponent', () => {
   });
 
   it('maps the legacy tienbuoc.index.html URL to the published tien-buoc slug', async () => {
-    const { element, requestedSlugs } = await render([], 'tienbuoc.index.html');
+    const { element, requestedSlugs, requestedTokens } =
+      await render([], 'tienbuoc.index.html');
 
     expect(requestedSlugs).toEqual(['tien-buoc']);
+    expect(requestedTokens).toEqual(['abcxyz']);
     expect(element.querySelector('h3')?.textContent)
       .toContain('Danh sách nhóm Tiến bước');
+  });
+
+  it('does not request or reveal a group list without its URL token', async () => {
+    const { element, requestedSlugs } = await render([], 'tien-buoc', null);
+
+    expect(requestedSlugs).toEqual([]);
+    expect(element.textContent).toContain('Liên kết xem danh sách không hợp lệ');
+    expect(element.textContent).not.toContain('Chưa có xác nhận nào');
   });
 
   it('shows an empty state when the group has no current confirmations', async () => {

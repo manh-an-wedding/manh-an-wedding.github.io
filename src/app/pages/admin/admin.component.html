@@ -43,11 +43,11 @@
 
     @if (tab() === 'overview') {
       <section class="summary" aria-label="Tổng quan">
-        <article><strong>{{ dashboard().summary.currentRsvpCount }}</strong><span>xác nhận đã xử lý</span></article>
         <article><strong>{{ dashboard().summary.attendingPeople }}</strong><span>người tham dự</span></article>
+        <article><strong>{{ dashboard().summary.busGuestSeats + dashboard().summary.busCompanionSeats }}</strong><span>ghế đã xử lý</span></article>
+        <article><strong>{{ dashboard().summary.currentRsvpCount }}</strong><span>xác nhận đã xử lý</span></article>
         <article><strong>{{ dashboard().summary.rawRsvpCount }}</strong><span>bản ghi raw</span></article>
         <article><strong>{{ dashboard().summary.pendingDuplicateCount }}</strong><span>trùng chờ duyệt</span></article>
-        <article><strong>{{ dashboard().summary.busGuestSeats + dashboard().summary.busCompanionSeats }}</strong><span>ghế đã xử lý</span></article>
       </section>
       <h2>Xác nhận mới nhất</h2>
     }
@@ -70,14 +70,14 @@
               </mark>
               <strong>{{ item.candidate_guest_name }}</strong>
               <small>{{ item.candidate_category }} · {{ statusLabel(item.candidate_status) }}</small>
-              <small>{{ item.candidate_phone || 'Không có SĐT' }} · {{ item.candidate_device_id || 'Không có mã thiết bị' }}</small>
+              <small>{{ item.candidate_phone || 'Không có SĐT' }}</small>
             </div>
             <span class="duplicate-arrow">→</span>
             <div>
               <span>Bản ghi mới #{{ item.target_id }}</span>
               <strong>{{ item.target_guest_name }}</strong>
               <small>{{ item.target_category }} · {{ statusLabel(item.target_status) }}</small>
-              <small>{{ item.target_phone || 'Không có SĐT' }} · {{ item.target_device_id || 'Không có mã thiết bị' }}</small>
+              <small>{{ item.target_phone || 'Không có SĐT' }}</small>
             </div>
             <footer>
               @if (item.candidate_duplicate_status !== 'pending') {
@@ -119,7 +119,9 @@
           <option value="self_transport">Tự di chuyển</option>
           <option value="cannot_attend">Không tham gia</option>
         </select>
-        <button type="button" (click)="downloadCsv()">Xuất CSV</button>
+        <button type="button" class="csv-export" (click)="downloadCsv()">
+          {{ tab() === 'busCurrent' ? 'Xuất DS xe CSV' : 'Xuất CSV' }}
+        </button>
       </section>
 
       <div class="table-wrap">
@@ -127,13 +129,14 @@
           <thead><tr>
             @if (isRawTab()) { <th>Phân loại</th><th>Check</th> }
             <th>Khách</th><th>Lựa chọn</th><th>Người đi cùng</th>
-            <th>Liên hệ / kỹ thuật</th><th>Thời gian</th><th></th>
+            <th>Liên hệ</th><th>Thời gian</th><th></th>
           </tr></thead>
           <tbody>
             @for (row of pagedRows(); track row.id) {
               <tr [class.raw-state-new]="isRawTab() && (rowState(row) === 'new' || rowState(row) === 'reviewed-unique')"
                   [class.raw-state-superseded]="isRawTab() && (rowState(row) === 'superseded' || rowState(row) === 'reviewed-duplicate')"
-                  [class.raw-state-duplicate]="isRawTab() && rowState(row) === 'duplicate'">
+                  [class.raw-state-duplicate]="isRawTab() && rowState(row) === 'duplicate'"
+                  [class.raw-state-invalidated]="isRawTab() && rowState(row) === 'invalidated'">
                 @if (isRawTab()) {
                   <td>
                     <span [class]="'raw-status ' + rowState(row)">
@@ -158,11 +161,23 @@
                   @if (row.companions.length === 0) { <span>—</span> }
                   @for (companion of row.companions; track companion.id) { <small>{{ companion.name }}</small> }
                 </td>
-                <td><small>{{ row.phone || 'Không có SĐT' }}</small><small>IP: {{ row.ip || '—' }}</small><small>Thiết bị: {{ row.device_id || '—' }}</small></td>
-                <td><small>{{ row.created_at | date:'dd/MM/yyyy HH:mm' }}</small><small>Thay bởi: {{ row.superseded_by_id || '—' }}</small><small>Trùng với: {{ row.duplicate_of_id || '—' }}</small></td>
+                <td><small>{{ row.phone || 'Không có SĐT' }}</small></td>
                 <td>
-                  @if (row.superseded_by_id === null && row.duplicate_status !== 'confirmed') {
-                    <button type="button" class="edit" (click)="startEdit(row)">Chỉnh sửa</button>
+                  <small>{{ row.created_at | date:'dd/MM/yyyy HH:mm' }}</small>
+                  <small>Thay bởi: {{ row.superseded_by_id || '—' }}</small>
+                  <small>Trùng với: {{ row.duplicate_of_id || '—' }}</small>
+                  @if (row.invalid_reason) { <small>Lý do loại: {{ row.invalid_reason }}</small> }
+                </td>
+                <td>
+                  @if (row.invalidated_at) {
+                    <button type="button" class="restore" [disabled]="busy()"
+                            (click)="restoreRsvp(row)">Khôi phục</button>
+                  } @else if (row.superseded_by_id === null && row.duplicate_status !== 'confirmed') {
+                    <div class="row-actions">
+                      <button type="button" class="edit" (click)="startEdit(row)">Chỉnh sửa</button>
+                      <button type="button" class="invalidate" [disabled]="busy()"
+                              (click)="invalidateRsvp(row)">Loại</button>
+                    </div>
                   } @else {
                     <small>Chỉ đọc</small>
                   }

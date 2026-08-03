@@ -15,7 +15,6 @@ describe('WishesService', () => {
       name: 'An',
       message: 'Chúc mừng',
       isPublic: true,
-      deviceId: 'device-1',
     });
 
     expect(calls).toEqual([{
@@ -24,7 +23,6 @@ describe('WishesService', () => {
         p_name: 'An',
         p_message: 'Chúc mừng',
         p_is_public: true,
-        p_device_id: 'device-1',
       },
     }]);
   });

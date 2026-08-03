@@ -10,7 +10,9 @@ describe('wedding config', () => {
     expect(WEDDING.gift.bride.account).toBe('');
     expect(WEDDING.gift.groom.account).toBe('');
     expect(WEDDING.faq[0].showGiftQr).toBe(false);
-    expect(WEDDING.faq.length).toBeGreaterThanOrEqual(6);
+    expect(WEDDING.faq).toHaveLength(3);
+    expect(WEDDING.faq[1].items?.filter(item => item.href)).toHaveLength(2);
+    expect(WEDDING.faq[2].items?.filter(item => item.href)).toHaveLength(5);
     expect(WEDDING.supabase.url).toBeTruthy();
   });
 
@@ -41,7 +43,7 @@ describe('wedding config', () => {
     expect(WEDDING.event.venue).toBe('VẠN PHÁT RIVERSIDE - SẢNH 01');
   });
 
-  it('uses the chronological wedding album and keeps optional sections hidden', () => {
+  it('uses the chronological wedding album, shows Q&A, and keeps wishes hidden', () => {
     const mediaBaseUrl = 'https://bmhwpctxxfpculhigham.supabase.co/storage/v1/object/public/wedding-media/v1';
 
     expect(WEDDING.media.coverImg).toBe(`${mediaBaseUrl}/cover.jpg`);
@@ -54,6 +56,6 @@ describe('wedding config', () => {
       `${mediaBaseUrl}/2023-2025.jpg`,
       `${mediaBaseUrl}/2026.jpg`,
     ]);
-    expect(WEDDING.sections).toEqual({ wishes: false, faq: false });
+    expect(WEDDING.sections).toEqual({ wishes: false, faq: true });
   });
 });

@@ -7,7 +7,12 @@ export interface CompanionDraft { name: string; joinsBus?: boolean; relation?: s
 export interface RsvpDraft {
   guestName: string; category: string;
   status: 'self_transport' | 'bus' | 'cannot_attend';
-  phone?: string; companions: CompanionDraft[]; deviceId: string;
+  phone?: string; companions: CompanionDraft[];
+}
+
+export interface RsvpEditHandle {
+  rsvpId: number;
+  editToken: string;
 }
 
 export type RsvpStatus = RsvpDraft['status'];
@@ -44,12 +49,13 @@ export interface AdminRsvpRow {
   status: RsvpStatus;
   phone: string | null;
   party_size: number;
-  device_id: string | null;
-  ip: string | null;
   created_at: string;
   superseded_by_id: number | null;
   duplicate_of_id: number | null;
   duplicate_status: DuplicateReviewStatus | null;
+  invalidated_at: string | null;
+  invalidated_by: string | null;
+  invalid_reason: string | null;
   data_check: boolean;
   companions: AdminCompanion[];
 }
@@ -60,7 +66,6 @@ export interface AdminDuplicateRow {
   candidate_category: string;
   candidate_status: RsvpStatus;
   candidate_phone: string | null;
-  candidate_device_id: string | null;
   candidate_party_size: number;
   candidate_created_at: string;
   target_id: number;
@@ -68,7 +73,6 @@ export interface AdminDuplicateRow {
   target_category: string;
   target_status: RsvpStatus;
   target_phone: string | null;
-  target_device_id: string | null;
   target_party_size: number;
   target_created_at: string;
   candidate_duplicate_status: DuplicateReviewStatus;
@@ -99,22 +103,43 @@ export interface AdminDashboard {
 export class RsvpService {
   constructor(@Inject(SUPABASE) private sb: SupabaseClient) {}
 
-  async submit(d: RsvpDraft): Promise<void> {
-    const { error } = await this.sb.rpc('submit_rsvp', {
+  async submit(d: RsvpDraft): Promise<RsvpEditHandle> {
+    const editToken = this.createEditToken();
+    const { data, error } = await this.sb.rpc('submit_rsvp', {
       p_guest_name: d.guestName,
       p_name_norm: nameNorm(d.guestName),
       p_category: d.category,
       p_status: d.status,
       p_phone: d.status === 'bus' ? (d.phone ?? null) : null,
       p_companions: d.companions,
-      p_device_id: d.deviceId,
+      p_edit_token: editToken,
+    });
+    if (error) throw error;
+    const rsvpId = Number(data);
+    if (!Number.isSafeInteger(rsvpId) || rsvpId <= 0) {
+      throw new Error('Invalid RSVP response');
+    }
+    return { rsvpId, editToken };
+  }
+
+  async update(handle: RsvpEditHandle, d: RsvpDraft): Promise<void> {
+    const { error } = await this.sb.rpc('update_rsvp', {
+      p_rsvp_id: handle.rsvpId,
+      p_edit_token: handle.editToken,
+      p_guest_name: d.guestName,
+      p_name_norm: nameNorm(d.guestName),
+      p_category: d.category,
+      p_status: d.status,
+      p_phone: d.status === 'bus' ? (d.phone ?? null) : null,
+      p_companions: d.companions,
     });
     if (error) throw error;
   }
 
-  async getPublicGroupRsvps(slug: string): Promise<PublicGroupRsvp[]> {
+  async getPublicGroupRsvps(slug: string, token: string): Promise<PublicGroupRsvp[]> {
     const { data, error } = await this.sb.rpc('get_public_group_rsvps', {
       p_slug: slug,
+      p_token: token,
     });
     if (error) throw error;
     return (data ?? []) as PublicGroupRsvp[];
@@ -194,5 +219,23 @@ export class RsvpService {
       p_status: status,
     });
     if (error) throw error;
+  }
+
+  async setRsvpInvalidated(
+    rsvpId: number,
+    invalidated: boolean,
+    reason?: string,
+  ): Promise<void> {
+    const { error } = await this.sb.rpc('admin_set_rsvp_invalidated', {
+      p_rsvp_id: rsvpId,
+      p_invalidated: invalidated,
+      p_reason: invalidated ? (reason?.trim() || null) : null,
+    });
+    if (error) throw error;
+  }
+
+  private createEditToken(): string {
+    const bytes = globalThis.crypto.getRandomValues(new Uint8Array(32));
+    return Array.from(bytes, value => value.toString(16).padStart(2, '0')).join('');
   }
 }

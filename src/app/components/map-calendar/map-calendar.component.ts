@@ -25,8 +25,9 @@ import { WeddingConfig } from '../../core/wedding-config';
       </a>
       <a class="reveal-step" style="--reveal-delay: .3s" [href]="appleCalendarUrl">
         {{ 'map.ics' | translate }}
-        <svg class="apple-calendar-icon" aria-hidden="true" viewBox="0 0 24 24">
-          <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.26.07 2.14.69 2.88.73 1.1-.22 2.16-.85 3.34-.76 1.42.12 2.49.67 3.2 1.7-2.93 1.76-2.23 5.62.45 6.7-.54 1.42-1.24 2.83-1.87 4.6ZM12.03 7.25C11.88 5.14 13.6 3.4 15.57 3.23c.27 2.44-2.22 4.26-3.54 4.02Z"></path>
+        <svg class="apple-calendar-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+          <path class="apple-fruit" d="M12 7.2c-1.4-1.2-3.5-1.8-5.2-.7C4.8 7.7 4 10.3 4.5 13c.7 3.7 3.2 7.5 5.2 7.5.9 0 1.5-.5 2.3-.5s1.4.5 2.3.5c2 0 4.5-3.8 5.2-7.5.5-2.7-.3-5.3-2.3-6.5-1.7-1.1-3.8-.5-5.2.7Z"></path>
+          <path class="apple-leaf" d="M12.2 6.3c.2-2.2 1.6-3.7 3.8-3.8-.1 2.2-1.6 3.7-3.8 3.8Z"></path>
         </svg>
       </a>
     </section>`,

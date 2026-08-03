@@ -13,8 +13,6 @@ import { RsvpFormComponent } from '../../components/rsvp-form/rsvp-form.componen
 import { WishesComponent } from '../../components/wishes/wishes.component';
 import { FaqComponent } from '../../components/faq/faq.component';
 import { MapCalendarComponent } from '../../components/map-calendar/map-calendar.component';
-import { VisitService } from '../../core/visit.service';
-import { DeviceIdService } from '../../core/device-id.service';
 import { WEDDING_CONFIG } from '../../core/wedding-config.token';
 import { WeddingConfig } from '../../core/wedding-config';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -44,8 +42,6 @@ const PHOTO_MOMENTS: Record<string, PhotoMoment> = {
   templateUrl: './invite.component.html',
 })
 export class InviteComponent implements OnInit, OnDestroy {
-  private visit = inject(VisitService);
-  private device = inject(DeviceIdService);
   private route = inject(ActivatedRoute);
   private translate = inject(TranslateService);
   private document = inject(DOCUMENT);
@@ -65,6 +61,11 @@ export class InviteComponent implements OnInit, OnDestroy {
   constructor(@Inject(WEDDING_CONFIG) public cfg: WeddingConfig) {}
 
   async ngOnInit() {
+    try {
+      this.document.defaultView?.localStorage.removeItem('manhan_device_id');
+    } catch {
+      // Storage may be unavailable in a restricted/private browsing context.
+    }
     // Option C: lang comes from route data ({ lang: 'vi' } at '/', { lang: 'en' } at '/en')
     this.lang = this.route.snapshot.data['lang'] === 'en' ? 'en' : 'vi';
     this.document.documentElement.lang = this.lang;
@@ -83,7 +84,6 @@ export class InviteComponent implements OnInit, OnDestroy {
         this.startAutoScroll();
       }
     }
-    await this.visit.log(this.device.get());
   }
 
   ngOnDestroy() {

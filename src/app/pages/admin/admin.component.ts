@@ -218,7 +218,9 @@ export class AdminComponent implements OnInit {
   }
 
   rowState(row: AdminRsvpRow):
-    'new' | 'superseded' | 'duplicate' | 'reviewed-unique' | 'reviewed-duplicate' {
+    'new' | 'superseded' | 'duplicate' | 'reviewed-unique' | 'reviewed-duplicate'
+    | 'invalidated' {
+    if (row.invalidated_at != null) return 'invalidated';
     if (row.duplicate_status === 'confirmed') return 'reviewed-duplicate';
     if (row.duplicate_status === 'rejected') return 'reviewed-unique';
     if (row.duplicate_of_id !== null && row.duplicate_of_id > 0) return 'duplicate';
@@ -228,6 +230,7 @@ export class AdminComponent implements OnInit {
 
   rowStateLabel(row: AdminRsvpRow): string {
     switch (this.rowState(row)) {
+      case 'invalidated': return 'Đã loại';
       case 'superseded': return 'Đã thay đổi';
       case 'duplicate': return 'Trùng';
       case 'reviewed-unique': return 'Đã xử lý (không trùng)';
@@ -256,6 +259,37 @@ export class AdminComponent implements OnInit {
     }
   }
 
+  async invalidateRsvp(row: AdminRsvpRow, suppliedReason?: string): Promise<void> {
+    const reason = (suppliedReason
+      ?? window.prompt('Lý do loại bản ghi này:', '')
+      ?? '').trim();
+    if (!reason) return;
+
+    this.busy.set(true);
+    this.error.set('');
+    try {
+      await this.rsvp.setRsvpInvalidated(row.id, true, reason);
+      await this.loadDashboard();
+    } catch (error) {
+      this.error.set(this.errorMessage(error, 'Không thể loại bản ghi.'));
+    } finally {
+      this.busy.set(false);
+    }
+  }
+
+  async restoreRsvp(row: AdminRsvpRow): Promise<void> {
+    this.busy.set(true);
+    this.error.set('');
+    try {
+      await this.rsvp.setRsvpInvalidated(row.id, false);
+      await this.loadDashboard();
+    } catch (error) {
+      this.error.set(this.errorMessage(error, 'Không thể khôi phục bản ghi.'));
+    } finally {
+      this.busy.set(false);
+    }
+  }
+
   statusLabel(status: RsvpStatus): string {
     switch (status) {
       case 'bus': return 'Đi xe';
@@ -270,7 +304,10 @@ export class AdminComponent implements OnInit {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `rsvp-${this.tab()}-${new Date().toISOString().slice(0, 10)}.csv`;
+    const prefix = this.tab() === 'busCurrent'
+      ? 'danh-sach-xe-da-xu-ly'
+      : `rsvp-${this.tab()}`;
+    link.download = `${prefix}-${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -297,9 +334,11 @@ export class AdminComponent implements OnInit {
   }
 
   private buildCsv(rows: AdminRsvpRow[]): string {
+    if (this.tab() === 'busCurrent') return this.buildProcessedBusCsv(rows);
+
     const fields = [
       'ID', 'Tên khách', 'Nhóm', 'Lựa chọn', 'SĐT', 'Số người',
-      'Người đi cùng', 'Thiết bị', 'IP', 'Thời gian',
+      'Người đi cùng', 'Thời gian',
     ];
     const lines = rows.map(row => [
       row.id,
@@ -309,15 +348,33 @@ export class AdminComponent implements OnInit {
       row.phone ?? '',
       row.party_size,
       row.companions.map(companion => companion.name).join('; '),
-      row.device_id ?? '',
-      row.ip ?? '',
       row.created_at,
     ].map(value => this.csvCell(String(value))).join(','));
     return [fields.map(field => this.csvCell(field)).join(','), ...lines].join('\r\n');
   }
 
+  private buildProcessedBusCsv(rows: AdminRsvpRow[]): string {
+    const fields = ['STT', 'Tên', 'SĐT', 'ID'];
+    const passengers = rows.flatMap(row => [
+      { name: row.guest_name, phone: row.phone ?? '-', rsvpId: row.id },
+      ...row.companions
+        .filter(companion => companion.joins_bus)
+        .map(companion => ({ name: companion.name, phone: '-', rsvpId: row.id })),
+    ]);
+    const lines = passengers.map((passenger, index) => [
+      index + 1,
+      passenger.name,
+      passenger.phone,
+      passenger.rsvpId,
+    ].map(value => this.csvCell(String(value))).join(','));
+    return [fields.map(field => this.csvCell(field)).join(','), ...lines].join('\r\n');
+  }
+
   private csvCell(value: string): string {
-    return `"${value.replaceAll('"', '""')}"`;
+    const spreadsheetSafeValue = value !== '-' && /^[=+\-@]/.test(value)
+      ? `\t${value}`
+      : value;
+    return `"${spreadsheetSafeValue.replaceAll('"', '""')}"`;
   }
 
   private errorMessage(error: unknown, fallback: string): string {

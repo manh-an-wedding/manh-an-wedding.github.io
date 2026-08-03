@@ -945,8 +945,12 @@ app-companions-editor > button { background: transparent; color: var(--red); bor
 .rsvp-confirmation .bus-leg-title {
   font-family: var(--font-body);
   font-size: .95rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.5;
+}
+.rsvp-confirmation .bus-info .bus-info-label {
+  color: var(--ink);
+  font-weight: 700;
 }
 .rsvp-edit-response {
   margin-top: 1rem;
@@ -966,6 +970,11 @@ app-companions-editor > button { background: transparent; color: var(--red); bor
 .faq .qa { border-bottom: 1px solid var(--line); }
 .faq .qa > button { width: 100%; text-align: left; background: none; border: none; padding: .9rem 0; font-weight: 500; color: var(--ink); font-size: 1rem; }
 .faq .answer { padding: 0 0 1rem; color: var(--muted); }
+.faq .answer > p { margin: .15rem 0 .35rem; }
+.faq-answer-list { display: grid; gap: .75rem; margin: .2rem 0 0; padding-left: 1.25rem; }
+.faq-answer-list li { padding-left: .15rem; }
+.faq-answer-list li::marker { color: var(--gold); }
+.faq-answer-link { display: inline-flex; gap: .2rem; align-items: center; margin-left: .35rem; color: var(--red); font-size: .84rem; font-weight: 600; text-underline-offset: .18em; }
 .faq .gift { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
 .faq .gift img { width: 150px; height: 150px; object-fit: contain; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
 .faq figure { text-align: center; margin: 0; }

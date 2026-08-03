@@ -2,7 +2,6 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { WishesService } from '../../core/wishes.service';
-import { DeviceIdService } from '../../core/device-id.service';
 
 @Component({
   selector: 'app-wishes', standalone: true, imports: [FormsModule, TranslatePipe],
@@ -22,13 +21,11 @@ import { DeviceIdService } from '../../core/device-id.service';
 })
 export class WishesComponent implements OnInit {
   private svc = inject(WishesService);
-  private device = inject(DeviceIdService);
   name = ''; message = ''; isPublic = true;
   wall: any[] = [];
   async ngOnInit() { this.wall = await this.svc.listPublic(); }
   async send() {
-    await this.svc.add({ name: this.name, message: this.message, isPublic: this.isPublic,
-      deviceId: this.device.get() });
+    await this.svc.add({ name: this.name, message: this.message, isPublic: this.isPublic });
     this.name = ''; this.message = '';
     this.wall = await this.svc.listPublic();
   }
