@@ -1,8 +1,7 @@
 # Wedding Invite — Nhật An ❤ Duy Mạnh — Project Handoff
 
 Single-page bilingual (VI/EN) wedding invitation for **Lễ Vu Quy**. Guests RSVP
-(3 options + companions + HCM–Cần Thơ bus + phone), leave public/private wishes,
-read a Q&A accordion (with gift QR), play background music. Static Angular SPA on
+(3 options + companions + HCM–Cần Thơ bus + phone), read a Q&A accordion and play background music. Static Angular SPA on
 GitHub Pages + Supabase as the data layer. **Config-driven** (all content/theme in
 one typed object) so it can be reused for other weddings later.
 
@@ -29,79 +28,63 @@ one typed object) so it can be reused for other weddings later.
 - **Config-driven:** everything (couple, event, groups, gift QR, FAQ, theme, i18n, Supabase
   URL+key) lives in `src/assets/config/wedding.config.ts` (typed by `src/app/core/wedding-config.ts`,
   provided via `WEDDING_CONFIG` token). Reuse = swap this file.
-- **Identity by typed name** (append-only; no login/tokens). `rsvp` is append-only; the current
-  choice is `rsvp_latest` = distinct on `(name_norm, device_id)` ordered by `created_at desc, id desc`
-  (the `id desc` tiebreaker matters — `now()` ties within a transaction). A random `device_id` in
-  `localStorage` (`DeviceIdService`) distinguishes "same person editing" from a name clash; the RSVP
-  form shows a clash popup when name+group+status match but device_id differs.
+- **Identity by typed name** (no guest login). A new submission supersedes the previous active row
+  with the same normalized name + group. During the same page session, an opaque edit token lets the
+  guest update the row in place; only its SHA-256 hash is stored. Cross-group same-name and same-phone
+  cases are sent to admin duplicate review.
+- No device identifier, visit tracking or raw IP is stored. New submissions are limited to 20 per
+  15 minutes per IP using a short-lived HMAC hash in `private.rsvp_rate_limit_events`.
 - **Name matching** uses `nameNorm()` (`src/app/core/name-normalize.ts`) — strips VN diacritics, đ→d.
 
 ## Supabase (project already provisioned)
 - Project URL: `https://bmhwpctxxfpculhigham.supabase.co` (also in `wedding.config.ts`).
 - The key in `wedding.config.ts` is the **publishable (anon) key** — public by design, safe to commit.
   **NEVER commit the service_role/secret key.**
-- Schema/RLS/views: `supabase/migrations/0001_init.sql` (already applied to the project).
-  Verify script: `supabase/tests/0001_init.verify.sql`.
+- Migrations `0001`–`0015` are applied to the linked project. Verification scripts live in
+  `supabase/tests/`; `0010`–`0015` have been run against live inside rollback transactions.
 - **RLS verified live:** anon SELECT on `rsvp`/`companions`/`rsvp_latest` = permission denied;
-  anon reads only `guests_public` (names) and `wishes_public` (public wishes, no ip/device);
-  anon INSERT on `rsvp`/`wishes` = OK; anon INSERT on `page_visits` = denied (edge-fn only).
-- Views for the couple (admin): `rsvp_latest`, `possible_duplicates` (names spanning >1 device),
-  `bus_manifest` + `bus_seat_count` (counts only companions of the LATEST rsvp per person),
-  `wishes_public`, `guests_public`. Read them via Supabase Dashboard (admin), not the anon key.
-- Edge Function `supabase/functions/log-visit/` captures real client IP + device_id into `page_visits`
-  (the only reliable way to get client IP; runs with the auto-injected service role).
+  anon reads only safe public RPC/views and submits through validated RPCs.
+- Views for the couple (admin): `rsvp_latest`, `possible_duplicates`,
+  `bus_manifest` + `bus_seat_count` (counts only companions of the current RSVP).
+- Migration `0010_remove_technical_tracking.sql` removes `page_visits`, RSVP/wish IP/device columns,
+  and their legacy RPCs.
+- `get_public_group_rsvps(slug, token)` exposes only a configured group page when its generated token
+  matches. The raw tables and token table remain unreadable to anon clients.
+- Wishes are hidden and their public RPC/view permissions are revoked by migration `0014`.
+- The old `log-visit` Edge Function has been deleted from the live project.
 
 ## Deploy (GitHub Pages)
 - Org/repo: **`manh-an-wedding/manh-an-wedding.github.io`** (Public). Site URL (root): `https://manh-an-wedding.github.io`.
 - CI: `.github/workflows/deploy.yml` — on push to `main`, builds `ng build --base-href /`, copies
   `index.html`→`404.html` (SPA fallback so `/en` deep-links resolve), publishes to Pages.
 - Pages source must be set to **GitHub Actions** in repo Settings → Pages.
-- **Gotcha:** `git push` on this Windows machine triggers an interactive Git Credential Manager
-  popup — it must be run by the user in a real terminal to complete GitHub auth (a background push
-  times out). Remote `origin` is already configured; work is merged to `main` locally.
+- Remote `origin` is already configured. GitHub Pages deploys only after a successful push to `main`.
 
-## Current status (branch: main; feat/build merged in)
-DONE (24 unit tests pass, build green):
-- Full frontend + services: config, name-normalize, device_id, Supabase client + rsvp/wishes/guests/visit
-  services, i18n + Option C routing, language toggle, RSVP form (+clash popup), companions editor,
-  wishes wall, FAQ + gift QR, map + calendar (.ics/Google), invite page + music toggle, Open Graph tags.
-- Supabase schema + RLS applied and verified live; app wired to the real project.
-- Backend/CI files authored: migration, log-visit edge function, deploy workflow, guest-import doc.
+## Current status
+DONE (99 unit tests pass, production build green):
+- Full frontend + services: config, name-normalize, Supabase client + rsvp/wishes/guests services,
+  i18n + Option C routing, language toggle, RSVP form, companions editor,
+  hidden wishes wall, visible Q&A, map + calendar (.ics/Google), invite page + music toggle, album,
+  public group page, admin RSVP review, Open Graph tags.
+- Supabase migrations `0001`–`0015` are applied; database lint reports no schema errors.
+- RSVP writes use validated RPCs, admin RPCs verify `is_rsvp_admin()`, and direct table writes are revoked.
 
 REMAINING:
-1. **Push `main` to origin** (user runs `git push -u origin main`; completes GCM auth) → Actions deploys.
-2. **Deploy the edge function** so visit-counting/IP works: `npx supabase login` (user, interactive),
-   then `npx supabase link --project-ref bmhwpctxxfpculhigham` + `npx supabase functions deploy log-visit --no-verify-jwt`.
-3. **Browser smoke test** on the live site: submit RSVP + companion + bus + phone, re-submit same
-   name/device (no popup), different device (popup), post public + private wish, open FAQ gift QR,
-   confirm rows land in Supabase + a `page_visits` row appears.
-4. **Import guest list** (optional, enables name autocomplete + invited-vs-confirmed): see `scripts/import-guests.md`.
+1. Push the finalized branch to `origin/main` so GitHub Actions deploys it.
+2. Smoke-test the deployed invitation, `/admin`, `/en`, and the tokenized public group link.
+3. Immediately before invitations are sent, manually run
+   `supabase/scripts/clear_test_data_before_invites.sql`. Never run it during development.
 
-## ⚠️ PRE-LAUNCH GATE — replace ALL fake data before printing the QR / going live
-`src/assets/config/wedding.config.ts` + `public/assets/i18n/*.json` still contain PLACEHOLDER data
-(marked `DATA GIẢ` / `[GIẢ]`). Wrong gift QR/bank = guests sending money to a nonexistent account.
-Before launch, run and confirm **no matches**:
-```bash
-grep -rn "GIẢ\|REPLACE\|placeholder\|0000000000\|1111111111" src/assets/config/
-```
-Replace: gift QR images + bank/account/name; event venue/address/map/datetime; bus
-pickup/time/duration + RSVP groups + deadline; Q&A "(cập nhật sau)" answers.
-
-### Assets to add (drop files here — names must match `wedding.config.ts`)
-Static assets are served from `public/` (mapped to `/`). Folders + READMEs already exist:
-| Put file at | Config key | Notes |
-|-------------|-----------|-------|
-| `public/assets/img/cover.jpg`    | `media.coverImg`   | hero photo, ~3:4 portrait |
-| `public/assets/img/couple-1.jpg` | `media.couplePhotos[0]` | optional |
-| `public/assets/img/qr-bride.png` | `gift.bride.qr`    | bride VietQR (square) |
-| `public/assets/img/qr-groom.png` | `gift.groom.qr`    | groom VietQR (square) |
-| `public/assets/audio/bg-music.mp3` | `theme.music`    | background music, keep small |
-Hero hides the cover `<img>` gracefully (via `coverOk` flag + `(error)`) until the file exists.
-To change a filename, edit the matching key in `wedding.config.ts`.
+## Pre-launch gate
+- Confirm event, bus, family, Q&A and translation content in `wedding.config.ts` and both i18n files.
+- The wedding photos are loaded from the public `wedding-media/v1` Supabase Storage path; do not add
+  the originals to Git. The local fallback must remain non-personal.
+- Run the cleanup script only after final testing and immediately before sharing the QR/link.
+- Keep the current music only with the owner's acknowledged copyright risk.
 
 ## Section toggles + theme
 - `wedding.config.ts` → `sections: { wishes, faq }` toggles the Wishes wall and Q&A accordion.
-  **Currently both `false` (hidden)** per request; set to `true` to show. Wired via `@if` in
+  **Currently Wishes is hidden and Q&A is visible.** Wired via `@if` in
   `invite.component.html`.
 - Visual theme (red-traditional VN) lives in `src/styles.scss` (CSS vars from `theme` colors,
   Playfair Display + Be Vietnam Pro via Google Fonts @import, invitation-card layout, hero with 囍).
