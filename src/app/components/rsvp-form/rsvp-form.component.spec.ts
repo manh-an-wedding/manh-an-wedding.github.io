@@ -148,7 +148,7 @@ describe('RsvpFormComponent', () => {
       your_name: 'Bác vui lòng cho em xin tên',
       bus_outbound_title: 'Xe khởi hành Hồ Chí Minh đi Cần Thơ:',
       departure_label: 'Xuất phát',
-      bus_outbound_departure: '07:15 - 17.10.2026',
+      bus_outbound_departure: '07:15 - Thứ 7 - 17.10.2026',
       location_label: 'Địa điểm',
       bus_outbound_location: 'IBIS SAIGON AIRPORT',
       bus_restaurant_arrival: 'Dự kiến đến nhà hàng',
@@ -193,7 +193,7 @@ describe('RsvpFormComponent', () => {
     await fixture.whenStable();
     fixture.detectChanges();
     const busText = text('.bus-info');
-    expect(busText).toContain('07:15 - 17.10.2026');
+    expect(busText).toContain('07:15 - Thứ 7 - 17.10.2026');
     expect(busText).toContain('10:45');
     expect(busText).toContain('13:30');
     expect(busText).toContain('17:30');
@@ -243,7 +243,7 @@ describe('RsvpFormComponent', () => {
     translate.setTranslation('en', { rsvp: {
       bus_outbound_title: 'Shuttle from Ho Chi Minh City to Can Tho:',
       departure_label: 'Departure',
-      bus_outbound_departure: '07:15 - 17.10.2026',
+      bus_outbound_departure: '07:15 - Saturday - 17.10.2026',
       location_label: 'Location',
       bus_outbound_location: 'IBIS SAIGON AIRPORT',
       bus_restaurant_arrival: 'Estimated arrival at the restaurant',
@@ -270,7 +270,7 @@ describe('RsvpFormComponent', () => {
     fixture.detectChanges();
 
     const busText = element.querySelector('.bus-info')?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
-    expect(busText).toContain('07:15 - 17.10.2026');
+    expect(busText).toContain('07:15 - Saturday - 17.10.2026');
     expect(busText).toContain('10:45');
     expect(busText).toContain('17:30');
     expect(busText).toContain('IBIS SAIGON AIRPORT');
@@ -408,7 +408,7 @@ describe('RsvpFormComponent', () => {
         confirmation_bus: 'Bác đã lựa chọn tham dự & hốt {{count}} suất xe đưa đón khứ hồi HCM–CT cho',
         bus_outbound_title: 'Xe khởi hành Hồ Chí Minh đi Cần Thơ:',
         departure_label: 'Xuất phát',
-        bus_outbound_departure: '07:15 - 17.10.2026',
+        bus_outbound_departure: '07:15 - Thứ 7 - 17.10.2026',
         location_label: 'Địa điểm',
         bus_outbound_location: 'IBIS SAIGON AIRPORT',
         bus_restaurant_arrival: 'Dự kiến đến nhà hàng',
@@ -461,7 +461,7 @@ describe('RsvpFormComponent', () => {
     )).toEqual(['STRONG', 'STRONG']);
     const confirmedBusInfo: HTMLElement | null =
       fixture.nativeElement.querySelector('.rsvp-confirmation .bus-info');
-    expect(confirmedBusInfo?.textContent).toContain('07:15 - 17.10.2026');
+    expect(confirmedBusInfo?.textContent).toContain('07:15 - Thứ 7 - 17.10.2026');
     expect(confirmedBusInfo?.textContent).toContain('10:45');
     expect(confirmedBusInfo?.textContent).toContain('13:30');
     expect(confirmedBusInfo?.textContent).toContain('17:30');

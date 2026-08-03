@@ -597,7 +597,7 @@ body.album-lightbox-open { overflow: hidden; }
   }
 }
 
-/* ---- progressive entrance + falling double-happiness ---- */
+/* ---- progressive entrance + falling confetti ---- */
 .scroll-reveal {
   opacity: 0;
   transform: translate3d(0, 1.6rem, 0);
@@ -636,72 +636,43 @@ body.album-lightbox-open { overflow: hidden; }
   pointer-events: none;
   user-select: none;
 }
-.happiness-rain span {
+.happiness-rain .confetti-particle {
   position: absolute;
   top: -12vh;
-  color: var(--gold);
-  font-family: 'Songti SC', 'Noto Serif SC', Georgia, serif;
-  font-weight: 700;
-  line-height: 1;
   opacity: 0;
-  text-shadow: 0 1px 4px rgba(122, 20, 20, .12);
   will-change: transform, opacity;
-  animation-name: happiness-snowfall;
+  display: block;
+  box-shadow: 0 1px 3px rgba(122, 20, 20, .1);
+  backface-visibility: visible;
+  animation-name: confetti-fall;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
 }
-.happiness-rain .happiness-secret-lane {
-  position: absolute;
-  inset: 0 auto 0 50%;
-  width: min(100%, var(--maxw));
-  transform: translateX(-50%);
-  overflow: visible;
-}
-.happiness-rain .happiness-secret {
-  z-index: 2;
-  color: #dfb84f;
-  text-shadow:
-    0 2px 8px rgba(122, 20, 20, .2),
-    0 0 18px rgba(201, 162, 75, .28);
-  animation-name: secret-happiness-fall;
-  animation-duration: 10s;
-  animation-delay: 0s;
-  animation-timing-function: linear;
-  animation-iteration-count: 1;
-}
-@keyframes happiness-snowfall {
+@keyframes confetti-fall {
   0% {
     opacity: 0;
-    transform: translate3d(0, -12vh, 0) rotate(-12deg);
+    transform:
+      translate3d(0, -12vh, 0)
+      rotate(var(--tilt))
+      rotateY(0deg);
   }
-  12% { opacity: .48; }
+  12% { opacity: .72; }
   52% {
-    opacity: .42;
-    transform: translate3d(var(--drift), 52vh, 0) rotate(110deg);
+    opacity: .66;
+    transform:
+      translate3d(var(--drift), 52vh, 0)
+      rotate(calc(var(--tilt) + var(--spin-mid)))
+      rotateY(180deg);
   }
-  88% { opacity: .32; }
+  88% { opacity: .5; }
   100% {
     opacity: 0;
-    transform: translate3d(var(--drift-back), 114vh, 0) rotate(235deg);
+    transform:
+      translate3d(var(--drift-back), 114vh, 0)
+      rotate(calc(var(--tilt) + var(--spin-end)))
+      rotateY(360deg);
   }
 }
-@keyframes secret-happiness-fall {
-  0% {
-    opacity: 0;
-    transform: translate3d(-50%, -15vh, 0) rotate(-8deg);
-  }
-  10% { opacity: .88; }
-  55% {
-    opacity: .76;
-    transform: translate3d(calc(-50% + var(--drift)), 53vh, 0) rotate(55deg);
-  }
-  90% { opacity: .62; }
-  100% {
-    opacity: 0;
-    transform: translate3d(calc(-50% + var(--drift-back)), 116vh, 0) rotate(112deg);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .scroll-reveal,
   .scroll-reveal.is-visible,

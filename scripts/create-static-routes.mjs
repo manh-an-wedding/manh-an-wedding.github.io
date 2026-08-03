@@ -3,7 +3,15 @@ import { join } from 'node:path';
 
 const outputDir = join('dist', 'manhan-web', 'browser');
 const rootDocument = await readFile(join(outputDir, 'index.html'), 'utf8');
+const vietnamesePreviewUrl =
+  'https://manh-an-wedding.github.io/assets/img/share-invitation.png';
+const englishPreviewUrl =
+  'https://manh-an-wedding.github.io/assets/img/share-invitation-en.png';
+const vietnamesePreviewAlt = 'content="Thư mời cưới Nhật An và Duy Mạnh"';
+const englishPreviewAlt = 'content="Wedding invitation for Nhật An and Duy Mạnh"';
 if (!rootDocument.includes('lang="vi"')
+    || !rootDocument.includes(vietnamesePreviewUrl)
+    || !rootDocument.includes(vietnamesePreviewAlt)
     || !rootDocument.includes(
       'content="Trân trọng kính mời bạn đến chung vui — Lễ Vu Quy"',
     )) {
@@ -15,7 +23,9 @@ const englishDocument = rootDocument
   .replace(
     'content="Trân trọng kính mời bạn đến chung vui — Lễ Vu Quy"',
     'content="You are cordially invited to celebrate Manh &amp; An’s wedding"',
-  );
+  )
+  .replaceAll(vietnamesePreviewUrl, englishPreviewUrl)
+  .replace(vietnamesePreviewAlt, englishPreviewAlt);
 
 const passthroughRoutes = [
   join('admin'),

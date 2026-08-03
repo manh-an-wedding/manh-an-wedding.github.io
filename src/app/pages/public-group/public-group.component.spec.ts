@@ -68,6 +68,7 @@ describe('PublicGroupComponent', () => {
       'Danh sách nhóm Tiến bước',
     );
     expect(getComputedStyle(eyebrow as Element).textAlign).toBe('left');
+    expect(eyebrow?.textContent).toContain('Thứ 7 - 17.10.2026');
     expect(getComputedStyle(title as Element).textAlign).toBe('left');
     expect(element.textContent).not.toContain(
       'Danh sách được cập nhật từ xác nhận mới nhất của từng khách.',

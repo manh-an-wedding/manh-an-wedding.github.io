@@ -50,7 +50,7 @@ export const WEDDING: WeddingConfig = {
     deadlineISO: '2026-10-10T11:30:00+07:00',
     bus: {
       pickup: 'Ibis hotel, 2 Hồng Hà, Tân Sơn Hòa, Hồ Chí Minh',
-      departTime: '7:15 17.10.2026',
+      departTime: '7:15 Thứ 7 - 17.10.2026',
       restaurantArrivalTime: '10:45',
       returnDepartTime: '13:30',
       hotelArrivalTime: '17:30',

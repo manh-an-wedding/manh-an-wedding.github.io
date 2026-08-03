@@ -24,6 +24,7 @@ const testTranslations = {
     reception_short_venue: 'Vạn Phát Riverside, Cần Thơ',
     reception_address: 'Số 02 Nguyễn Văn Cừ (Cồn Khương), phường Cái Khế, TP Cần Thơ',
     date: 'Ngày',
+    event_date: 'Thứ 7 - 17.10.2026',
     rsvp_intro: 'Sự hiện diện của quý khách là niềm vinh hạnh cho gia đình chúng tôi.',
   },
 };
@@ -45,6 +46,7 @@ const englishTranslations = {
     reception_short_venue: 'Van Phat Riverside, Can Tho',
     reception_address: '02 Nguyen Van Cu, Cai Khe ward, Can Tho',
     date: 'Date',
+    event_date: 'Saturday - 17.10.2026',
     lunar: 'Lunar date',
     time: 'Time',
     welcome: 'Guest welcome',
@@ -184,7 +186,7 @@ describe('InviteComponent', () => {
 
     expect(heroNames.indexOf('Nhật An')).toBeLessThan(heroNames.indexOf('Duy Mạnh'));
     expect(coverText).toContain('11:00');
-    expect(coverText).toContain('17/10/2026');
+    expect(coverText).toContain('Thứ 7 - 17.10.2026');
     expect(coverText).toContain('Vạn Phát Riverside');
     expect(Array.from(element.querySelectorAll('.save-the-day span'))
       .map(line => line.textContent?.trim()))
@@ -221,6 +223,7 @@ describe('InviteComponent', () => {
       .toContain('Trân trọng báo tin Lễ Vu Quy của');
     expect(sectionText('.invitation-intro')).not.toContain('của chúng tôi');
     expect(sectionText('.ceremony-card')).toContain('08:00');
+    expect(sectionText('.ceremony-card')).toContain('Thứ 7 - 17.10.2026');
     expect(sectionText('.ceremony-card')).toContain('Tư gia nhà gái');
     expect(sectionText('.ceremony-card')).not.toContain('Bình Thủy, Cần Thơ');
     expect(sectionText('.reception-card')).toContain(
@@ -233,6 +236,7 @@ describe('InviteComponent', () => {
     expect(element.querySelector('.reception-card .event-place .reception-venue-name')).not.toBeNull();
     expect(sectionText('.reception-card')).toContain('10:30');
     expect(sectionText('.reception-card')).toContain('11:00');
+    expect(sectionText('.reception-card')).toContain('Thứ 7 - 17.10.2026');
     expect(sectionText('.reception-card')).toContain(
       'Sự hiện diện của quý khách là niềm vinh hạnh cho gia đình chúng tôi.',
     );
@@ -275,6 +279,7 @@ describe('InviteComponent', () => {
       element.querySelector(selector)?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
 
     expect(sectionText('.cover-hero')).toContain('Van Phat Riverside, Can Tho');
+    expect(sectionText('.cover-hero')).toContain('Saturday - 17.10.2026');
     expect(sectionText('.invitation-intro'))
       .toContain('We respectfully announce the Vu Quy ceremony');
     expect(sectionText('.invitation-intro')).toContain('Eldest Daughter');
@@ -282,6 +287,7 @@ describe('InviteComponent', () => {
     expect(sectionText('.reception-card'))
       .toContain('We cordially invite you to celebrate with the family at');
     expect(sectionText('.ceremony-card')).toContain("the Bride's house");
+    expect(sectionText('.ceremony-card')).toContain('Saturday - 17.10.2026');
     expect(sectionText('.ceremony-card')).toContain('Year of the Fire Horse');
     expect(sectionText('.reception-venue-name')).toContain('Van Phat Riverside - Hall 1');
     expect(sectionText('.reception-card'))
@@ -375,7 +381,7 @@ describe('InviteComponent', () => {
     const dateValue = dateRow?.querySelector('.event-value');
 
     expect(dateRow?.querySelector('.event-label')?.textContent?.trim()).toBe('Ngày');
-    expect(dateValue?.textContent?.trim()).toBe('17.10.2026');
+    expect(dateValue?.textContent?.trim()).toBe('Thứ 7 - 17.10.2026');
     expect(element.querySelectorAll('.reception-card .event-time-grid .event-value')).toHaveLength(2);
   });
 

@@ -36,7 +36,7 @@
       <strong>
         {{ cfg.reception.datetime | date:'HH:mm':'+0700' }}
         <i aria-hidden="true">·</i>
-        {{ cfg.reception.datetime | date:'dd/MM/yyyy':'+0700' }}
+        {{ 'details.event_date' | translate }}
       </strong>
       <em>{{ 'details.reception_short_venue' | translate }}</em>
     </div>
@@ -98,7 +98,7 @@
         </div>
         <div>
           <span>{{ 'details.date' | translate }}</span>
-          <strong>{{ cfg.ceremony.datetime | date:'dd.MM.yyyy':'+0700' }}</strong>
+          <strong>{{ 'details.event_date' | translate }}</strong>
         </div>
       </div>
       <p class="lunar-date reveal-step" style="--reveal-delay: .3s">
@@ -133,7 +133,7 @@
         </div>
         <div class="reception-date-row">
           <span class="event-label">{{ 'details.date' | translate }}</span>
-          <strong class="event-value">{{ cfg.reception.datetime | date:'dd.MM.yyyy':'+0700' }}</strong>
+          <strong class="event-value">{{ 'details.event_date' | translate }}</strong>
         </div>
       </div>
       <div class="reveal-step" style="--reveal-delay: .45s">

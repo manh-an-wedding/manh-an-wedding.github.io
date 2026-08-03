@@ -6,7 +6,12 @@ interface HappinessParticle {
   delay: number;
   duration: number;
   size: number;
+  width: number;
+  color: string;
+  radius: number;
   drift: number;
+  tilt: number;
+  spin: number;
 }
 
 @Component({
@@ -16,57 +21,26 @@ interface HappinessParticle {
     <div class="happiness-rain" aria-hidden="true">
       @for (particle of particles; track particle.id) {
         <span
+          class="confetti-particle"
           [style.left.%]="particle.left"
-          [style.font-size.rem]="particle.size"
+          [style.width.rem]="particle.width"
+          [style.height.rem]="particle.size"
+          [style.background-color]="particle.color"
+          [style.border-radius.px]="particle.radius"
           [style.animation-delay.s]="particle.delay"
           [style.animation-duration.s]="particle.duration"
           [style.--drift]="particle.drift + 'px'"
           [style.--drift-back]="particle.drift * -0.45 + 'px'"
-          (animationiteration)="recordFall()">囍</span>
-      }
-      @if (secretVisible) {
-        <div class="happiness-secret-lane">
-          <span
-            class="happiness-secret"
-            [style.left.%]="secretLeft"
-            [style.font-size.rem]="secretSize"
-            [style.--drift]="secretDrift + 'px'"
-            [style.--drift-back]="secretDrift * -0.45 + 'px'"
-            (animationend)="finishSecretFall()">囍</span>
-        </div>
+          [style.--tilt]="particle.tilt + 'deg'"
+          [style.--spin-mid]="particle.spin * .5 + 'deg'"
+          [style.--spin-end]="particle.spin + 'deg'"></span>
       }
     </div>
   `,
 })
 export class HappinessRainComponent {
+  private readonly confettiPalette = ['#a8191d', '#c9952e', '#efb7b5', '#f4e6cf'] as const;
   readonly particles: readonly HappinessParticle[] = this.createParticles(22);
-  readonly secretEveryFalls = 40;
-  readonly secretSize = this.round(Math.max(...this.particles.map(particle => particle.size)) * 5);
-  secretLeft = 50;
-  secretDrift = 0;
-  completedFalls = 0;
-  secretVisible = false;
-
-  recordFall() {
-    this.completedFalls += 1;
-
-    if (!this.secretVisible && this.completedFalls >= this.secretEveryFalls) {
-      this.completedFalls = 0;
-      this.randomizeSecretPath();
-      this.secretVisible = true;
-    }
-  }
-
-  finishSecretFall() {
-    this.secretVisible = false;
-  }
-
-  randomizeSecretPath() {
-    this.secretLeft = this.round(8 + Math.random() * 84);
-    this.secretDrift = Math.round(
-      (16 + Math.random() * 22) * (Math.random() < .5 ? -1 : 1),
-    );
-  }
 
   private createParticles(count: number): HappinessParticle[] {
     const horizontalSegment = 100 / count;
@@ -76,6 +50,7 @@ export class HappinessRainComponent {
       const phaseIndex = (id * 11) % count;
       const phaseJitter = (Math.random() - .5) * .55;
       const driftDirection = Math.random() < .5 ? -1 : 1;
+      const spinDirection = Math.random() < .5 ? -1 : 1;
 
       return {
         id,
@@ -83,7 +58,12 @@ export class HappinessRainComponent {
         delay: -this.round(Math.max(0, phaseIndex * delayWindow / count + phaseJitter)),
         duration: this.round(10 + Math.random() * 9),
         size: this.round(.62 + Math.random() * .58),
+        width: this.round(.18 + Math.random() * .18),
+        color: this.confettiPalette[id % this.confettiPalette.length],
+        radius: id % 4 === 0 ? 3 : 1,
         drift: Math.round((12 + Math.random() * 26) * driftDirection),
+        tilt: Math.round(-28 + Math.random() * 56),
+        spin: Math.round((260 + Math.random() * 360) * spinDirection),
       };
     });
   }
