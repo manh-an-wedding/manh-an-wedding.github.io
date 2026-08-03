@@ -152,8 +152,9 @@ describe('RsvpFormComponent', () => {
       bus_return_traffic_note: '(chiều về có thể kẹt xe trên cao tốc)',
       bus_deadline_prefix: 'Danh sách đi xe sẽ được chốt vào',
       bus_deadline_detail: '11:30 AM thứ 7, 10.10.2026',
-      bus_info_hint: '(bấm chữ i xem thông tin xe)',
-      bus_driver_update_note: 'Thông tin tài xế và thay đổi lịch trình (nếu có) sẽ được gửi vào SĐT của bác nhé. Xin cảm ơn.',
+      bus_info_hint: 'xem thông tin xe ở đây',
+      bus_driver_update_note: 'Thông tin tài xế và thay đổi lịch trình (nếu có) sẽ được gửi vào SĐT của bác nha.',
+      bus_driver_update_thanks: 'Xin cảm ơn.',
     } });
     await firstValueFrom(translate.use('vi'));
 
@@ -166,10 +167,14 @@ describe('RsvpFormComponent', () => {
     expect(text('.rsvp-name-label')).toContain('Bác vui lòng cho em xin tên');
     expect(text('.rsvp-group-label')).toContain('rsvp.group');
     expect(element.querySelector('.note')).toBeNull();
-    expect(element.querySelector('.bus-info-button')?.textContent?.trim()).toBe('i');
+    expect(element.querySelector('.bus-info-button')).toBeNull();
     const busInfoHint: HTMLElement | null = element.querySelector('.bus-info-hint');
-    expect(busInfoHint?.textContent?.trim()).toBe('(bấm chữ i xem thông tin xe)');
-    expect(busInfoHint?.tagName).toBe('EM');
+    expect(busInfoHint?.textContent).toContain('xem thông tin xe ở đây');
+    expect(busInfoHint?.tagName).toBe('BUTTON');
+    expect(busInfoHint?.querySelector('em')).not.toBeNull();
+    const busHintIcon = busInfoHint?.querySelector('.bus-info-hint-icon');
+    expect(busHintIcon?.namespaceURI).toBe('http://www.w3.org/2000/svg');
+    expect(busHintIcon?.querySelector('[stroke="currentColor"]')).not.toBeNull();
     expect(element.querySelector('.rsvp-privacy-note')).toBeNull();
 
     fixture.componentInstance.model.status = 'bus';
@@ -193,9 +198,15 @@ describe('RsvpFormComponent', () => {
       element.querySelectorAll('.bus-registration-deadline strong'),
       (item: Element) => item.textContent?.trim(),
     )).toEqual(['11:30 AM thứ 7, 10.10.2026']);
-    expect(text('.bus-driver-update-note')).toBe(
-      'Thông tin tài xế và thay đổi lịch trình (nếu có) sẽ được gửi vào SĐT của bác nhé. Xin cảm ơn.',
+    const driverUpdateNote = element.querySelector('.bus-driver-update-note');
+    expect(driverUpdateNote?.querySelector(':scope > em')).not.toBeNull();
+    expect(driverUpdateNote?.querySelector('br')).not.toBeNull();
+    expect(text('.bus-driver-update-note-main')).toBe(
+      'Thông tin tài xế và thay đổi lịch trình (nếu có) sẽ được gửi vào SĐT của bác nha.',
     );
+    expect(text('.bus-driver-update-note-thanks')).toBe('Xin cảm ơn.');
+    const registrationNotes = element.querySelector('.bus-registration-notes');
+    expect(registrationNotes?.children.length).toBe(2);
     expect(element.querySelector('.bus-registration-deadline')?.nextElementSibling)
       .toBe(element.querySelector('.bus-driver-update-note'));
     expect(element.querySelectorAll('.bus-info p')).toHaveLength(8);
@@ -205,17 +216,19 @@ describe('RsvpFormComponent', () => {
     const fixture = TestBed.createComponent(RsvpFormComponent);
     fixture.detectChanges();
 
-    const infoButton: HTMLButtonElement =
-      fixture.nativeElement.querySelector('.bus-info-button');
-    infoButton.click();
+    const hintButton: HTMLButtonElement =
+      fixture.nativeElement.querySelector('.bus-info-hint');
+    hintButton.click();
 
     expect(document.activeElement)
       .toBe(fixture.nativeElement.querySelector('.bus-info-focus-target'));
+    expect(hintButton.getAttribute('aria-expanded')).toBe('true');
 
-    infoButton.click();
+    hintButton.click();
 
     expect(fixture.nativeElement.querySelector('.bus-info-focus-target')).toBeNull();
-    expect(document.activeElement).toBe(infoButton);
+    expect(document.activeElement).toBe(hintButton);
+    expect(hintButton.getAttribute('aria-expanded')).toBe('false');
   });
 
   it('renders the English bus schedule from translations', async () => {
@@ -234,7 +247,8 @@ describe('RsvpFormComponent', () => {
       bus_return_traffic_note: '(return traffic may be congested on the expressway)',
       bus_deadline_prefix: 'The shuttle list will be finalized at',
       bus_deadline_detail: '11:30 AM Saturday, 10.10.2026',
-      bus_driver_update_note: 'Driver details and any schedule changes will be sent to your phone number. Thank you.',
+      bus_driver_update_note: 'Driver details and any schedule changes will be sent to your phone number.',
+      bus_driver_update_thanks: 'Thank you.',
     } });
     await firstValueFrom(translate.use('en'));
 
@@ -344,7 +358,8 @@ describe('RsvpFormComponent', () => {
         bus_return_traffic_note: '(chiều về có thể kẹt xe trên cao tốc)',
         bus_deadline_prefix: 'Danh sách đi xe sẽ được chốt vào',
         bus_deadline_detail: '11:30 AM thứ 7, 10.10.2026',
-        bus_driver_update_note: 'Thông tin tài xế và thay đổi lịch trình (nếu có) sẽ được gửi vào SĐT của bác nhé. Xin cảm ơn.',
+        bus_driver_update_note: 'Thông tin tài xế và thay đổi lịch trình (nếu có) sẽ được gửi vào SĐT của bác nha.',
+        bus_driver_update_thanks: 'Xin cảm ơn.',
         edit_response: 'Chỉnh sửa',
       },
       invite: { confirm: 'Xác nhận tham dự' },
@@ -393,14 +408,17 @@ describe('RsvpFormComponent', () => {
       .toContain('chiều về có thể kẹt xe trên cao tốc');
     expect(confirmedBusInfo?.textContent)
       .toContain('Danh sách đi xe sẽ được chốt vào');
-    expect(confirmedBusInfo?.textContent)
-      .toContain('Thông tin tài xế và thay đổi lịch trình (nếu có) sẽ được gửi vào SĐT của bác nhé. Xin cảm ơn.');
+    expect(confirmedBusInfo?.querySelector('.bus-driver-update-note-main')?.textContent?.trim())
+      .toBe('Thông tin tài xế và thay đổi lịch trình (nếu có) sẽ được gửi vào SĐT của bác nha.');
+    expect(confirmedBusInfo?.querySelector('.bus-driver-update-note-thanks')?.textContent?.trim())
+      .toBe('Xin cảm ơn.');
     expect(Array.from(
       confirmedBusInfo?.querySelectorAll('.bus-registration-deadline strong') ?? [],
       (item: Element) => item.textContent?.trim(),
     )).toEqual(['11:30 AM thứ 7, 10.10.2026']);
     expect(confirmedBusInfo?.querySelector('a')?.getAttribute('href'))
       .toBe('https://maps.app.goo.gl/A4G9MXVdHavg2cTq6');
+    expect(confirmedBusInfo?.querySelectorAll('.bus-leg-title')).toHaveLength(2);
 
     const editButton: HTMLButtonElement | null =
       fixture.nativeElement.querySelector('.rsvp-edit-response');

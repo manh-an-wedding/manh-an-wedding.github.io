@@ -1,7 +1,7 @@
 <ng-template #busInformation>
   <div class="bus-info">
     <section class="bus-leg">
-      <h3>{{ 'rsvp.bus_outbound_title' | translate }}</h3>
+      <h3 class="bus-leg-title">{{ 'rsvp.bus_outbound_title' | translate }}</h3>
       <p><strong>{{ 'rsvp.departure_label' | translate }}:</strong>
         {{ 'rsvp.bus_outbound_departure' | translate }}</p>
       <p><strong>{{ 'rsvp.location_label' | translate }}:</strong>
@@ -14,7 +14,7 @@
         {{ cfg.rsvp.bus.restaurantArrivalTime }}</p>
     </section>
     <section class="bus-leg">
-      <h3>{{ 'rsvp.bus_return_title' | translate }}</h3>
+      <h3 class="bus-leg-title">{{ 'rsvp.bus_return_title' | translate }}</h3>
       <p><strong>{{ 'rsvp.departure_label' | translate }}:</strong>
         {{ 'rsvp.bus_return_departure_time' | translate }}</p>
       <p><strong>{{ 'rsvp.location_label' | translate }}:</strong>
@@ -24,15 +24,24 @@
         <span class="bus-traffic-note">{{ 'rsvp.bus_return_traffic_note' | translate }}</span>
       </p>
     </section>
-    <p class="bus-registration-deadline">
-      <em>
-        {{ 'rsvp.bus_deadline_prefix' | translate }}
-        <strong>{{ 'rsvp.bus_deadline_detail' | translate }}</strong>.
-      </em>
-    </p>
-    <p class="bus-driver-update-note">
-      {{ 'rsvp.bus_driver_update_note' | translate }}
-    </p>
+    <div class="bus-registration-notes">
+      <p class="bus-registration-deadline">
+        <em>
+          {{ 'rsvp.bus_deadline_prefix' | translate }}
+          <strong>{{ 'rsvp.bus_deadline_detail' | translate }}</strong>.
+        </em>
+      </p>
+      <p class="bus-driver-update-note">
+        <em>
+          <span class="bus-driver-update-note-main">
+            {{ 'rsvp.bus_driver_update_note' | translate }}
+          </span><br>
+          <span class="bus-driver-update-note-thanks">
+            {{ 'rsvp.bus_driver_update_thanks' | translate }}
+          </span>
+        </em>
+      </p>
+    </div>
   </div>
 </ng-template>
 
@@ -100,11 +109,23 @@
                     [disabled]="deadlinePassed"
                     (ngModelChange)="onStatusChange($event)">
         {{ 'rsvp.bus' | translate:{ count: formattedBusPartySize } }}
-        <button #busInfoButton type="button" class="bus-info-button"
-                (click)="toggleBusInfo()" aria-label="info"
+        <button #busInfoHintButton type="button" class="bus-info-hint"
+                (click)="toggleBusInfo(busInfoHintButton)"
                 aria-controls="bus-information"
-                [attr.aria-expanded]="showBusInfo">i</button>
-        <em class="bus-info-hint">{{ 'rsvp.bus_info_hint' | translate }}</em>
+                [attr.aria-expanded]="showBusInfo">
+          <em>
+            <span aria-hidden="true">&lt;</span>
+            {{ 'rsvp.bus_info_hint' | translate }}
+            <svg class="bus-info-hint-icon" viewBox="0 0 24 24"
+                 aria-hidden="true" focusable="false">
+              <path d="M6 4h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z
+                       M4 12h16 M8 8h8 M7 18v2 M17 18v2 M8 15h.01 M16 15h.01"
+                    fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span aria-hidden="true">&gt;</span>
+          </em>
+        </button>
       </label>
       @if (showBusInfo) {
         <div #busInfoPanel id="bus-information" class="bus-info-focus-target"

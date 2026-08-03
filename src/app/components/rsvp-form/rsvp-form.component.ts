@@ -28,7 +28,7 @@ export class RsvpFormComponent {
   private rsvp = inject(RsvpService);
   private device = inject(DeviceIdService);
   private cdr = inject(ChangeDetectorRef);
-  @ViewChild('busInfoButton') private busInfoButton?: ElementRef<HTMLButtonElement>;
+  @ViewChild('busInfoHintButton') private busInfoHintButton?: ElementRef<HTMLButtonElement>;
   @ViewChild('busInfoPanel') private busInfoPanel?: ElementRef<HTMLElement>;
   @ViewChild('confirmationPanel') private confirmationPanel?: ElementRef<HTMLElement>;
   @ViewChild('guestNameInput') private guestNameInput?: ElementRef<HTMLInputElement>;
@@ -57,12 +57,12 @@ export class RsvpFormComponent {
     if (status !== 'bus') this.showBusInfo = false;
   }
 
-  toggleBusInfo() {
+  toggleBusInfo(returnTarget = this.busInfoHintButton?.nativeElement) {
     this.showBusInfo = !this.showBusInfo;
     this.cdr.detectChanges();
     const target = this.showBusInfo
       ? this.busInfoPanel?.nativeElement
-      : this.busInfoButton?.nativeElement;
+      : returnTarget;
     this.focusAndCenter(target);
   }
 
