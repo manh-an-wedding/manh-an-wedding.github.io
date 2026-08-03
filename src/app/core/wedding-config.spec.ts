@@ -10,9 +10,15 @@ describe('wedding config', () => {
     expect(WEDDING.gift.bride.account).toBe('');
     expect(WEDDING.gift.groom.account).toBe('');
     expect(WEDDING.faq[0].showGiftQr).toBe(false);
-    expect(WEDDING.faq).toHaveLength(3);
-    expect(WEDDING.faq[1].items?.filter(item => item.href)).toHaveLength(2);
-    expect(WEDDING.faq[2].items?.filter(item => item.href)).toHaveLength(5);
+    expect(WEDDING.faq.map(item => item.qKey)).toEqual([
+      'faq.venue_parking.q',
+      'faq.parking.q',
+      'faq.activities.q',
+      'faq.food.q',
+    ]);
+    expect(WEDDING.faq).toHaveLength(4);
+    expect(WEDDING.faq[2].items?.filter(item => item.href)).toHaveLength(2);
+    expect(WEDDING.faq[3].items?.filter(item => item.href)).toHaveLength(5);
     expect(WEDDING.supabase.url).toBeTruthy();
   });
 

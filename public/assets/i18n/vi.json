@@ -40,7 +40,7 @@
   "agenda": { "welcome": "Đón khách", "ceremony": "Nghi lễ", "lunch": "Dùng tiệc", "party": "Chung vui" },
   "rsvp": { "your_name": "Bác vui lòng cho em xin tên", "group": "Và nhóm", "add_companion": "Thêm người đi cùng", "remove_companion": "Xóa người đi cùng", "people": "người",
             "self_transport": "Tham dự và tự di chuyển",
-            "bus": "Tham dự và hốt {{count}} slot xe đưa đón khứ hồi HCM–CT", "cannot_attend": "Không thể tham dự",
+            "bus": "Tham dự và hốt {{count}} suất xe đưa đón khứ hồi HCM–CT", "cannot_attend": "Không thể tham dự",
             "table_full": "Chúc mừng bác đã sở hữu 1 bàn tiệc trọn vẹn!",
             "phone": "Vui lòng nhập SĐT", "departure_label": "Xuất phát", "location_label": "Địa điểm",
             "bus_outbound_title": "Xe khởi hành Hồ Chí Minh đi Cần Thơ:",
@@ -61,17 +61,21 @@
             "submit": "Gửi xác nhận",
             "submitting": "Đang gửi...", "submit_error": "Không thể gửi xác nhận. Vui lòng thử lại.",
             "confirmation_thanks": "Cảm ơn bác {{name}} đã dành thời gian xác nhận!",
-            "confirmation_bus": "Bác đã lựa chọn tham dự & hốt {{count}} slot xe đưa đón khứ hồi HCM–CT cho",
+            "confirmation_bus": "Bác đã lựa chọn tham dự & hốt {{count}} suất xe đưa đón khứ hồi HCM–CT cho",
             "confirmation_self_transport": "Bác đã chọn tham dự và tự di chuyển cho",
             "edit_response": "Chỉnh sửa" },
   "wishes": { "title": "Số lưu bút", "public": "Công khai", "private": "Ẩn",
               "placeholder": "Lời chúc của bạn…", "send": "Gửi", "wall": "Lời chúc từ mọi người" },
   "faq": {
-    "title": "Hỏi & Đáp",
+    "title": "Q & A",
     "actions": { "details": "Xem thông tin", "directions": "Chỉ đường" },
+    "venue_parking": {
+      "q": "Vạn Phát có chỗ gửi xe không?",
+      "a": "Trước sảnh 1 có nơi để xe máy, xe hơi, xe khách miễn phí."
+    },
     "parking": {
-      "q": "Có chỗ gửi xe ở IBIS không?",
-      "a": "Có. Giá gửi xe là 7.000đ nếu lấy xe trước 18:00 và 14.000đ nếu lấy xe sau 18:00."
+      "q": "IBIS có chỗ gửi xe không?",
+      "a": "Có. Giá gửi xe máy là 7k nếu lấy xe trước 18:00 và 14k nếu lấy xe sau 18:00."
     },
     "activities": {
       "q": "Ghé Cần Thơ có thể chơi gì?",

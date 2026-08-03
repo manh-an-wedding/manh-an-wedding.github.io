@@ -242,7 +242,7 @@ export class InviteComponent implements OnInit, OnDestroy {
 
       const elapsed = Math.min(timestamp - this.lastAutoScrollTime, 50);
       this.lastAutoScrollTime = timestamp;
-      this.autoScrollPosition = Math.min(maxScroll, this.autoScrollPosition + elapsed * 0.06);
+      this.autoScrollPosition = Math.min(maxScroll, this.autoScrollPosition + elapsed * 0.035);
       view.scrollTo(0, this.autoScrollPosition);
       this.autoScrollFrame = view.requestAnimationFrame(scrollStep);
     };

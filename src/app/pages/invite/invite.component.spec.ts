@@ -123,7 +123,7 @@ describe('InviteComponent', () => {
     expect(component['autoScrollFrame']).toBe(23);
   });
 
-  it('auto-scrolls at about 1 pixel per 60Hz frame', () => {
+  it('auto-scrolls at 35 pixels per second', () => {
     const fixture = TestBed.createComponent(InviteComponent);
     const component = fixture.componentInstance;
     const music = TestBed.inject(MusicService);
@@ -151,7 +151,7 @@ describe('InviteComponent', () => {
 
       expect(scrollSpy).toHaveBeenCalledTimes(1);
       expect(scrollSpy.mock.calls[0][0]).toBe(0);
-      expect(scrollSpy.mock.calls[0][1]).toBeCloseTo(3, 5);
+      expect(scrollSpy.mock.calls[0][1]).toBeCloseTo(1.75, 5);
     } finally {
       component.ngOnDestroy();
       nowSpy.mockRestore();
@@ -326,6 +326,7 @@ describe('InviteComponent', () => {
       'reception',
       'separator',
       'rsvp',
+      'separator',
       'separator',
     ]);
   });

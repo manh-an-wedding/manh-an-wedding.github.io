@@ -720,7 +720,8 @@ body.album-lightbox-open { overflow: hidden; }
 
 /* ---- continuous feature sections ---- */
 app-map-calendar, app-rsvp-form { display: block; margin: 0; }
-app-wishes, app-faq { display: block; margin: 1.4rem 0; }
+app-wishes { display: block; margin: 1.4rem 0; }
+app-faq { display: block; margin: 0; }
 
 .map-cal, app-rsvp-form form, app-rsvp-form .thanks {
   margin: 0;
@@ -733,7 +734,7 @@ app-wishes, app-faq { display: block; margin: 1.4rem 0; }
 }
 app-rsvp-form form, app-rsvp-form .thanks { border-top: 0; }
 
-.wishes, .faq {
+.wishes {
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -967,14 +968,38 @@ app-companions-editor > button { background: transparent; color: var(--red); bor
 .wishes blockquote { border-left: 3px solid var(--gold); margin: .6rem 0; padding: .3rem .8rem; background: var(--cream); border-radius: 0 8px 8px 0; }
 
 /* ---- FAQ accordion ---- */
-.faq .qa { border-bottom: 1px solid var(--line); }
-.faq .qa > button { width: 100%; text-align: left; background: none; border: none; padding: .9rem 0; font-weight: 500; color: var(--ink); font-size: 1rem; }
-.faq .answer { padding: 0 0 1rem; color: var(--muted); }
+.faq.continuous-section {
+  margin: 0;
+  padding: var(--section-boundary-padding) clamp(1rem, 5vw, 2.25rem);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+main.invite .faq-title {
+  margin-bottom: .65rem;
+  font-size: 1.125rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.faq .qa { border-bottom: 1px solid rgba(201, 162, 75, .28); }
+.faq .qa > button {
+  width: 100%;
+  padding: .72rem 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-size: .9rem;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: left;
+}
+.faq .answer { padding: 0 0 .8rem; color: var(--muted); font-size: .82rem; }
 .faq .answer > p { margin: .15rem 0 .35rem; }
-.faq-answer-list { display: grid; gap: .75rem; margin: .2rem 0 0; padding-left: 1.25rem; }
+.faq-answer-list { display: grid; gap: .55rem; margin: .2rem 0 0; padding-left: 1.1rem; }
 .faq-answer-list li { padding-left: .15rem; }
 .faq-answer-list li::marker { color: var(--gold); }
-.faq-answer-link { display: inline-flex; gap: .2rem; align-items: center; margin-left: .35rem; color: var(--red); font-size: .84rem; font-weight: 600; text-underline-offset: .18em; }
+.faq-answer-link { display: inline-flex; gap: .2rem; align-items: center; margin-left: .3rem; color: var(--red); font-size: .76rem; font-weight: 600; text-underline-offset: .18em; }
 .faq .gift { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
 .faq .gift img { width: 150px; height: 150px; object-fit: contain; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
 .faq figure { text-align: center; margin: 0; }

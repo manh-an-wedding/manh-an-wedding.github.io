@@ -6,8 +6,9 @@ import { WeddingConfig, FaqItem } from '../../core/wedding-config';
 @Component({
   selector: 'app-faq', standalone: true, imports: [TranslatePipe],
   template: `
-    <section class="faq">
-      <h2>{{ 'faq.title' | translate }}</h2>
+    <div class="section-separator faq-separator" aria-hidden="true"><span>♡</span></div>
+    <section class="faq continuous-section">
+      <h2 class="faq-title">{{ 'faq.title' | translate }}</h2>
       @for (item of items; track $index) {
         <div class="qa">
           <button type="button" (click)="toggle($index)"

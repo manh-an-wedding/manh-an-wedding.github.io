@@ -91,11 +91,11 @@ describe('RsvpFormComponent', () => {
     expect(fixture.nativeElement.querySelector('.rsvp-group-select')).not.toBeNull();
   });
 
-  it('pads shuttle slots, removes the trailing count, and celebrates a full table', async () => {
+  it('pads the shuttle seat count, removes the trailing count, and celebrates a full table', async () => {
     const translate = TestBed.inject(TranslateService);
     translate.setTranslation('vi', {
       rsvp: {
-        bus: 'Tham dự và hốt {{count}} slot xe đưa đón khứ hồi HCM–CT',
+        bus: 'Tham dự và hốt {{count}} suất xe đưa đón khứ hồi HCM–CT',
         table_full: 'Chúc mừng bác đã sở hữu 1 bàn tiệc trọn vẹn!',
       },
     });
@@ -111,7 +111,7 @@ describe('RsvpFormComponent', () => {
         ?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
 
     expect(optionText())
-      .toContain('Tham dự và hốt 01 slot xe đưa đón khứ hồi HCM–CT');
+      .toContain('Tham dự và hốt 01 suất xe đưa đón khứ hồi HCM–CT');
     expect(fixture.nativeElement.querySelector('.bus-party-size')).toBeNull();
     expect(fixture.nativeElement.querySelector('.table-full-message')).toBeNull();
 
@@ -129,7 +129,7 @@ describe('RsvpFormComponent', () => {
     }
 
     expect(optionText())
-      .toContain('Tham dự và hốt 10 slot xe đưa đón khứ hồi HCM–CT');
+      .toContain('Tham dự và hốt 10 suất xe đưa đón khứ hồi HCM–CT');
     expect(fixture.nativeElement.querySelector('.companion-add')).toBeNull();
     const message: HTMLElement | null =
       fixture.nativeElement.querySelector('.table-full-message');
@@ -417,7 +417,7 @@ describe('RsvpFormComponent', () => {
     translate.setTranslation('vi', {
       rsvp: {
         confirmation_thanks: 'Cảm ơn bác {{name}} đã dành thời gian xác nhận!',
-        confirmation_bus: 'Bác đã lựa chọn tham dự & hốt {{count}} slot xe đưa đón khứ hồi HCM–CT cho',
+        confirmation_bus: 'Bác đã lựa chọn tham dự & hốt {{count}} suất xe đưa đón khứ hồi HCM–CT cho',
         bus_outbound_title: 'Xe khởi hành Hồ Chí Minh đi Cần Thơ:',
         departure_label: 'Xuất phát',
         bus_outbound_departure: '07:15 - 17.10.2026',
@@ -457,7 +457,7 @@ describe('RsvpFormComponent', () => {
       .toContain('Cảm ơn bác Duy Mạnh đã dành thời gian xác nhận!');
     expect(fixture.nativeElement.querySelector('.rsvp-confirmation-count')).toBeNull();
     expect(fixture.nativeElement.querySelector('.rsvp-confirmation-summary')?.textContent)
-      .toContain('Bác đã lựa chọn tham dự & hốt 02 slot xe đưa đón khứ hồi HCM–CT cho');
+      .toContain('Bác đã lựa chọn tham dự & hốt 02 suất xe đưa đón khứ hồi HCM–CT cho');
     const confirmedGuests = Array.from(
       fixture.nativeElement.querySelectorAll('.rsvp-confirmation-guests li'),
     ) as HTMLElement[];

@@ -61,6 +61,7 @@ export const WEDDING: WeddingConfig = {
     groom: { name: 'Duy Mạnh', bank: '', account: '', qr: '' },
   },
   faq: [
+    { qKey: 'faq.venue_parking.q', aKey: 'faq.venue_parking.a', showGiftQr: false },
     { qKey: 'faq.parking.q', aKey: 'faq.parking.a', showGiftQr: false },
     {
       qKey: 'faq.activities.q',

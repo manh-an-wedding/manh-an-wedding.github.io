@@ -67,11 +67,15 @@
   "wishes": { "title": "Send your wishes", "public": "Public", "private": "Hidden",
               "placeholder": "Your wishes…", "send": "Send", "wall": "Wishes from guests" },
   "faq": {
-    "title": "Q&A",
+    "title": "Q & A",
     "actions": { "details": "View details", "directions": "Directions" },
+    "venue_parking": {
+      "q": "Does Van Phat Riverside have parking?",
+      "a": "Free parking for motorbikes, cars, and coaches is available in front of Hall 1."
+    },
     "parking": {
-      "q": "Is parking available at IBIS?",
-      "a": "Yes. Parking costs VND 7,000 if you collect your vehicle before 6:00 PM, and VND 14,000 after 6:00 PM."
+      "q": "Does IBIS have parking?",
+      "a": "Yes. Motorbike parking costs VND 7,000 if you collect your vehicle before 6:00 PM, and VND 14,000 after 6:00 PM."
     },
     "activities": {
       "q": "What can I do while visiting Cần Thơ?",
