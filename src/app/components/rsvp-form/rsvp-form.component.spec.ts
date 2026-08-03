@@ -315,7 +315,7 @@ describe('RsvpFormComponent', () => {
     });
   });
 
-  it('locks the guest name and group while editing an existing RSVP', async () => {
+  it('allows the guest to change their name and group while editing an existing RSVP', async () => {
     const fixture = TestBed.createComponent(RsvpFormComponent);
     const c = fixture.componentInstance;
     c.model.guestName = 'Duy Manh';
@@ -332,30 +332,18 @@ describe('RsvpFormComponent', () => {
       'input[value="self_transport"]',
     );
 
-    expect(nameInput.disabled).toBe(true);
-    expect(groupSelect.disabled).toBe(true);
-    expect(selfTransport.disabled).toBe(false);
-  });
-
-  it('unlocks identity fields when an existing RSVP can no longer be edited', async () => {
-    const fixture = TestBed.createComponent(RsvpFormComponent);
-    const c = fixture.componentInstance;
-    c.model.guestName = 'Duy Manh';
-    c.model.category = 'IAS';
-    c.model.status = 'self_transport';
-
-    await c.trySubmit();
-    c.editResponse();
-    rsvp.failure = Object.assign(new Error('RSVP edit is not authorized'), {
-      code: '42501',
-    });
-    await c.trySubmit();
-    fixture.detectChanges();
-
-    const nameInput: HTMLInputElement = fixture.nativeElement.querySelector('input[name="name"]');
-    const groupSelect: HTMLSelectElement = fixture.nativeElement.querySelector('select[name="group"]');
     expect(nameInput.disabled).toBe(false);
     expect(groupSelect.disabled).toBe(false);
+    expect(selfTransport.disabled).toBe(false);
+
+    c.model.guestName = 'Nhật An';
+    c.model.category = 'Tiến bước';
+    await c.trySubmit();
+
+    expect(rsvp.updated?.draft).toEqual(expect.objectContaining({
+      guestName: 'Nhật An',
+      category: 'Tiến bước',
+    }));
   });
 
   it('shows an error and re-enables submission when the RSVP request fails', async () => {
@@ -504,7 +492,7 @@ describe('RsvpFormComponent', () => {
     const form: HTMLFormElement | null = fixture.nativeElement.querySelector('form');
     expect(form?.hidden).toBe(false);
     expect(document.activeElement)
-      .toBe(fixture.nativeElement.querySelector('input[value="self_transport"]'));
+      .toBe(fixture.nativeElement.querySelector('input[name="name"]'));
     expect(c.model.guestName).toBe('Duy Mạnh');
     expect(c.companions).toEqual([{ name: 'Bé An' }]);
   });

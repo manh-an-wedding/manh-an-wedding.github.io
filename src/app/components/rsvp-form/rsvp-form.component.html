@@ -86,13 +86,11 @@
 
     <label class="rsvp-name-label">{{ 'rsvp.your_name' | translate }}
       <input name="name" [(ngModel)]="model.guestName"
-             #guestNameInput autocomplete="name" maxlength="120" required
-             [disabled]="editingExisting">
+             #guestNameInput autocomplete="name" maxlength="120" required>
     </label>
 
     <label class="rsvp-group-label">{{ 'rsvp.group' | translate }}
-      <select class="rsvp-group-select" name="group" [(ngModel)]="model.category" required
-              [disabled]="editingExisting">
+      <select class="rsvp-group-select" name="group" [(ngModel)]="model.category" required>
         <option value="" disabled selected></option>
         @for (g of cfg.rsvp.groups; track g) { <option [value]="g">{{ g }}</option> }
       </select>
@@ -139,7 +137,7 @@
         <label class="bus-phone">{{ 'rsvp.phone' | translate }}
           <input name="phone" [(ngModel)]="model.phone" inputmode="tel"></label>
       }
-      <label><input #editFocusTarget type="radio" name="st" value="self_transport" [(ngModel)]="model.status"
+      <label><input type="radio" name="st" value="self_transport" [(ngModel)]="model.status"
                     (ngModelChange)="onStatusChange($event)">
         {{ 'rsvp.self_transport' | translate }}</label>
       <label><input type="radio" name="st" value="cannot_attend" [(ngModel)]="model.status"

@@ -35,7 +35,6 @@ export class RsvpFormComponent {
   @ViewChild('busInfoPanel') private busInfoPanel?: ElementRef<HTMLElement>;
   @ViewChild('confirmationPanel') private confirmationPanel?: ElementRef<HTMLElement>;
   @ViewChild('guestNameInput') private guestNameInput?: ElementRef<HTMLInputElement>;
-  @ViewChild('editFocusTarget') private editFocusTarget?: ElementRef<HTMLInputElement>;
   @ViewChild('submitError') private submitError?: ElementRef<HTMLElement>;
   @Input() lang: 'vi' | 'en' = 'vi';
 
@@ -52,7 +51,6 @@ export class RsvpFormComponent {
   constructor(@Inject(WEDDING_CONFIG) public cfg: WeddingConfig) {}
 
   get deadlinePassed(): boolean { return new Date() > new Date(this.cfg.rsvp.deadlineISO); }
-  get editingExisting(): boolean { return this.editHandle !== null; }
   get busPartySize(): number { return 1 + this.companions.length; }
   get formattedBusPartySize(): string {
     return String(this.busPartySize).padStart(2, '0');
@@ -123,11 +121,7 @@ export class RsvpFormComponent {
     this.done = false;
     this.submitFailed = false;
     this.cdr.detectChanges();
-    this.focusAndCenter(
-      this.editingExisting
-        ? this.editFocusTarget?.nativeElement
-        : this.guestNameInput?.nativeElement,
-    );
+    this.focusAndCenter(this.guestNameInput?.nativeElement);
   }
 
   private focusAndCenter(target?: HTMLElement) {
