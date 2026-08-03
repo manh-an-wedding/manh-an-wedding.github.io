@@ -27,7 +27,8 @@ test('publishes a 1200x630 invitation image for social link previews', async () 
 
   assert.match(svg, />THƯ MỜI</);
   assert.match(svg, />Nhật An &amp; Duy Mạnh</);
-  assert.match(svg, />11:00 · Thứ 7 - 17.10.2026</);
+  assert.match(svg, />11:00</);
+  assert.match(svg, />Thứ 7 · 17.10.2026</);
   assert.match(svg, />Vạn Phát Riverside, Cần Thơ</);
 
   assert.equal(png.toString('ascii', 1, 4), 'PNG');
@@ -49,7 +50,8 @@ test('publishes a 1200x630 English invitation image', async () => {
 
   assert.match(svg, />INVITATION</);
   assert.match(svg, />Nhật An &amp; Duy Mạnh</);
-  assert.match(svg, />11:00 · Saturday - 17.10.2026</);
+  assert.match(svg, />11:00</);
+  assert.match(svg, />Sat · 17.10.2026</);
   assert.match(svg, />Van Phat Riverside, Can Tho</);
   assert.match(svg, />\s*We cordially invite you to celebrate with our family\s*</);
   assert.equal(png.toString('ascii', 1, 4), 'PNG');
