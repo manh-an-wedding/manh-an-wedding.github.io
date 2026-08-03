@@ -51,7 +51,7 @@ main.invite {
   max-width: var(--maxw);
   margin: 0 auto;
   position: relative;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 1440 / 2561;
   overflow: hidden;
   background: var(--red-dark);
   border-inline: 1px solid rgba(201, 162, 75, .55);
@@ -61,7 +61,7 @@ main.invite {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 .cover-shade {
   position: absolute;
@@ -408,7 +408,7 @@ main.invite h2 { text-align: center; font-size: 1.5rem; margin: 0 0 1.1rem; }
 .album-stage {
   position: relative;
   overflow: hidden;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 4 / 5;
   background: var(--cream);
   border: 3px solid #fff;
   border-radius: 4px;
@@ -428,6 +428,7 @@ main.invite h2 { text-align: center; font-size: 1.5rem; margin: 0 0 1.1rem; }
   transition: transform .65s cubic-bezier(.22, .61, .36, 1);
 }
 .album-slide {
+  position: relative;
   flex: 0 0 100%;
   width: 100%;
   height: 100%;
@@ -436,11 +437,35 @@ main.invite h2 { text-align: center; font-size: 1.5rem; margin: 0 0 1.1rem; }
   border: 0;
   cursor: zoom-in;
 }
+.album-moment {
+  position: absolute;
+  z-index: 2;
+  top: clamp(.8rem, 3vw, 1.2rem);
+  left: clamp(.8rem, 3vw, 1.2rem);
+  display: grid;
+  gap: .12rem;
+  padding: .45rem .65rem;
+  color: #fff8eb;
+  background: rgba(40, 10, 12, .25);
+  border-radius: 3px;
+  font-family: var(--font-head);
+  line-height: 1.1;
+  pointer-events: none;
+  text-align: left;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, .78);
+}
+.album-moment strong {
+  font-size: clamp(1.2rem, 5vw, 1.75rem);
+  font-weight: 600;
+}
+.album-moment span {
+  font-size: clamp(.8rem, 3vw, 1rem);
+}
 .album-slide img {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 .album-arrow,
 .lightbox-arrow {
@@ -513,22 +538,32 @@ body.album-lightbox-open { overflow: hidden; }
   touch-action: pan-y;
 }
 .lightbox-stage {
+  --lightbox-height: min(82vh, 900px, calc(100vh - 7rem));
+  --lightbox-height: min(82dvh, 900px, calc(100dvh - 7rem));
   width: min(100%, 1100px);
-  height: min(82vh, 900px);
+  height: var(--lightbox-height);
   overflow: hidden;
+}
+.lightbox-track {
+  min-height: 0;
 }
 .lightbox-slide {
   display: grid;
   flex: 0 0 100%;
   place-items: center;
+  min-width: 0;
+  min-height: 0;
   width: 100%;
   height: 100%;
   margin: 0;
+  overflow: hidden;
 }
 .lightbox-slide img {
   display: block;
+  width: auto;
+  height: var(--lightbox-height);
   max-width: 100%;
-  max-height: 100%;
+  max-height: var(--lightbox-height);
   object-fit: contain;
   user-select: none;
   -webkit-user-drag: none;
@@ -776,6 +811,14 @@ fieldset label { font-weight: 400; }
   border-top: 1px solid var(--line);
   text-align: center;
 }
+.bus-registration-notes {
+  display: grid;
+  gap: .25rem;
+}
+.bus-registration-notes .bus-registration-deadline,
+.bus-registration-notes .bus-driver-update-note {
+  margin: 0;
+}
 .bus-driver-update-note {
   text-align: center;
   line-height: 1.5;
@@ -786,28 +829,33 @@ fieldset label { font-weight: 400; }
   text-decoration-color: rgba(158, 27, 27, .42);
   text-underline-offset: .15em;
 }
-.bus-info-button {
-  display: inline-grid;
-  place-items: center;
-  width: 1.25rem;
-  height: 1.25rem;
-  margin-left: .3rem;
+.bus-info-hint {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  margin: .2rem 0 0;
   padding: 0;
   border: 0;
-  border-radius: 50%;
-  background: var(--red);
-  color: #fff8eb;
-  font-family: Georgia, serif;
-  font-size: .85rem;
-  font-style: italic;
-  line-height: 1;
-}
-.bus-info-hint {
-  margin-left: .35rem;
-  color: var(--muted);
+  background: transparent;
+  color: var(--gold);
   font-size: .68rem;
   font-weight: 400;
   line-height: 1.4;
+  text-align: center;
+}
+.bus-info-hint em {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+}
+.bus-info-hint-icon {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+}
+.bus-info-hint:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: .2rem;
 }
 .warn { color: var(--red-dark); background: #fbeaea; border-radius: 8px; padding: .6rem .7rem; font-size: .88rem; }
 .table-full-message {
@@ -893,6 +941,12 @@ app-companions-editor > button { background: transparent; color: var(--red); bor
 .rsvp-confirmation .bus-info {
   margin-top: 1rem;
   text-align: left;
+}
+.rsvp-confirmation .bus-leg-title {
+  font-family: var(--font-body);
+  font-size: .95rem;
+  font-weight: 600;
+  line-height: 1.5;
 }
 .rsvp-edit-response {
   margin-top: 1rem;

@@ -1,5 +1,8 @@
 import { WeddingConfig } from '../../app/core/wedding-config';
 
+const WEDDING_MEDIA_BASE_URL =
+  'https://bmhwpctxxfpculhigham.supabase.co/storage/v1/object/public/wedding-media/v1';
+
 export const WEDDING: WeddingConfig = {
   couple: { bride: 'Nhật An', groom: 'Duy Mạnh' },
   families: {
@@ -70,8 +73,16 @@ export const WEDDING: WeddingConfig = {
   supabase: { url: 'https://bmhwpctxxfpculhigham.supabase.co',
               anonKey: 'sb_publishable_-O11WC89Xynpmtj6BiFseQ_iubAJjFy' },
   media: {
-    coverImg: 'assets/img/demo-couple.png',
-    photos: Array(4).fill('assets/img/demo-couple.png'),
+    coverImg: `${WEDDING_MEDIA_BASE_URL}/cover.jpg`,
+    photos: [
+      `${WEDDING_MEDIA_BASE_URL}/2018.jpg`,
+      `${WEDDING_MEDIA_BASE_URL}/2019.jpg`,
+      `${WEDDING_MEDIA_BASE_URL}/2020.jpg`,
+      `${WEDDING_MEDIA_BASE_URL}/2021.jpg`,
+      `${WEDDING_MEDIA_BASE_URL}/2022.jpg`,
+      `${WEDDING_MEDIA_BASE_URL}/2023-2025.jpg`,
+      `${WEDDING_MEDIA_BASE_URL}/2026.jpg`,
+    ],
   },
   // Bật/tắt từng phần. Tạm ẩn Q&A + Lời chúc (đổi thành true để hiện lại).
   sections: { wishes: false, faq: false },

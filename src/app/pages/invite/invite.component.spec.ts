@@ -97,7 +97,38 @@ describe('InviteComponent', () => {
     expect(c.musicOn()).toBe(false);
   });
 
-  it('auto-scrolls at about 0.67 pixels per 60Hz frame', () => {
+  it('does not auto-scroll when autoplay is blocked', async () => {
+    const fixture = TestBed.createComponent(InviteComponent);
+    const component = fixture.componentInstance;
+    const music = TestBed.inject(MusicService);
+    const view = (fixture.nativeElement as HTMLElement).ownerDocument.defaultView!;
+    vi.spyOn(music, 'tryAutoplay').mockResolvedValue(false);
+    vi.spyOn(view, 'requestAnimationFrame').mockImplementation(() => 17);
+
+    await component.ngOnInit();
+
+    expect(component['autoScrollFrame']).toBeUndefined();
+  });
+
+  it('starts auto-scroll when the first gesture successfully starts blocked music', async () => {
+    const fixture = TestBed.createComponent(InviteComponent);
+    const component = fixture.componentInstance;
+    const music = TestBed.inject(MusicService);
+    const view = (fixture.nativeElement as HTMLElement).ownerDocument.defaultView!;
+    vi.spyOn(music, 'tryAutoplay')
+      .mockResolvedValueOnce(false)
+      .mockResolvedValueOnce(true);
+    vi.spyOn(view, 'requestAnimationFrame').mockImplementation(() => 23);
+
+    await component.ngOnInit();
+    expect(component['autoScrollFrame']).toBeUndefined();
+
+    await component['resumeAutoplayAfterGesture'](fixture.nativeElement);
+
+    expect(component['autoScrollFrame']).toBe(23);
+  });
+
+  it('auto-scrolls at about 1 pixel per 60Hz frame', () => {
     const fixture = TestBed.createComponent(InviteComponent);
     const component = fixture.componentInstance;
     const music = TestBed.inject(MusicService);
@@ -125,7 +156,7 @@ describe('InviteComponent', () => {
 
       expect(scrollSpy).toHaveBeenCalledTimes(1);
       expect(scrollSpy.mock.calls[0][0]).toBe(0);
-      expect(scrollSpy.mock.calls[0][1]).toBeCloseTo(2, 5);
+      expect(scrollSpy.mock.calls[0][1]).toBeCloseTo(3, 5);
     } finally {
       component.ngOnDestroy();
       nowSpy.mockRestore();
@@ -163,6 +194,8 @@ describe('InviteComponent', () => {
     expect(Array.from(element.querySelectorAll('.save-the-day span'))
       .map(line => line.textContent?.trim()))
       .toEqual(['Save', 'The', 'Day']);
+    expect(element.querySelector('.cover-image')?.getAttribute('src'))
+      .toBe('https://bmhwpctxxfpculhigham.supabase.co/storage/v1/object/public/wedding-media/v1/cover.jpg');
     expect(element.querySelector('.hero')).toBeNull();
     const music = TestBed.inject(MusicService);
     expect(element.querySelector('audio')).toBeNull();
@@ -357,26 +390,89 @@ describe('InviteComponent', () => {
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
+    const photoSources = Array.from(
+      element.querySelectorAll('.album-slide img'),
+      image => image.getAttribute('src'),
+    );
+    const moments = Array.from(
+      element.querySelectorAll('.album-moment'),
+      moment => moment.textContent?.replace(/\s+/g, ' ').trim(),
+    );
     expect(element.querySelectorAll('.photo-panel')).toHaveLength(0);
     expect(element.querySelector('.album')).not.toBeNull();
     expect(element.querySelectorAll('.album-slide img'))
       .toHaveLength(fixture.componentInstance.cfg.media.photos.length);
     expect(element.querySelectorAll('.album-dots button'))
       .toHaveLength(fixture.componentInstance.cfg.media.photos.length);
+    expect(photoSources).toEqual([
+      'https://bmhwpctxxfpculhigham.supabase.co/storage/v1/object/public/wedding-media/v1/2018.jpg',
+      'https://bmhwpctxxfpculhigham.supabase.co/storage/v1/object/public/wedding-media/v1/2019.jpg',
+      'https://bmhwpctxxfpculhigham.supabase.co/storage/v1/object/public/wedding-media/v1/2020.jpg',
+      'https://bmhwpctxxfpculhigham.supabase.co/storage/v1/object/public/wedding-media/v1/2021.jpg',
+      'https://bmhwpctxxfpculhigham.supabase.co/storage/v1/object/public/wedding-media/v1/2022.jpg',
+      'https://bmhwpctxxfpculhigham.supabase.co/storage/v1/object/public/wedding-media/v1/2023-2025.jpg',
+      'https://bmhwpctxxfpculhigham.supabase.co/storage/v1/object/public/wedding-media/v1/2026.jpg',
+    ]);
+    expect(moments).toEqual([
+      '2018',
+      '2019 Koh Hong',
+      '2020 Đà Lạt',
+      '2021 Đắk Lắk',
+      '2022 Melaka',
+      '2026 Kuala Lumpur',
+    ]);
+    expect(element.querySelectorAll('.album-moment')[0]?.querySelector('span')).toBeNull();
   });
 
-  it('removes a broken photo and its empty album frame', async () => {
+  it('shows the whole portrait cover and album photos without cropping', async () => {
     const fixture = TestBed.createComponent(InviteComponent);
     fixture.detectChanges();
     await fixture.whenStable();
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
-    const firstPhoto = element.querySelector('.album-slide img');
+    const cover = element.querySelector<HTMLElement>('.cover-hero');
+    const coverImage = element.querySelector<HTMLImageElement>('.cover-image');
+    const albumStage = element.querySelector<HTMLElement>('.album-stage');
+    const albumImages = Array.from(element.querySelectorAll<HTMLImageElement>('.album-slide img'));
+
+    expect(cover?.style.aspectRatio).toBe('1440 / 2561');
+    expect(coverImage?.style.objectFit).toBe('contain');
+    expect(albumStage?.style.aspectRatio).toBe('4 / 5');
+    expect(albumImages.every(image => image.style.objectFit === 'contain')).toBe(true);
+
+    element.querySelector<HTMLButtonElement>('.album-slide')?.click();
+    fixture.detectChanges();
+
+    const lightboxImages = Array.from(
+      element.querySelectorAll<HTMLImageElement>('.lightbox-slide img'),
+    );
+    expect(lightboxImages).toHaveLength(fixture.componentInstance.cfg.media.photos.length);
+    expect(lightboxImages.every(image => image.style.objectFit === 'contain')).toBe(true);
+    expect(lightboxImages.every(image => image.style.width === 'auto')).toBe(true);
+    expect(lightboxImages.every(image => image.style.height === 'var(--lightbox-height)')).toBe(true);
+    expect(lightboxImages.every(image => image.style.maxWidth === '100%')).toBe(true);
+    expect(lightboxImages.every(image => image.style.maxHeight === 'var(--lightbox-height)')).toBe(true);
+  });
+
+  it('replaces broken Supabase images with the local happiness fallback', async () => {
+    const fixture = TestBed.createComponent(InviteComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const element = fixture.nativeElement as HTMLElement;
+    const cover = element.querySelector<HTMLImageElement>('.cover-image');
+    const firstPhoto = element.querySelector<HTMLImageElement>('.album-slide img');
+    cover?.dispatchEvent(new Event('error'));
     firstPhoto?.dispatchEvent(new Event('error'));
     fixture.detectChanges();
 
+    expect(element.querySelector<HTMLImageElement>('.cover-image')?.getAttribute('src'))
+      .toBe('assets/img/happiness-fallback.svg');
+    expect(element.querySelector<HTMLImageElement>('.album-slide img')?.getAttribute('src'))
+      .toBe('assets/img/happiness-fallback.svg');
     expect(element.querySelectorAll('.album-slide'))
-      .toHaveLength(fixture.componentInstance.cfg.media.photos.length - 1);
+      .toHaveLength(fixture.componentInstance.cfg.media.photos.length);
   });
 });

@@ -15,11 +15,11 @@
   </svg>
 </button>
 
-<header class="cover-hero">
-  @if (coverOk) {
-    <img class="cover-image" [src]="cfg.media.coverImg"
-         [alt]="cfg.couple.bride + ' & ' + cfg.couple.groom" (error)="coverOk = false" />
-  }
+<header class="cover-hero" style="aspect-ratio: 1440 / 2561">
+  <img class="cover-image" [src]="cfg.media.coverImg"
+       style="object-fit: contain"
+       [alt]="cfg.couple.bride + ' & ' + cfg.couple.groom"
+       (error)="useImageFallback($event)" />
   <div class="cover-shade" aria-hidden="true"></div>
   <div class="cover-overlay">
     <p class="save-the-day" aria-label="Save The Day">
@@ -157,7 +157,7 @@
       <div class="album-slider reveal-step" style="--reveal-delay: .15s"
            aria-roledescription="carousel"
            [attr.aria-label]="'details.album_eyebrow' | translate">
-        <div class="album-stage">
+        <div class="album-stage" style="aspect-ratio: 4 / 5">
           <div class="album-track"
                [style.transform]="'translateX(-' + (activeSlide * 100) + '%)'">
             @for (photo of visiblePhotos; track photo.originalIndex; let slideIndex = $index) {
@@ -165,9 +165,18 @@
                       [attr.aria-label]="'Mở ảnh ' + (slideIndex + 1)"
                       (click)="openLightbox()">
                 <img [src]="photo.src"
+                     style="object-fit: contain"
                      [alt]="cfg.couple.bride + ' & ' + cfg.couple.groom"
                      loading="lazy"
-                     (error)="photoFailed(photo.originalIndex)" />
+                     (error)="useImageFallback($event)" />
+                @if (photo.moment; as moment) {
+                  <span class="album-moment">
+                    <strong>{{ moment.year }}</strong>
+                    @if (moment.place) {
+                      <span> {{ moment.place }}</span>
+                    }
+                  </span>
+                }
               </button>
             }
           </div>
@@ -212,8 +221,9 @@
         @for (photo of visiblePhotos; track photo.originalIndex) {
           <figure class="lightbox-slide">
             <img [src]="photo.src"
+                 style="width: auto; height: var(--lightbox-height); max-width: 100%; max-height: var(--lightbox-height); object-fit: contain"
                  [alt]="cfg.couple.bride + ' & ' + cfg.couple.groom"
-                 (error)="photoFailed(photo.originalIndex)" />
+                 (error)="useImageFallback($event)" />
           </figure>
         }
       </div>

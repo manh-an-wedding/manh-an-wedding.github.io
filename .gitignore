@@ -19,10 +19,14 @@ Thumbs.db
 
 # Brainstorm visual companion
 .superpowers/
+.worktrees/
 
 # Local Supabase metadata and print-only QR exports
 supabase/.temp/
 public/assets/qr/
+
+# Personal wedding photos are hosted in Supabase Storage, never in Git
+public/assets/img/wedding/
 
 # Logs
 *.log

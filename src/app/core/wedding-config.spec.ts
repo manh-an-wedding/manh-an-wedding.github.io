@@ -41,9 +41,19 @@ describe('wedding config', () => {
     expect(WEDDING.event.venue).toBe('VẠN PHÁT RIVERSIDE - SẢNH 01');
   });
 
-  it('uses one temporary image in all four photo positions and keeps optional sections hidden', () => {
-    expect(WEDDING.media.photos).toHaveLength(4);
-    expect(new Set(WEDDING.media.photos).size).toBe(1);
+  it('uses the chronological wedding album and keeps optional sections hidden', () => {
+    const mediaBaseUrl = 'https://bmhwpctxxfpculhigham.supabase.co/storage/v1/object/public/wedding-media/v1';
+
+    expect(WEDDING.media.coverImg).toBe(`${mediaBaseUrl}/cover.jpg`);
+    expect(WEDDING.media.photos).toEqual([
+      `${mediaBaseUrl}/2018.jpg`,
+      `${mediaBaseUrl}/2019.jpg`,
+      `${mediaBaseUrl}/2020.jpg`,
+      `${mediaBaseUrl}/2021.jpg`,
+      `${mediaBaseUrl}/2022.jpg`,
+      `${mediaBaseUrl}/2023-2025.jpg`,
+      `${mediaBaseUrl}/2026.jpg`,
+    ]);
     expect(WEDDING.sections).toEqual({ wishes: false, faq: false });
   });
 });

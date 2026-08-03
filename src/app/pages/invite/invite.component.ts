@@ -22,6 +22,20 @@ import { RevealOnScrollDirective } from '../../directives/reveal-on-scroll.direc
 import { HappinessRainComponent } from '../../components/happiness-rain/happiness-rain.component';
 import { MusicService } from '../../core/music.service';
 
+interface PhotoMoment {
+  year: string;
+  place: string;
+}
+
+const PHOTO_MOMENTS: Record<string, PhotoMoment> = {
+  '2018': { year: '2018', place: '' },
+  '2019': { year: '2019', place: 'Koh Hong' },
+  '2020': { year: '2020', place: 'Đà Lạt' },
+  '2021': { year: '2021', place: 'Đắk Lắk' },
+  '2022': { year: '2022', place: 'Melaka' },
+  '2026': { year: '2026', place: 'Kuala Lumpur' },
+};
+
 @Component({
   selector: 'app-invite', standalone: true,
   imports: [DatePipe, TranslatePipe, LanguageToggleComponent, RsvpFormComponent,
@@ -43,9 +57,8 @@ export class InviteComponent implements OnInit, OnDestroy {
   private autoplayWaitingForGesture = false;
   private touchStartX: number | null = null;
   readonly musicOn = this.music.playing;
+  readonly imageFallback = 'assets/img/happiness-fallback.svg';
   lang: 'vi' | 'en' = 'vi';
-  coverOk = true;
-  failedPhotoIndexes = new Set<number>();
   activeSlide = 0;
   lightboxOpen = false;
 
@@ -58,14 +71,17 @@ export class InviteComponent implements OnInit, OnDestroy {
     this.translate.use(this.lang);
     this.startSlideshow();
     this.music.initializeAutoScroll();
-    if (this.music.autoScrollEnabled()) {
-      this.startAutoScroll();
-    }
     if (this.music.playing()) {
       this.autoplayWaitingForGesture = false;
+      if (this.music.autoScrollEnabled()) {
+        this.startAutoScroll();
+      }
     } else {
       const started = await this.music.tryAutoplay();
       this.autoplayWaitingForGesture = !started;
+      if (started && this.music.autoScrollEnabled()) {
+        this.startAutoScroll();
+      }
     }
     await this.visit.log(this.device.get());
   }
@@ -99,19 +115,20 @@ export class InviteComponent implements OnInit, OnDestroy {
     this.stopAutoScrollAnimation();
   }
 
-  photoFailed(index: number) {
-    this.failedPhotoIndexes.add(index);
-    this.normalizeActiveSlide();
-  }
-
-  isPhotoVisible(index: number) {
-    return !this.failedPhotoIndexes.has(index);
+  useImageFallback(event: Event) {
+    const image = event.target;
+    if (!(image instanceof HTMLImageElement)
+        || image.getAttribute('src') === this.imageFallback) return;
+    image.setAttribute('src', this.imageFallback);
   }
 
   get visiblePhotos() {
     return this.cfg.media.photos
-      .map((src, originalIndex) => ({ src, originalIndex }))
-      .filter(({ originalIndex }) => this.isPhotoVisible(originalIndex));
+      .map((src, originalIndex) => ({
+        src,
+        originalIndex,
+        moment: this.photoMoment(src),
+      }));
   }
 
   selectPhoto(index: number) {
@@ -176,10 +193,9 @@ export class InviteComponent implements OnInit, OnDestroy {
     }
   }
 
-  private normalizeActiveSlide() {
-    const photoCount = this.visiblePhotos.length;
-    this.activeSlide = photoCount ? Math.min(this.activeSlide, photoCount - 1) : 0;
-    this.restartSlideshow();
+  private photoMoment(src: string): PhotoMoment | undefined {
+    const filename = src.split(/[\\/]/).pop()?.replace(/\.[^.]+$/, '').toLowerCase();
+    return filename ? PHOTO_MOMENTS[filename] : undefined;
   }
 
   private restartSlideshow() {
@@ -226,7 +242,7 @@ export class InviteComponent implements OnInit, OnDestroy {
 
       const elapsed = Math.min(timestamp - this.lastAutoScrollTime, 50);
       this.lastAutoScrollTime = timestamp;
-      this.autoScrollPosition = Math.min(maxScroll, this.autoScrollPosition + elapsed * 0.04);
+      this.autoScrollPosition = Math.min(maxScroll, this.autoScrollPosition + elapsed * 0.06);
       view.scrollTo(0, this.autoScrollPosition);
       this.autoScrollFrame = view.requestAnimationFrame(scrollStep);
     };
@@ -249,5 +265,8 @@ export class InviteComponent implements OnInit, OnDestroy {
     this.autoplayWaitingForGesture = false;
     const started = await this.music.tryAutoplay();
     this.autoplayWaitingForGesture = !started;
+    if (started && this.music.autoScrollEnabled()) {
+      this.startAutoScroll();
+    }
   }
 }
