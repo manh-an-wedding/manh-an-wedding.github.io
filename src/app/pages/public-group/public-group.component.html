@@ -1,0 +1,44 @@
+<main class="group-page">
+  <header>
+    <p class="eyebrow">Mạnh & An · 17.10.2026</p>
+    <h3 class="group-title">{{ title }}</h3>
+  </header>
+
+  @if (loading()) {
+    <p class="state">Đang tải danh sách…</p>
+  } @else if (error) {
+    <p class="state state-error">{{ error }}</p>
+  } @else if (rows.length === 0) {
+    <p class="state">Chưa có xác nhận nào trong nhóm này.</p>
+  } @else {
+    <ol class="guest-list">
+      @for (row of pagedRows; track row.guest_name + $index) {
+        <li>
+          <div class="guest-heading">
+            <span class="guest-number" aria-hidden="true">{{ (page() - 1) * pageSize + $index + 1 }}.</span>
+            <strong>{{ row.guest_name }}</strong>
+            <span class="guest-choice">({{ statusLabel(row.status) }})</span>
+          </div>
+          @if (row.companions.length > 0) {
+            <ul>
+              @for (companion of row.companions; track companion + $index) {
+                <li class="companion-item"><span aria-hidden="true">+</span> {{ companion }}</li>
+              }
+            </ul>
+          }
+        </li>
+      }
+    </ol>
+    @if (pageCount > 1) {
+      <nav class="pagination" aria-label="Phân trang">
+        <button type="button" aria-label="Trang trước" [disabled]="page() === 1" (click)="goToPage(page() - 1)">Trước</button>
+        <span class="pagination-status">Trang {{ page() }} / {{ pageCount }}</span>
+        <button type="button" aria-label="Trang sau" [disabled]="page() === pageCount" (click)="goToPage(page() + 1)">Sau</button>
+      </nav>
+    }
+  }
+
+  <footer>
+    <a routerLink="/">Mở thiệp cưới</a>
+  </footer>
+</main>

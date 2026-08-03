@@ -1,0 +1,207 @@
+<main class="admin-page">
+  @if (authenticated() === null) {
+    <section class="login-card"><p>Đang kiểm tra phiên đăng nhập…</p></section>
+  } @else if (!authenticated()) {
+    <form class="login-card" (ngSubmit)="login()">
+      <p class="eyebrow">Mạnh & An</p>
+      <label>
+        Email
+        <input type="email" name="email" [(ngModel)]="email" autocomplete="username" required>
+      </label>
+      <label>
+        Mật khẩu
+        <input type="password" name="password" [(ngModel)]="password" autocomplete="current-password" required>
+      </label>
+      @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+      <button type="submit" [disabled]="busy() || !email || !password">
+        {{ busy() ? 'Đang đăng nhập…' : 'Đăng nhập' }}
+      </button>
+      <a routerLink="/">Về trang thiệp</a>
+    </form>
+  } @else {
+    <header class="admin-header">
+      <div>
+        <p class="eyebrow">Mạnh & An · RSVP</p>
+        <h1>Quản lý khách mời</h1>
+      </div>
+      <div class="header-actions">
+        <a routerLink="/">Mở thiệp</a>
+        <button type="button" (click)="logout()">Đăng xuất</button>
+      </div>
+    </header>
+
+    @if (error()) { <p class="error page-error" role="alert">{{ error() }}</p> }
+
+    <nav class="tabs" aria-label="Các phần quản trị">
+      <button type="button" [class.active]="tab() === 'overview'" (click)="selectTab('overview')">Tổng quan</button>
+      <button type="button" [class.active]="tab() === 'current'" (click)="selectTab('current')">RSVP đã xử lý</button>
+      <button type="button" [class.active]="tab() === 'history'" (click)="selectTab('history')">Raw RSVP</button>
+      <button type="button" [class.active]="tab() === 'busCurrent'" (click)="selectTab('busCurrent')">DS xe đã xử lý</button>
+      <button type="button" [class.active]="tab() === 'busHistory'" (click)="selectTab('busHistory')">Raw DS Xe</button>
+      <button type="button" [class.active]="tab() === 'duplicates'" (click)="selectTab('duplicates')">Duyệt trùng</button>
+    </nav>
+
+    @if (tab() === 'overview') {
+      <section class="summary" aria-label="Tổng quan">
+        <article><strong>{{ dashboard().summary.currentRsvpCount }}</strong><span>xác nhận đã xử lý</span></article>
+        <article><strong>{{ dashboard().summary.attendingPeople }}</strong><span>người tham dự</span></article>
+        <article><strong>{{ dashboard().summary.rawRsvpCount }}</strong><span>bản ghi raw</span></article>
+        <article><strong>{{ dashboard().summary.pendingDuplicateCount }}</strong><span>trùng chờ duyệt</span></article>
+        <article><strong>{{ dashboard().summary.busGuestSeats + dashboard().summary.busCompanionSeats }}</strong><span>ghế đã xử lý</span></article>
+      </section>
+      <h2>Xác nhận mới nhất</h2>
+    }
+
+    @if (tab() === 'duplicates') {
+      <section class="duplicates">
+        @if (dashboard().duplicates.length === 0) {
+          <p class="empty">Không có bản ghi được đánh dấu trùng.</p>
+        }
+        @for (item of pagedDuplicates(); track item.candidate_id) {
+          <article class="duplicate-card">
+            <div>
+              <span>Bản ghi cũ #{{ item.candidate_id }}</span>
+              <mark [class]="'review-status ' + item.candidate_duplicate_status">
+                @switch (item.candidate_duplicate_status) {
+                  @case ('confirmed') { Đã xác nhận trùng }
+                  @case ('rejected') { Đã xác nhận không trùng }
+                  @default { Chờ duyệt }
+                }
+              </mark>
+              <strong>{{ item.candidate_guest_name }}</strong>
+              <small>{{ item.candidate_category }} · {{ statusLabel(item.candidate_status) }}</small>
+              <small>{{ item.candidate_phone || 'Không có SĐT' }} · {{ item.candidate_device_id || 'Không có mã thiết bị' }}</small>
+            </div>
+            <span class="duplicate-arrow">→</span>
+            <div>
+              <span>Bản ghi mới #{{ item.target_id }}</span>
+              <strong>{{ item.target_guest_name }}</strong>
+              <small>{{ item.target_category }} · {{ statusLabel(item.target_status) }}</small>
+              <small>{{ item.target_phone || 'Không có SĐT' }} · {{ item.target_device_id || 'Không có mã thiết bị' }}</small>
+            </div>
+            <footer>
+              @if (item.candidate_duplicate_status !== 'pending') {
+                <button type="button" [disabled]="busy()" (click)="review(item, 'pending')">Đưa về chờ duyệt</button>
+              }
+              @if (item.candidate_duplicate_status !== 'confirmed') {
+                <button type="button" class="danger" [disabled]="busy()" (click)="review(item, 'confirmed')">Xác nhận trùng</button>
+              }
+              @if (item.candidate_duplicate_status !== 'rejected') {
+                <button type="button" [disabled]="busy()" (click)="review(item, 'rejected')">Không trùng</button>
+              }
+            </footer>
+          </article>
+        }
+        @if (pageCount() > 1) {
+          <nav class="pagination" aria-label="Phân trang">
+            <button type="button" aria-label="Trang trước" [disabled]="page() === 1" (click)="goToPage(page() - 1)">Trước</button>
+            <span class="pagination-status">Trang {{ page() }} / {{ pageCount() }}</span>
+            <button type="button" aria-label="Trang sau" [disabled]="page() === pageCount()" (click)="goToPage(page() + 1)">Sau</button>
+          </nav>
+        }
+      </section>
+    } @else {
+      <section class="filters">
+        <input
+          type="search"
+          aria-label="Tìm khách"
+          placeholder="Tìm tên, SĐT, người đi cùng…"
+          [ngModel]="search()"
+          (ngModelChange)="setSearch($event)"
+        >
+        <select aria-label="Lọc nhóm" [ngModel]="groupFilter()" (ngModelChange)="setGroupFilter($event)">
+          <option value="">Tất cả nhóm</option>
+          @for (group of dashboard().groups; track group) { <option [value]="group">{{ group }}</option> }
+        </select>
+        <select aria-label="Lọc lựa chọn" [ngModel]="statusFilter()" (ngModelChange)="setStatusFilter($event)">
+          <option value="">Tất cả lựa chọn</option>
+          <option value="bus">Đi xe</option>
+          <option value="self_transport">Tự di chuyển</option>
+          <option value="cannot_attend">Không tham gia</option>
+        </select>
+        <button type="button" (click)="downloadCsv()">Xuất CSV</button>
+      </section>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            @if (isRawTab()) { <th>Phân loại</th><th>Check</th> }
+            <th>Khách</th><th>Lựa chọn</th><th>Người đi cùng</th>
+            <th>Liên hệ / kỹ thuật</th><th>Thời gian</th><th></th>
+          </tr></thead>
+          <tbody>
+            @for (row of pagedRows(); track row.id) {
+              <tr [class.raw-state-new]="isRawTab() && (rowState(row) === 'new' || rowState(row) === 'reviewed-unique')"
+                  [class.raw-state-superseded]="isRawTab() && (rowState(row) === 'superseded' || rowState(row) === 'reviewed-duplicate')"
+                  [class.raw-state-duplicate]="isRawTab() && rowState(row) === 'duplicate'">
+                @if (isRawTab()) {
+                  <td>
+                    <span [class]="'raw-status ' + rowState(row)">
+                      @if (rowState(row) === 'duplicate') {
+                        <span class="duplicate-warning" aria-hidden="true">⚠</span>
+                      }
+                      {{ rowStateLabel(row) }}
+                    </span>
+                  </td>
+                  <td>
+                    <label class="data-check-control">
+                      <input class="data-check-toggle" type="checkbox"
+                             aria-label="Đánh dấu dữ liệu đã kiểm tra"
+                             [checked]="row.data_check" [disabled]="busy()"
+                             (change)="toggleDataCheck(row, $any($event.target).checked)">
+                    </label>
+                  </td>
+                }
+                <td><strong>{{ row.guest_name }}</strong><small>{{ row.category }} · {{ row.party_size }} người · #{{ row.id }}</small></td>
+                <td>{{ statusLabel(row.status) }}</td>
+                <td>
+                  @if (row.companions.length === 0) { <span>—</span> }
+                  @for (companion of row.companions; track companion.id) { <small>{{ companion.name }}</small> }
+                </td>
+                <td><small>{{ row.phone || 'Không có SĐT' }}</small><small>IP: {{ row.ip || '—' }}</small><small>Thiết bị: {{ row.device_id || '—' }}</small></td>
+                <td><small>{{ row.created_at | date:'dd/MM/yyyy HH:mm' }}</small><small>Thay bởi: {{ row.superseded_by_id || '—' }}</small><small>Trùng với: {{ row.duplicate_of_id || '—' }}</small></td>
+                <td>
+                  @if (row.superseded_by_id === null && row.duplicate_status !== 'confirmed') {
+                    <button type="button" class="edit" (click)="startEdit(row)">Chỉnh sửa</button>
+                  } @else {
+                    <small>Chỉ đọc</small>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr><td [attr.colspan]="isRawTab() ? 8 : 6" class="empty">Không có dữ liệu phù hợp.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (pageCount() > 1) {
+        <nav class="pagination" aria-label="Phân trang">
+          <button type="button" aria-label="Trang trước" [disabled]="page() === 1" (click)="goToPage(page() - 1)">Trước</button>
+          <span class="pagination-status">Trang {{ page() }} / {{ pageCount() }}</span>
+          <button type="button" aria-label="Trang sau" [disabled]="page() === pageCount()" (click)="goToPage(page() + 1)">Sau</button>
+        </nav>
+      }
+    }
+
+    @if (editDraft) {
+      <div class="modal-backdrop" role="presentation">
+        <form class="edit-modal" (ngSubmit)="saveEdit()">
+          <header><h2>Chỉnh sửa RSVP #{{ editDraft.sourceId }}</h2><button type="button" aria-label="Đóng" (click)="editDraft = null">×</button></header>
+          <p>Dữ liệu của bản ghi này sẽ được cập nhật trực tiếp.</p>
+          <label>Tên khách<input name="editGuestName" [(ngModel)]="editDraft.guestName" required></label>
+          <label>Nhóm<select name="editCategory" [(ngModel)]="editDraft.category" required>@for (group of dashboard().groups; track group) { <option [value]="group">{{ group }}</option> }</select></label>
+          <label>Lựa chọn<select name="editStatus" [(ngModel)]="editDraft.status" required><option value="bus">Đi xe</option><option value="self_transport">Tự di chuyển</option><option value="cannot_attend">Không tham gia</option></select></label>
+          @if (editDraft.status === 'bus') { <label>SĐT<input name="editPhone" [(ngModel)]="editDraft.phone" required></label> }
+          <fieldset>
+            <legend>Người đi cùng</legend>
+            @for (companion of editDraft.companions; track $index) {
+              <div class="companion-edit"><input [name]="'companionName' + $index" [(ngModel)]="companion.name" required><input [name]="'companionRelation' + $index" [(ngModel)]="companion.relation" placeholder="Quan hệ (không bắt buộc)"><button type="button" (click)="removeEditCompanion($index)">×</button></div>
+            }
+            <button type="button" (click)="addEditCompanion()">+ Thêm người đi cùng</button>
+          </fieldset>
+          <button type="submit" [disabled]="busy()">{{ busy() ? 'Đang lưu…' : 'Lưu thay đổi' }}</button>
+        </form>
+      </div>
+    }
+  }
+</main>

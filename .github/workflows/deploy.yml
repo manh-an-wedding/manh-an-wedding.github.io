@@ -21,7 +21,7 @@ jobs:
       - run: npm ci
       - run: npm test -- --watch=false
       - run: npx ng build --base-href /
-      # Emit localized /en/ metadata plus the SPA fallback.
+      # Emit localized metadata, direct SPA route documents, and the fallback.
       - name: Static route documents
         run: node scripts/create-static-routes.mjs
       - uses: actions/upload-pages-artifact@v3

@@ -17,8 +17,20 @@ const englishDocument = rootDocument
     'content="You are cordially invited to celebrate Manh &amp; An’s wedding"',
   );
 
-await mkdir(join(outputDir, 'en'), { recursive: true });
+const passthroughRoutes = [
+  join('admin'),
+  join('view', 'tien-buoc'),
+];
+
+await Promise.all([
+  mkdir(join(outputDir, 'en'), { recursive: true }),
+  ...passthroughRoutes.map(route => mkdir(join(outputDir, route), { recursive: true })),
+]);
 await Promise.all([
   writeFile(join(outputDir, 'en', 'index.html'), englishDocument),
+  ...passthroughRoutes.map(route => (
+    writeFile(join(outputDir, route, 'index.html'), rootDocument)
+  )),
+  writeFile(join(outputDir, 'view', 'tienbuoc.index.html'), rootDocument),
   writeFile(join(outputDir, '404.html'), rootDocument),
 ]);
