@@ -98,6 +98,15 @@
         "ca_loc": "Lẩu cháo cá lóc, cá lóc nướng",
         "lua_nep": "Nhà hàng Lúa Nếp"
       }
+    },
+    "hotels": {
+      "q": "Danh sách khách sạn tham khảo ở Cần Thơ",
+      "items": {
+        "lion_11": "Lion 11 Hotel (~550k/đêm)",
+        "tru_by_hilton": "Tru by Hilton (~900k/đêm)",
+        "charmant_suites": "Charmant Suites (~1300k/đêm)",
+        "sophia_healing_house": "Sophia Healing House (~400k/đêm) — cách trung tâm 6 km"
+      }
     }
   }
 }

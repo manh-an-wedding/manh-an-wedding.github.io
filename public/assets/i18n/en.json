@@ -98,6 +98,15 @@
         "ca_loc": "Lẩu cháo cá lóc, cá lóc nướng",
         "lua_nep": "Nhà hàng Lúa Nếp"
       }
+    },
+    "hotels": {
+      "q": "Suggested hotels in Cần Thơ",
+      "items": {
+        "lion_11": "Lion 11 Hotel (~VND 550,000/night)",
+        "tru_by_hilton": "Tru by Hilton (~VND 900,000/night)",
+        "charmant_suites": "Charmant Suites (~VND 1,300,000/night)",
+        "sophia_healing_house": "Sophia Healing House (~VND 400,000/night) — about 6 km from the city centre"
+      }
     }
   }
 }

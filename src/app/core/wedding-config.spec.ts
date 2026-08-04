@@ -15,10 +15,17 @@ describe('wedding config', () => {
       'faq.parking.q',
       'faq.activities.q',
       'faq.food.q',
+      'faq.hotels.q',
     ]);
-    expect(WEDDING.faq).toHaveLength(4);
+    expect(WEDDING.faq).toHaveLength(5);
     expect(WEDDING.faq[2].items?.filter(item => item.href)).toHaveLength(2);
     expect(WEDDING.faq[3].items?.filter(item => item.href)).toHaveLength(5);
+    expect(WEDDING.faq[4].items?.map(item => item.href)).toEqual([
+      'https://maps.app.goo.gl/AuYkjRSzbjUpL4GP8?g_st=ic',
+      'https://maps.app.goo.gl/uFZ4YgQgD8mqdFDy7?g_st=ic',
+      'https://maps.app.goo.gl/w8r3482E2vuDZYCK7?g_st=ic',
+      'https://maps.app.goo.gl/QY5QTPz3VwWCW8Fj6?g_st=ic',
+    ]);
     expect(WEDDING.supabase.url).toBeTruthy();
   });
 

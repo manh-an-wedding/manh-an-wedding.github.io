@@ -91,6 +91,15 @@ export const WEDDING: WeddingConfig = {
         { textKey: 'faq.food.items.lua_nep', href: 'https://share.google/nskq5HvezlQbwMowm', linkLabelKey: 'faq.actions.directions' },
       ],
     },
+    {
+      qKey: 'faq.hotels.q',
+      items: [
+        { textKey: 'faq.hotels.items.lion_11', href: 'https://maps.app.goo.gl/AuYkjRSzbjUpL4GP8?g_st=ic', linkLabelKey: 'faq.actions.directions' },
+        { textKey: 'faq.hotels.items.tru_by_hilton', href: 'https://maps.app.goo.gl/uFZ4YgQgD8mqdFDy7?g_st=ic', linkLabelKey: 'faq.actions.directions' },
+        { textKey: 'faq.hotels.items.charmant_suites', href: 'https://maps.app.goo.gl/w8r3482E2vuDZYCK7?g_st=ic', linkLabelKey: 'faq.actions.directions' },
+        { textKey: 'faq.hotels.items.sophia_healing_house', href: 'https://maps.app.goo.gl/QY5QTPz3VwWCW8Fj6?g_st=ic', linkLabelKey: 'faq.actions.directions' },
+      ],
+    },
   ],
   theme: { primary: '#9E1B1B', accent: '#C9A24B', fontHeading: 'serif', fontBody: 'sans-serif',
            music: 'assets/audio/bg-music.mp3' },

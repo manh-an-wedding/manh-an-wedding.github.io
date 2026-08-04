@@ -44,6 +44,36 @@ describe('FaqComponent', () => {
     expect(links[0].rel).toContain('noopener');
   });
 
+  it('renders all four hotel recommendations with Google Maps links', async () => {
+    await TestBed.configureTestingModule({
+      imports: [FaqComponent],
+      providers: [provideTranslateService({})],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(FaqComponent);
+    fixture.detectChanges();
+    const hotelsIndex = fixture.componentInstance.items.findIndex(
+      item => item.qKey === 'faq.hotels.q',
+    );
+    const buttons = fixture.nativeElement.querySelectorAll('.qa > button');
+
+    expect(hotelsIndex).toBeGreaterThanOrEqual(0);
+    (buttons[hotelsIndex] as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    const links = Array.from(
+      fixture.nativeElement.querySelectorAll('.faq-answer-link'),
+    ) as HTMLAnchorElement[];
+    expect(links.map(link => link.href)).toEqual([
+      'https://maps.app.goo.gl/AuYkjRSzbjUpL4GP8?g_st=ic',
+      'https://maps.app.goo.gl/uFZ4YgQgD8mqdFDy7?g_st=ic',
+      'https://maps.app.goo.gl/w8r3482E2vuDZYCK7?g_st=ic',
+      'https://maps.app.goo.gl/QY5QTPz3VwWCW8Fj6?g_st=ic',
+    ]);
+    expect(links.every(link => link.target === '_blank')).toBe(true);
+    expect(links.every(link => link.rel.includes('noopener'))).toBe(true);
+  });
+
   it('renders as a continuous invitation section instead of a raised card', async () => {
     await TestBed.configureTestingModule({
       imports: [FaqComponent],
