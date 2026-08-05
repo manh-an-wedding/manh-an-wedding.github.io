@@ -24,7 +24,6 @@ describe('wedding config', () => {
       'https://maps.app.goo.gl/AuYkjRSzbjUpL4GP8?g_st=ic',
       'https://maps.app.goo.gl/uFZ4YgQgD8mqdFDy7?g_st=ic',
       'https://maps.app.goo.gl/w8r3482E2vuDZYCK7?g_st=ic',
-      'https://maps.app.goo.gl/QY5QTPz3VwWCW8Fj6?g_st=ic',
     ]);
     expect(WEDDING.supabase.url).toBeTruthy();
   });
@@ -45,7 +44,7 @@ describe('wedding config', () => {
     expect(WEDDING.reception.mapEmbedUrl).toContain('hl=vi');
     expect(WEDDING.reception.mapDirUrl)
       .toBe('https://maps.app.goo.gl/of7FJD3HC6WWPuv7A');
-    expect(WEDDING.rsvp.deadlineISO).toBe('2026-10-10T11:30:00+07:00');
+    expect(WEDDING.rsvp.deadlineISO).toBe('2026-10-13T11:30:00+07:00');
     expect(WEDDING.rsvp.bus).toEqual({
       pickup: 'Ibis hotel, 2 Hồng Hà, Tân Sơn Hòa, Hồ Chí Minh',
       departTime: '7:15 · Thứ 7 · 17.10.2026',

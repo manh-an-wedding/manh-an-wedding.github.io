@@ -68,7 +68,6 @@ describe('FaqComponent', () => {
       'https://maps.app.goo.gl/AuYkjRSzbjUpL4GP8?g_st=ic',
       'https://maps.app.goo.gl/uFZ4YgQgD8mqdFDy7?g_st=ic',
       'https://maps.app.goo.gl/w8r3482E2vuDZYCK7?g_st=ic',
-      'https://maps.app.goo.gl/QY5QTPz3VwWCW8Fj6?g_st=ic',
     ]);
     expect(links.every(link => link.target === '_blank')).toBe(true);
     expect(links.every(link => link.rel.includes('noopener'))).toBe(true);

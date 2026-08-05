@@ -65,11 +65,6 @@ export class InviteComponent implements OnInit, OnDestroy {
   constructor(@Inject(WEDDING_CONFIG) public cfg: WeddingConfig) {}
 
   async ngOnInit() {
-    try {
-      this.document.defaultView?.localStorage.removeItem('manhan_device_id');
-    } catch {
-      // Storage may be unavailable in a restricted/private browsing context.
-    }
     // Option C: lang comes from route data ({ lang: 'vi' } at '/', { lang: 'en' } at '/en')
     this.lang = this.route.snapshot.data['lang'] === 'en' ? 'en' : 'vi';
     this.document.documentElement.lang = this.lang;

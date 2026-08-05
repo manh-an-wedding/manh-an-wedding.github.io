@@ -80,7 +80,7 @@
 }
 
 <form (ngSubmit)="trySubmit()" [attr.aria-busy]="submitting" [hidden]="done">
-    <h2 class="rsvp-title">{{ 'invite.confirm' | translate }}</h2>
+    <p class="rsvp-confirm-help">{{ 'rsvp.confirm_help' | translate }}</p>
 
     @if (deadlinePassed) { <p class="warn">{{ 'rsvp.deadline_passed' | translate }}</p> }
 

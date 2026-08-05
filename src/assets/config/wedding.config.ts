@@ -46,8 +46,8 @@ export const WEDDING: WeddingConfig = {
     agendaKeys: ['agenda.welcome', 'agenda.ceremony', 'agenda.lunch', 'agenda.party'],
   },
   rsvp: {
-    groups: ['Họ hàng nhà gái', 'Bạn cha Năm', 'Bạn mẹ Bắc', 'Tiến bước', 'IAS', 'ZAD', 'MWG', 'RVC', 'Bạn của An', 'Bạn của Tâm'],
-    deadlineISO: '2026-10-10T11:30:00+07:00',
+    groups: ['Họ hàng nhà gái', 'Bạn cha Năm', 'Bạn mẹ Bắc', 'Bạn của Mạnh', 'Bạn của Tâm', 'Bạn của An'],
+    deadlineISO: '2026-10-13T11:30:00+07:00',
     bus: {
       pickup: 'Ibis hotel, 2 Hồng Hà, Tân Sơn Hòa, Hồ Chí Minh',
       departTime: '7:15 · Thứ 7 · 17.10.2026',
@@ -97,7 +97,6 @@ export const WEDDING: WeddingConfig = {
         { textKey: 'faq.hotels.items.lion_11', href: 'https://maps.app.goo.gl/AuYkjRSzbjUpL4GP8?g_st=ic', linkLabelKey: 'faq.actions.directions' },
         { textKey: 'faq.hotels.items.tru_by_hilton', href: 'https://maps.app.goo.gl/uFZ4YgQgD8mqdFDy7?g_st=ic', linkLabelKey: 'faq.actions.directions' },
         { textKey: 'faq.hotels.items.charmant_suites', href: 'https://maps.app.goo.gl/w8r3482E2vuDZYCK7?g_st=ic', linkLabelKey: 'faq.actions.directions' },
-        { textKey: 'faq.hotels.items.sophia_healing_house', href: 'https://maps.app.goo.gl/QY5QTPz3VwWCW8Fj6?g_st=ic', linkLabelKey: 'faq.actions.directions' },
       ],
     },
   ],
