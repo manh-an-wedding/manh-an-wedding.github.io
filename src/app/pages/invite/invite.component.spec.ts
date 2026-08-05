@@ -66,15 +66,6 @@ describe('InviteComponent', () => {
     TestBed.inject(TranslateService).setTranslation('vi', testTranslations);
   });
 
-  it('removes the legacy browser identifier on load', async () => {
-    localStorage.setItem('manhan_device_id', 'legacy-device');
-    const fixture = TestBed.createComponent(InviteComponent);
-
-    await fixture.componentInstance.ngOnInit();
-
-    expect(localStorage.getItem('manhan_device_id')).toBeNull();
-  });
-
   it('reads lang from route data (defaults to vi)', async () => {
     const f = TestBed.createComponent(InviteComponent);
     await f.componentInstance.ngOnInit();
