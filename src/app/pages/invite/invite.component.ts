@@ -5,6 +5,7 @@ import {
   inject,
   Inject,
   HostListener,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { DatePipe, DOCUMENT } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
@@ -46,6 +47,7 @@ export class InviteComponent implements OnInit, OnDestroy {
   private translate = inject(TranslateService);
   private document = inject(DOCUMENT);
   private music = inject(MusicService);
+  private cdr = inject(ChangeDetectorRef);
   private slideshowTimer?: ReturnType<typeof setInterval>;
   private autoScrollFrame?: number;
   private lastAutoScrollTime = 0;
@@ -212,6 +214,8 @@ export class InviteComponent implements OnInit, OnDestroy {
       const photoCount = this.visiblePhotos.length;
       if (photoCount > 1) {
         this.activeSlide = (this.activeSlide + 1) % photoCount;
+        // Zoneless CD: the timer mutation won't render without an explicit notify
+        this.cdr.markForCheck();
       }
     }, 4000);
   }
