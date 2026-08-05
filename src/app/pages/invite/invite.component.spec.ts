@@ -127,7 +127,7 @@ describe('InviteComponent', () => {
     expect(component['autoScrollFrame']).toBe(23);
   });
 
-  it('auto-scrolls at 35 pixels per second', () => {
+  it('starts auto-scroll at 20 pixels per second', () => {
     const fixture = TestBed.createComponent(InviteComponent);
     const component = fixture.componentInstance;
     const music = TestBed.inject(MusicService);
@@ -155,7 +155,7 @@ describe('InviteComponent', () => {
 
       expect(scrollSpy).toHaveBeenCalledTimes(1);
       expect(scrollSpy.mock.calls[0][0]).toBe(0);
-      expect(scrollSpy.mock.calls[0][1]).toBeCloseTo(1.75, 5);
+      expect(scrollSpy.mock.calls[0][1]).toBeCloseTo(1, 5);
     } finally {
       component.ngOnDestroy();
       nowSpy.mockRestore();
@@ -168,6 +168,17 @@ describe('InviteComponent', () => {
         Reflect.deleteProperty(documentElement, 'scrollHeight');
       }
     }
+  });
+
+  it('ramps auto-scroll from 20 to 35 pixels per second across the first third of the cover', () => {
+    const component = TestBed.createComponent(InviteComponent).componentInstance as unknown as {
+      autoScrollSpeedPxPerMs(position: number, coverHeight: number): number;
+    };
+
+    expect(component.autoScrollSpeedPxPerMs(0, 120)).toBeCloseTo(.02, 5);
+    expect(component.autoScrollSpeedPxPerMs(20, 120)).toBeCloseTo(.0275, 5);
+    expect(component.autoScrollSpeedPxPerMs(40, 120)).toBeCloseTo(.035, 5);
+    expect(component.autoScrollSpeedPxPerMs(120, 120)).toBeCloseTo(.035, 5);
   });
 
   it('shows Q&A while keeping wishes hidden', () => {

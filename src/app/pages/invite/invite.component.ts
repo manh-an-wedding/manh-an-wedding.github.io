@@ -50,6 +50,8 @@ export class InviteComponent implements OnInit, OnDestroy {
   private autoScrollFrame?: number;
   private lastAutoScrollTime = 0;
   private autoScrollPosition = 0;
+  private readonly autoScrollMinSpeedPxPerMs = .02;
+  private readonly autoScrollMaxSpeedPxPerMs = .035;
   private autoplayWaitingForGesture = false;
   private touchStartX: number | null = null;
   readonly musicOn = this.music.playing;
@@ -227,6 +229,10 @@ export class InviteComponent implements OnInit, OnDestroy {
 
     this.lastAutoScrollTime = view.performance.now();
     this.autoScrollPosition = view.scrollY;
+    const measuredCoverHeight = this.document
+      .querySelector<HTMLElement>('.cover-hero')
+      ?.getBoundingClientRect().height ?? 0;
+    const coverHeight = measuredCoverHeight > 0 ? measuredCoverHeight : view.innerHeight;
     const scrollStep = (timestamp: number) => {
       if (!this.music.autoScrollEnabled()) {
         this.autoScrollFrame = undefined;
@@ -242,12 +248,20 @@ export class InviteComponent implements OnInit, OnDestroy {
 
       const elapsed = Math.min(timestamp - this.lastAutoScrollTime, 50);
       this.lastAutoScrollTime = timestamp;
-      this.autoScrollPosition = Math.min(maxScroll, this.autoScrollPosition + elapsed * 0.035);
+      const speed = this.autoScrollSpeedPxPerMs(this.autoScrollPosition, coverHeight);
+      this.autoScrollPosition = Math.min(maxScroll, this.autoScrollPosition + elapsed * speed);
       view.scrollTo(0, this.autoScrollPosition);
       this.autoScrollFrame = view.requestAnimationFrame(scrollStep);
     };
 
     this.autoScrollFrame = view.requestAnimationFrame(scrollStep);
+  }
+
+  private autoScrollSpeedPxPerMs(position: number, coverHeight: number): number {
+    const rampDistance = Math.max(coverHeight / 3, 1);
+    const coverProgress = Math.min(1, Math.max(0, position / rampDistance));
+    return this.autoScrollMinSpeedPxPerMs
+      + (this.autoScrollMaxSpeedPxPerMs - this.autoScrollMinSpeedPxPerMs) * coverProgress;
   }
 
   private stopAutoScrollAnimation() {
