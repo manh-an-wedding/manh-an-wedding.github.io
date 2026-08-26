@@ -40,7 +40,7 @@
     "rsvp_intro": "Your presence would be a great honour to our families."
   },
   "agenda": { "welcome": "Welcome", "ceremony": "Ceremony", "lunch": "Banquet", "party": "Celebration" },
-  "rsvp": { "your_name": "Your name (and company/organization, if any)", "confirm_help": "Please kindly confirm your information so that our family can prepare to welcome you more thoughtfully. ❤️", "group": "And group", "add_companion": "Add companion", "remove_companion": "Remove companion", "people": "people",
+  "rsvp": { "your_name": "Your name (and company/organization, if any)", "confirm_help": "Please kindly confirm your information so that our family can prepare to welcome you more thoughtfully. ❤️", "group": "And group", "groupNames": { "Họ hàng nhà gái": "Bride's family", "Bạn cha Năm": "Dad Năm's friends", "Bạn mẹ Bắc": "Mom Bắc's friends", "Bạn của Mạnh": "Mạnh's friends", "Bạn của Tâm": "Tâm's friends", "Bạn của An": "An's friends" }, "add_companion": "Add companion", "remove_companion": "Remove companion", "people": "people",
             "self_transport": "Attending — own transport",
             "bus": "Attending — reserve {{count}} round-trip HCM–Can Tho shuttle seats", "cannot_attend": "Cannot attend",
             "table_full": "Congratulations, you now have a complete table!",

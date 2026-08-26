@@ -92,7 +92,7 @@
     <label class="rsvp-group-label">{{ 'rsvp.group' | translate }}
       <select class="rsvp-group-select" name="group" [(ngModel)]="model.category" required>
         <option value="" disabled selected></option>
-        @for (g of cfg.rsvp.groups; track g) { <option [value]="g">{{ g }}</option> }
+        @for (g of cfg.rsvp.groups; track g) { <option [value]="g">{{ ('rsvp.groupNames.' + g) | translate }}</option> }
       </select>
     </label>
 
