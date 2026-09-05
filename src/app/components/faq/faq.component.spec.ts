@@ -14,7 +14,7 @@ describe('FaqComponent', () => {
     expect(c.openIndex).toBe(0);
     c.toggle(0);
     expect(c.openIndex).toBe(-1);
-    expect(c.items[0].showGiftQr).toBe(false);
+    expect(c.items.some(item => item.showGiftQr)).toBe(false);
   });
 
   it('renders structured recommendations with safe external links', async () => {

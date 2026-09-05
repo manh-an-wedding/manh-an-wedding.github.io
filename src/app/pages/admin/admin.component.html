@@ -119,6 +119,16 @@
           <option value="self_transport">Tự di chuyển</option>
           <option value="cannot_attend">Không tham gia</option>
         </select>
+        <select aria-label="Lọc điểm đón" [ngModel]="pickupFilter()" (ngModelChange)="setPickupFilter($event)">
+          <option value="">Tất cả điểm đón</option>
+          <option value="hotel">Ibis (Tân Bình)</option>
+          <option value="park">Bình Phú (Q6)</option>
+        </select>
+        <select aria-label="Lọc khứ hồi" [ngModel]="returnFilter()" (ngModelChange)="setReturnFilter($event)">
+          <option value="">Khứ hồi</option>
+          <option value="Y">Y</option>
+          <option value="N">N</option>
+        </select>
         <button type="button" class="csv-export" (click)="downloadCsv()">
           {{ tab() === 'busCurrent' ? 'Xuất DS xe CSV' : 'Xuất CSV' }}
         </button>
@@ -156,7 +166,13 @@
                   </td>
                 }
                 <td><strong>{{ row.guest_name }}</strong><small>{{ row.category }} · {{ row.party_size }} người · #{{ row.id }}</small></td>
-                <td>{{ statusLabel(row.status) }}</td>
+                <td>
+                  {{ statusLabel(row.status) }}
+                  @if (row.status === 'bus') {
+                    <small>Đón: {{ pickupLabel(row.bus_pickup) }}</small>
+                    <small>Khứ hồi: {{ returnLabel(row.bus_return) }}</small>
+                  }
+                </td>
                 <td>
                   @if (row.companions.length === 0) { <span>—</span> }
                   @for (companion of row.companions; track companion.id) { <small>{{ companion.name }}</small> }
@@ -207,6 +223,16 @@
           <label>Nhóm<select name="editCategory" [(ngModel)]="editDraft.category" required>@for (group of dashboard().groups; track group) { <option [value]="group">{{ group }}</option> }</select></label>
           <label>Lựa chọn<select name="editStatus" [(ngModel)]="editDraft.status" required><option value="bus">Đi xe</option><option value="self_transport">Tự di chuyển</option><option value="cannot_attend">Không tham gia</option></select></label>
           @if (editDraft.status === 'bus') { <label>SĐT<input name="editPhone" [(ngModel)]="editDraft.phone" required></label> }
+          @if (editDraft.status === 'bus') {
+            <label>Đón tại<select name="editPickup" [(ngModel)]="editDraft.busPickup">
+              <option value="hotel">Ibis (Tân Bình)</option>
+              <option value="park">Bình Phú (Q6)</option>
+            </select></label>
+            <label>Khứ hồi<select name="editReturn" [(ngModel)]="editDraft.busReturn">
+              <option [ngValue]="true">Có</option>
+              <option [ngValue]="false">Không</option>
+            </select></label>
+          }
           <fieldset>
             <legend>Người đi cùng</legend>
             @for (companion of editDraft.companions; track $index) {

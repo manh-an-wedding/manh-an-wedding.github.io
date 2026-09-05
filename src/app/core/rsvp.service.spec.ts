@@ -52,6 +52,8 @@ describe('RsvpService', () => {
         p_category: 'IAS',
         p_status: 'bus',
         p_phone: '0900',
+        p_bus_pickup: 'hotel',
+        p_bus_return: true,
         p_companions: [{ name: 'Vợ', joinsBus: true, relation: '' }],
         p_edit_token: handle.editToken,
       },
@@ -78,6 +80,8 @@ describe('RsvpService', () => {
         p_category: 'IAS',
         p_status: 'self_transport',
         p_phone: null,
+        p_bus_pickup: null,
+        p_bus_return: null,
         p_companions: [{ name: 'Vợ', joinsBus: true, relation: '' }],
       },
     }]);
@@ -163,6 +167,8 @@ describe('RsvpService', () => {
         p_category: 'Tiến bước',
         p_status: 'self_transport',
         p_phone: null,
+        p_bus_pickup: null,
+        p_bus_return: null,
         p_companions: revision.companions,
       },
     }]);

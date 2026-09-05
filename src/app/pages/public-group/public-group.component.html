@@ -17,7 +17,7 @@
           <div class="guest-heading">
             <span class="guest-number" aria-hidden="true">{{ (page() - 1) * pageSize + $index + 1 }}.</span>
             <strong>{{ row.guest_name }}</strong>
-            <span class="guest-choice">({{ statusLabel(row.status) }})</span>
+            <span class="guest-choice">({{ statusLabel(row.status) }}@if (row.status === 'bus') {<span> · Đón: {{ pickupLabel(row.bus_pickup) }} · Khứ hồi: {{ returnLabel(row.bus_return) }}</span>})</span>
           </div>
           @if (row.companions.length > 0) {
             <ul>

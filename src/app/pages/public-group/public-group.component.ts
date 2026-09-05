@@ -71,6 +71,20 @@ export class PublicGroupComponent implements OnInit {
     }
   }
 
+  pickupLabel(pickup: 'hotel' | 'park' | null | undefined): string {
+    switch (pickup) {
+      case 'hotel': return 'Ibis';
+      case 'park': return 'CV Bình Phú';
+      default: return '—';
+    }
+  }
+
+  returnLabel(value: boolean | null | undefined): string {
+    if (value === true) return 'Y';
+    if (value === false) return 'N';
+    return '—';
+  }
+
   goToPage(page: number): void {
     this.page.set(Math.max(1, Math.min(page, this.pageCount)));
   }

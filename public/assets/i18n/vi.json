@@ -39,24 +39,24 @@
     "album_title": "Album ảnh",
     "rsvp_intro": "Sự hiện diện của quý khách là niềm vinh hạnh cho gia đình chúng tôi."
   },
-  "agenda": { "welcome": "Đón khách", "ceremony": "Nghi lễ", "lunch": "Dùng tiệc", "party": "Chung vui" },
+  "agenda": { "title": "Chương trình dự kiến", "welcome": { "title": "Đón khách", "p1": "Check-in, ký lưu bút", "p2": "Chụp choẹt với dâu rể", "p3": "Tự do chụp hình Hàn Quốc" }, "ceremony": { "title": "Nghi Lễ", "p1": "MC chém gió", "p2": "Cắt bánh rót rịu", "p3": "Phụ huynh phát biểu" }, "party": { "title": "Dùng tiệc", "p1": "Ăn uống & hát hò", "p2": "Dâu rể đi giao lưu nhó" }, "closing": { "title": "Tan tiệc", "p1": "Lại chụp choẹt với dâu rể", "p2": "Chụp hình HQ còn luôn" } },
   "rsvp": { "your_name": "Bác cho con/em xin tên (và cơ quan/công ty nếu có)", "confirm_help": "Nhờ bác xác nhận thông tin để phía gia đình chuẩn bị đón tiếp được chu đáo hơn nha❤️", "group": "Và nhóm", "groupNames": { "Họ hàng nhà gái": "Họ hàng nhà gái", "Bạn cha Năm": "Bạn cha Năm", "Bạn mẹ Bắc": "Bạn mẹ Bắc", "Bạn của Mạnh": "Bạn của Mạnh", "Bạn của Tâm": "Bạn của Tâm", "Bạn của An": "Bạn của An" }, "add_companion": "Thêm người đi cùng", "remove_companion": "Xóa người đi cùng", "people": "người",
             "self_transport": "Tham dự và tự di chuyển",
             "bus": "Tham dự và hốt {{count}} suất xe đưa đón khứ hồi HCM–CT", "cannot_attend": "Không thể tham dự",
             "table_full": "Chúc mừng bác đã sở hữu 1 bàn tiệc trọn vẹn!",
             "phone": "Vui lòng nhập SĐT", "departure_label": "Xuất phát", "location_label": "Địa điểm",
-            "bus_outbound_title": "Xe khởi hành Hồ Chí Minh đi Cần Thơ:",
-            "bus_outbound_departure": "07:15 · Thứ 7 · 17.10.2026",
-            "bus_outbound_location": "IBIS SAIGON AIRPORT, 2 Hồng Hà, Tân Sơn Hòa, Hồ Chí Minh.",
+            "bus_outbound_title": "Xe khởi hành Hồ Chí Minh đi Cần Thơ",
+            "bus_weekday": "Thứ 7",
+            "bus_outbound_location": "IBIS SAIGON AIRPORT, 2 Hồng Hà, Tân Sơn Hòa, Hồ Chí Minh.", "bus_pickup1_label": "Điểm đón 1", "bus_pickup2_label": "Điểm đón 2", "bus_outbound_location_2": "Cổng công viên Bình Phú, phía đường số 26",
             "bus_restaurant_arrival": "Dự kiến đến nhà hàng",
             "bus_return_title": "Xe khởi hành Cần Thơ về Hồ Chí Minh:",
-            "bus_return_departure_time": "13:30 (dự kiến)",
+            "bus_return_departure_time": "{{time}} (dự kiến)",
             "bus_return_location": "Sảnh 01 Vạn Phát",
-            "bus_hotel_arrival": "Dự kiến về đến IBIS",
+            "bus_hotel_arrival": "Dự kiến về đến IBIS", "bus_park_arrival": "Dự kiến về đến Công viên Bình Phú",
             "bus_return_traffic_note": "(chiều về có thể kẹt xe trên cao tốc)",
             "bus_deadline_prefix": "Danh sách đi xe sẽ được chốt vào",
             "bus_deadline_detail": "11:30 AM thứ 3, 13.10.2026",
-            "bus_info_hint": "xem thông tin xe ở đây",
+            "bus_info_hint": "xem thông tin xe ở đây", "no_return_label": "Không theo xe về HCM", "pickup_at_label": "Đón tại", "pickup_hotel": "Ibis hotel (Tân Bình cũ)", "pickup_park": "Công Viên Bình Phú (Q6 cũ)", "roundtrip_label": "Khứ hồi?", "roundtrip_yes": "OK", "roundtrip_no_single": "Thôi, tôi ở Cần Thơ không theo xe về ✌️ (tự dìa)", "roundtrip_no_plural": "Thôi, chúng tôi ở Cần Thơ không theo xe về ✌️ (tự dìa)",
             "bus_driver_update_note": "Thông tin tài xế và thay đổi lịch trình (nếu có) sẽ được gửi vào SĐT của bác nha.",
             "bus_driver_update_thanks": "Xin cảm ơn.",
             "deadline_passed": "Danh sách xe đưa đón đã được chốt. Bác vẫn có thể xác nhận tham dự và tự di chuyển.",
@@ -70,7 +70,19 @@
               "placeholder": "Lời chúc của bạn…", "send": "Gửi", "wall": "Lời chúc từ mọi người" },
   "faq": {
     "title": "Q & A",
-    "actions": { "details": "Xem thông tin", "directions": "Chỉ đường" },
+    "actions": { "details": "Xem thông tin", "directions": "Chỉ đường", "location": "Vị trí" },
+    "bus": {
+      "q": "Thông tin xe đưa đón HCM – Cần Thơ?",
+      "items": {
+        "pickup1": "Điểm đón 1 ({{t1}}, Thứ 7 17.10): IBIS SAIGON AIRPORT, 2 Hồng Hà, Tân Sơn Hòa, HCM",
+        "pickup2": "Điểm đón 2 ({{t2}}): Cổng công viên Bình Phú, phía đường số 26",
+        "arrival": "Dự kiến đến nhà hàng: {{arr}}",
+        "return": "Chiều về: xuất phát {{rdep}} → Công viên Bình Phú {{park}} → IBIS {{hotel}}",
+        "breakfast": "Các bác tự túc ăn sáng và giải quyết nỗi buồn trước khi lên xe nha, xe đi thẳng không ghé trạm. Trên xe sẽ có đồ ăn vặt và nước nha.",
+        "deadline": "Hạn đăng ký xe: 11:30 thứ 3, 13.10.2026",
+        "register": "Đăng ký tại mục Xác nhận tham dự (chọn 'Tham dự — có xe')"
+      }
+    },
     "venue_parking": {
       "q": "Vạn Phát có chỗ gửi xe không?",
       "a": "Trước sảnh 1 có nơi để xe máy, xe hơi, xe khách miễn phí."
@@ -78,6 +90,12 @@
     "parking": {
       "q": "IBIS có chỗ gửi xe không?",
       "a": "Có. Giá gửi xe máy là 7k nếu lấy xe trước 18:00 và 14k nếu lấy xe sau 18:00."
+    },
+    "binhphu_parking": {
+      "q": "Công Viên Bình Phú có chỗ gửi xe không?",
+      "items": {
+        "a": "Có ở phía mặt đường số 10. Thấy đi qua đường 26 cũng hơi xa đó, đi xe ôm cho lành bác êi."
+      }
     },
     "activities": {
       "q": "Ghé Cần Thơ có thể chơi gì?",

@@ -25,7 +25,7 @@ import { WeddingConfig, FaqItem } from '../../core/wedding-config';
                 <ul class="faq-answer-list">
                   @for (answerItem of item.items; track answerItem.textKey) {
                     <li>
-                      <span>{{ answerItem.textKey | translate }}</span>
+                      <span>{{ answerItem.textKey | translate:answerItem.params }}</span>
                       @if (answerItem.href) {
                         <a class="faq-answer-link" [href]="answerItem.href"
                            target="_blank" rel="noopener noreferrer">

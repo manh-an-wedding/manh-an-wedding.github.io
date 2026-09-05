@@ -9,18 +9,22 @@ describe('wedding config', () => {
     expect(WEDDING.rsvp.groups).toContain('Bạn của Tâm');
     expect(WEDDING.gift.bride.account).toBe('');
     expect(WEDDING.gift.groom.account).toBe('');
-    expect(WEDDING.faq[0].showGiftQr).toBe(false);
+    expect(WEDDING.faq.some(item => item.showGiftQr)).toBe(false);
     expect(WEDDING.faq.map(item => item.qKey)).toEqual([
-      'faq.venue_parking.q',
+      'faq.bus.q',
       'faq.parking.q',
+      'faq.binhphu_parking.q',
+      'faq.venue_parking.q',
       'faq.activities.q',
       'faq.food.q',
       'faq.hotels.q',
     ]);
-    expect(WEDDING.faq).toHaveLength(5);
-    expect(WEDDING.faq[2].items?.filter(item => item.href)).toHaveLength(2);
-    expect(WEDDING.faq[3].items?.filter(item => item.href)).toHaveLength(5);
-    expect(WEDDING.faq[4].items?.map(item => item.href)).toEqual([
+    expect(WEDDING.faq).toHaveLength(7);
+    expect(WEDDING.faq[0].items?.filter(item => item.href)).toHaveLength(2);
+    expect(WEDDING.faq[2].items?.filter(item => item.href)).toHaveLength(1);
+    expect(WEDDING.faq[4].items?.filter(item => item.href)).toHaveLength(2);
+    expect(WEDDING.faq[5].items?.filter(item => item.href)).toHaveLength(5);
+    expect(WEDDING.faq[6].items?.map(item => item.href)).toEqual([
       'https://maps.app.goo.gl/AuYkjRSzbjUpL4GP8?g_st=ic',
       'https://maps.app.goo.gl/uFZ4YgQgD8mqdFDy7?g_st=ic',
       'https://maps.app.goo.gl/w8r3482E2vuDZYCK7?g_st=ic',
@@ -46,11 +50,13 @@ describe('wedding config', () => {
       .toBe('https://maps.app.goo.gl/of7FJD3HC6WWPuv7A');
     expect(WEDDING.rsvp.deadlineISO).toBe('2026-10-13T11:30:00+07:00');
     expect(WEDDING.rsvp.bus).toEqual({
-      pickup: 'Ibis hotel, 2 Hồng Hà, Tân Sơn Hòa, Hồ Chí Minh',
-      departTime: '7:15 · Thứ 7 · 17.10.2026',
+      outboundDepart1Time: '07:15',
+      outboundDepart2Time: '07:50',
+      eventDate: '17.10.26',
       restaurantArrivalTime: '10:45',
-      returnDepartTime: '13:30',
-      hotelArrivalTime: '17:30',
+      returnDepartTime: '14:30',
+      parkArrivalTime: '18:00',
+      hotelArrivalTime: '18:45',
     });
     expect(WEDDING.event.venue).toBe('VẠN PHÁT RIVERSIDE - SẢNH 01');
   });

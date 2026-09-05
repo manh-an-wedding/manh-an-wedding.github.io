@@ -13,6 +13,7 @@ import { LanguageToggleComponent } from '../../components/language-toggle/langua
 import { RsvpFormComponent } from '../../components/rsvp-form/rsvp-form.component';
 import { WishesComponent } from '../../components/wishes/wishes.component';
 import { FaqComponent } from '../../components/faq/faq.component';
+import { AgendaComponent } from '../../components/agenda/agenda.component';
 import { MapCalendarComponent } from '../../components/map-calendar/map-calendar.component';
 import { WEDDING_CONFIG } from '../../core/wedding-config.token';
 import { WeddingConfig } from '../../core/wedding-config';
@@ -38,7 +39,7 @@ const PHOTO_MOMENTS: Record<string, PhotoMoment> = {
 @Component({
   selector: 'app-invite', standalone: true,
   imports: [DatePipe, TranslatePipe, LanguageToggleComponent, RsvpFormComponent,
-            WishesComponent, FaqComponent, MapCalendarComponent,
+            WishesComponent, FaqComponent, AgendaComponent, MapCalendarComponent,
             RevealOnScrollDirective, HappinessRainComponent],
   templateUrl: './invite.component.html',
 })

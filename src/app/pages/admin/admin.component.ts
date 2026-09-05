@@ -61,6 +61,8 @@ export class AdminComponent implements OnInit {
   readonly search = signal('');
   readonly groupFilter = signal('');
   readonly statusFilter = signal('');
+  readonly pickupFilter = signal('');
+  readonly returnFilter = signal('');
   readonly page = signal(1);
   readonly pageSize = PAGE_SIZE;
   editDraft: EditDraft | null = null;
@@ -71,6 +73,8 @@ export class AdminComponent implements OnInit {
     const query = this.search().trim().toLocaleLowerCase('vi');
     const group = this.groupFilter();
     const status = this.statusFilter();
+    const pickup = this.pickupFilter();
+    const ret = this.returnFilter();
     const filtered = rows.filter(row => {
       const haystack = [
         row.guest_name,
@@ -80,7 +84,9 @@ export class AdminComponent implements OnInit {
       ].join(' ').toLocaleLowerCase('vi');
       return (!query || haystack.includes(query))
         && (!group || row.category === group)
-        && (!status || row.status === status);
+        && (!status || row.status === status)
+        && (!pickup || row.bus_pickup === pickup)
+        && (!ret || (ret === 'Y' ? row.bus_return === true : row.bus_return === false));
     });
     return filtered;
   });
@@ -150,6 +156,16 @@ export class AdminComponent implements OnInit {
     this.page.set(1);
   }
 
+  setPickupFilter(value: string): void {
+    this.pickupFilter.set(value);
+    this.page.set(1);
+  }
+
+  setReturnFilter(value: string): void {
+    this.returnFilter.set(value);
+    this.page.set(1);
+  }
+
   goToPage(page: number): void {
     this.page.set(Math.max(1, Math.min(page, this.pageCount())));
   }
@@ -161,6 +177,8 @@ export class AdminComponent implements OnInit {
       category: row.category,
       status: row.status,
       phone: row.phone ?? '',
+      busPickup: row.bus_pickup ?? 'hotel',
+      busReturn: row.bus_return ?? true,
       companions: row.companions.map(companion => ({
         name: companion.name,
         joinsBus: companion.joins_bus,
@@ -298,6 +316,20 @@ export class AdminComponent implements OnInit {
     }
   }
 
+  pickupLabel(pickup: 'hotel' | 'park' | null): string {
+    switch (pickup) {
+      case 'hotel': return 'TB';
+      case 'park': return 'Q6';
+      default: return '—';
+    }
+  }
+
+  returnLabel(value: boolean | null): string {
+    if (value === true) return 'Y';
+    if (value === false) return 'N';
+    return '—';
+  }
+
   downloadCsv(): void {
     const csv = this.buildCsv(this.visibleRows());
     const blob = new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' });
@@ -337,8 +369,8 @@ export class AdminComponent implements OnInit {
     if (this.tab() === 'busCurrent') return this.buildProcessedBusCsv(rows);
 
     const fields = [
-      'ID', 'Tên khách', 'Nhóm', 'Lựa chọn', 'SĐT', 'Số người',
-      'Người đi cùng', 'Thời gian',
+      'ID', 'Tên khách', 'Nhóm', 'Lựa chọn', 'SĐT', 'Đón tại', 'Khứ hồi',
+      'Số người', 'Người đi cùng', 'Thời gian',
     ];
     const lines = rows.map(row => [
       row.id,
@@ -346,6 +378,8 @@ export class AdminComponent implements OnInit {
       row.category,
       this.statusLabel(row.status),
       row.phone ?? '',
+      row.status === 'bus' ? this.pickupLabel(row.bus_pickup) : '',
+      row.status === 'bus' ? this.returnLabel(row.bus_return) : '',
       row.party_size,
       row.companions.map(companion => companion.name).join('; '),
       row.created_at,
@@ -354,17 +388,23 @@ export class AdminComponent implements OnInit {
   }
 
   private buildProcessedBusCsv(rows: AdminRsvpRow[]): string {
-    const fields = ['STT', 'Tên', 'SĐT', 'ID'];
-    const passengers = rows.flatMap(row => [
-      { name: row.guest_name, phone: row.phone ?? '-', rsvpId: row.id },
-      ...row.companions
-        .filter(companion => companion.joins_bus)
-        .map(companion => ({ name: companion.name, phone: '-', rsvpId: row.id })),
-    ]);
+    const fields = ['STT', 'Tên', 'SĐT', 'Đón tại', 'Khứ hồi', 'ID'];
+    const passengers = rows.flatMap(row => {
+      const pickup = this.pickupLabel(row.bus_pickup);
+      const ret = this.returnLabel(row.bus_return);
+      return [
+        { name: row.guest_name, phone: row.phone ?? '-', pickup, ret, rsvpId: row.id },
+        ...row.companions
+          .filter(companion => companion.joins_bus)
+          .map(companion => ({ name: companion.name, phone: '-', pickup, ret, rsvpId: row.id })),
+      ];
+    });
     const lines = passengers.map((passenger, index) => [
       index + 1,
       passenger.name,
       passenger.phone,
+      passenger.pickup,
+      passenger.ret,
       passenger.rsvpId,
     ].map(value => this.csvCell(String(value))).join(','));
     return [fields.map(field => this.csvCell(field)).join(','), ...lines].join('\r\n');

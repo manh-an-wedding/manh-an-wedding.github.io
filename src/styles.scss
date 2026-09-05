@@ -772,6 +772,35 @@ textarea { min-height: 90px; resize: vertical; }
 
 fieldset { border: 1px solid var(--line); border-radius: 10px; padding: .8rem; display: flex; flex-direction: column; gap: .55rem; }
 fieldset label { font-weight: 400; }
+.bus-details {
+  display: grid;
+  gap: .55rem;
+  background: var(--cream);
+  border-radius: 8px;
+  padding: .85rem;
+}
+.bus-details .bus-phone { display: flex; align-items: center; gap: .5rem; margin: 0; }
+.bus-details .bus-phone input {
+  flex: 0 1 190px;
+  min-width: 0;
+  margin-top: 0;
+  padding: .4rem .55rem;
+  font-size: .8rem;
+}
+.bus-field-label { color: var(--ink); font-weight: 600; font-size: .72rem; }
+.bus-choice { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .9rem; }
+.bus-choice label {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: .25rem;
+  font-weight: 400;
+  font-size: .72rem;
+  line-height: 1.35;
+  color: var(--muted);
+}
+.bus-choice label input { flex: 0 0 auto; margin-right: 0; margin-top: .1rem; }
+.rsvp-confirmation-pickup { margin: .25rem 0 0; }
+.rsvp-confirmation-no-return { margin: .15rem 0 0; color: var(--red); font-weight: 600; }
 .bus-info { display: grid; gap: 1rem; background: var(--cream); border-radius: 8px; padding: .85rem; }
 .bus-info h3 {
   margin: 0 0 .55rem;
@@ -784,6 +813,13 @@ fieldset label { font-weight: 400; }
 .bus-info p:last-child { margin-bottom: 0; }
 .bus-info strong { color: var(--ink); font-weight: 600; }
 .bus-info-focus-target:focus { outline: none; }
+.bus-leg-date {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: .72rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
 .bus-registration-deadline {
   padding-top: .75rem;
   border-top: 1px solid var(--line);
@@ -869,15 +905,13 @@ app-companions-editor .row { display: flex; gap: .5rem; align-items: center; mar
 app-companions-editor .row input[type="text"], app-companions-editor .row input:not([type]) {
   flex: 1;
   margin-top: 0;
-  border: 2px solid var(--red);
-  font-weight: 700;
 }
 app-companions-editor .companion-remove {
   flex: 0 0 auto;
   padding: .3rem;
   border: 0;
   background: transparent;
-  color: var(--red);
+  color: var(--gold);
   font-size: 1.2rem;
   font-weight: 800;
   line-height: 1;
@@ -953,6 +987,39 @@ app-companions-editor > button { background: transparent; color: var(--red); bor
   border-radius: 0;
   box-shadow: none;
 }
+.agenda.continuous-section {
+  margin: 0;
+  padding: var(--section-boundary-padding) clamp(1rem, 5vw, 2.25rem);
+  background: transparent;
+}
+main.invite .agenda-title {
+  text-align: center;
+  color: var(--red);
+  font-family: var(--font-body);
+  font-size: .85rem;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  margin: 0 0 1.2rem;
+}
+.agenda-list { list-style: none; margin: 0 auto; padding: 0; width: fit-content; max-width: min(100%, 18rem); }
+.agenda-item { display: grid; grid-template-columns: 54px 16px 1fr; align-items: start; column-gap: 8px; }
+.agenda-time {
+  text-align: right;
+  color: var(--red);
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: -5px;
+}
+.agenda-marker { display: flex; flex-direction: column; align-items: center; align-self: stretch; }
+.agenda-marker::before { content: ''; width: 9px; height: 9px; border-radius: 50%; background: var(--gold); margin-top: 4px; }
+.agenda-marker::after { content: ''; flex: 1; width: 1px; background: rgba(201, 162, 75, .35); margin-top: 2px; }
+.agenda-item-last .agenda-marker::after { display: none; }
+.agenda-body { padding: 0 0 1.1rem 4px; }
+.agenda-name { margin: 0; color: var(--red); font-family: var(--font-head); font-size: .85rem; font-weight: 600; line-height: 1.25; }
+.agenda-points { list-style: none; margin: .25rem 0 0; padding: 0; }
+.agenda-points li { color: var(--muted); font-size: .72rem; line-height: 1.5; }
 main.invite .faq-title {
   margin-bottom: .65rem;
   font-size: 1.125rem;

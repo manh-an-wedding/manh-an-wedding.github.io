@@ -48,6 +48,8 @@ describe('PublicGroupComponent', () => {
       {
         guest_name: 'Nhật An',
         status: 'bus',
+        bus_pickup: 'hotel',
+        bus_return: true,
         companions: ['Duy Mạnh'],
       },
       {
@@ -82,7 +84,11 @@ describe('PublicGroupComponent', () => {
     );
     expect(guests[0]?.querySelector('.guest-number')?.textContent?.trim()).toBe('1.');
     expect(guests[1]?.querySelector('.guest-number')?.textContent?.trim()).toBe('2.');
-    expect(choices).toEqual(['(Đi xe)', '(Tự di chuyển)', '(Không tham gia)']);
+    expect(choices).toEqual([
+      '(Đi xe · Đón: Ibis · Khứ hồi: Y)',
+      '(Tự di chuyển)',
+      '(Không tham gia)',
+    ]);
     expect(guests[0]?.querySelector('.companion-item')?.textContent?.replace(/\s+/g, ' ').trim())
       .toBe('+ Duy Mạnh');
     expect(element.querySelector('input')).toBeNull();

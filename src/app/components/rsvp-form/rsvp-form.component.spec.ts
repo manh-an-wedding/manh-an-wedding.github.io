@@ -148,13 +148,17 @@ describe('RsvpFormComponent', () => {
       your_name: 'Bác vui lòng cho em xin tên',
       bus_outbound_title: 'Xe khởi hành Hồ Chí Minh đi Cần Thơ:',
       departure_label: 'Xuất phát',
-      bus_outbound_departure: '07:15 · Thứ 7 · 17.10.2026',
+      bus_weekday: 'Thứ 7',
       location_label: 'Địa điểm',
       bus_outbound_location: 'IBIS SAIGON AIRPORT',
+      bus_pickup1_label: 'Điểm đón 1',
+      bus_pickup2_label: 'Điểm đón 2',
+      bus_outbound_location_2: 'Cổng công viên Bình Phú',
       bus_restaurant_arrival: 'Dự kiến đến nhà hàng',
       bus_return_title: 'Xe khởi hành Cần Thơ về Hồ Chí Minh:',
-      bus_return_departure_time: '13:30 (dự kiến)',
+      bus_return_departure_time: '{{time}} (dự kiến)',
       bus_return_location: 'Sảnh 01 Vạn Phát',
+      bus_park_arrival: 'Dự kiến về đến Công viên Bình Phú',
       bus_hotel_arrival: 'Dự kiến về đến IBIS',
       bus_return_traffic_note: '(chiều về có thể kẹt xe trên cao tốc)',
       bus_deadline_prefix: 'Danh sách đi xe sẽ được chốt vào',
@@ -193,10 +197,13 @@ describe('RsvpFormComponent', () => {
     await fixture.whenStable();
     fixture.detectChanges();
     const busText = text('.bus-info');
-    expect(busText).toContain('07:15 · Thứ 7 · 17.10.2026');
+    expect(busText).toContain('Thứ 7 · 17.10.26');
+    expect(busText).toContain('07:15');
+    expect(busText).toContain('07:50');
     expect(busText).toContain('10:45');
-    expect(busText).toContain('13:30');
-    expect(busText).toContain('17:30');
+    expect(busText).toContain('14:30');
+    expect(busText).toContain('18:00');
+    expect(busText).toContain('18:45');
     expect(busText).toContain('chiều về có thể kẹt xe trên cao tốc');
     expect(busText)
       .toContain('Danh sách đi xe sẽ được chốt vào 11:30 AM thứ 7, 10.10.2026');
@@ -216,7 +223,7 @@ describe('RsvpFormComponent', () => {
     expect(registrationNotes?.children.length).toBe(2);
     expect(element.querySelector('.bus-registration-deadline')?.nextElementSibling)
       .toBe(element.querySelector('.bus-driver-update-note'));
-    expect(element.querySelectorAll('.bus-info p')).toHaveLength(8);
+    expect(element.querySelectorAll('.bus-info p')).toHaveLength(9);
   });
 
   it('moves focus into the bus information and back to its trigger when closed', () => {
@@ -243,13 +250,17 @@ describe('RsvpFormComponent', () => {
     translate.setTranslation('en', { rsvp: {
       bus_outbound_title: 'Shuttle from Ho Chi Minh City to Can Tho:',
       departure_label: 'Departure',
-      bus_outbound_departure: '07:15 · Sat · 17.10.2026',
+      bus_weekday: 'Sat',
       location_label: 'Location',
       bus_outbound_location: 'IBIS SAIGON AIRPORT',
+      bus_pickup1_label: 'Pickup point 1',
+      bus_pickup2_label: 'Pickup point 2',
+      bus_outbound_location_2: 'Binh Phu Park gate',
       bus_restaurant_arrival: 'Estimated arrival at the restaurant',
       bus_return_title: 'Shuttle from Can Tho to Ho Chi Minh City:',
-      bus_return_departure_time: '13:30 (estimated)',
+      bus_return_departure_time: '{{time}} (estimated)',
       bus_return_location: 'Van Phat Hall 01',
+      bus_park_arrival: 'Estimated arrival at Binh Phu Park',
       bus_hotel_arrival: 'Estimated arrival at IBIS',
       bus_return_traffic_note: '(return traffic may be congested on the expressway)',
       bus_deadline_prefix: 'The shuttle list will be finalized at',
@@ -270,9 +281,12 @@ describe('RsvpFormComponent', () => {
     fixture.detectChanges();
 
     const busText = element.querySelector('.bus-info')?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
-    expect(busText).toContain('07:15 · Sat · 17.10.2026');
+    expect(busText).toContain('Sat · 17.10.26');
+    expect(busText).toContain('07:15');
+    expect(busText).toContain('07:50');
     expect(busText).toContain('10:45');
-    expect(busText).toContain('17:30');
+    expect(busText).toContain('18:00');
+    expect(busText).toContain('18:45');
     expect(busText).toContain('IBIS SAIGON AIRPORT');
     expect(busText)
       .toContain('The shuttle list will be finalized at 11:30 AM Saturday, 10.10.2026');
@@ -408,15 +422,22 @@ describe('RsvpFormComponent', () => {
         confirmation_bus: 'Bác đã lựa chọn tham dự & hốt {{count}} suất xe đưa đón khứ hồi HCM–CT cho',
         bus_outbound_title: 'Xe khởi hành Hồ Chí Minh đi Cần Thơ:',
         departure_label: 'Xuất phát',
-        bus_outbound_departure: '07:15 · Thứ 7 · 17.10.2026',
+        bus_weekday: 'Thứ 7',
         location_label: 'Địa điểm',
         bus_outbound_location: 'IBIS SAIGON AIRPORT',
+        bus_pickup1_label: 'Điểm đón 1',
+        bus_pickup2_label: 'Điểm đón 2',
+        bus_outbound_location_2: 'Cổng công viên Bình Phú',
         bus_restaurant_arrival: 'Dự kiến đến nhà hàng',
         bus_return_title: 'Xe khởi hành Cần Thơ về Hồ Chí Minh:',
-        bus_return_departure_time: '13:30 (dự kiến)',
+        bus_return_departure_time: '{{time}} (dự kiến)',
         bus_return_location: 'Sảnh 01 Vạn Phát',
+        bus_park_arrival: 'Dự kiến về đến Công viên Bình Phú',
         bus_hotel_arrival: 'Dự kiến về đến IBIS',
         bus_return_traffic_note: '(chiều về có thể kẹt xe trên cao tốc)',
+        pickup_at_label: 'Đón tại',
+        pickup_hotel: 'Ibis hotel (Tân Bình cũ)',
+        no_return_label: 'Không theo xe về HCM',
         bus_deadline_prefix: 'Danh sách đi xe sẽ được chốt vào',
         bus_deadline_detail: '11:30 AM thứ 7, 10.10.2026',
         bus_driver_update_note: 'Thông tin tài xế và thay đổi lịch trình (nếu có) sẽ được gửi vào SĐT của bác nha.',
@@ -461,10 +482,12 @@ describe('RsvpFormComponent', () => {
     )).toEqual(['STRONG', 'STRONG']);
     const confirmedBusInfo: HTMLElement | null =
       fixture.nativeElement.querySelector('.rsvp-confirmation .bus-info');
-    expect(confirmedBusInfo?.textContent).toContain('07:15 · Thứ 7 · 17.10.2026');
+    expect(confirmedBusInfo?.textContent).toContain('Thứ 7 · 17.10.26');
+    expect(confirmedBusInfo?.textContent).toContain('07:15');
     expect(confirmedBusInfo?.textContent).toContain('10:45');
-    expect(confirmedBusInfo?.textContent).toContain('13:30');
-    expect(confirmedBusInfo?.textContent).toContain('17:30');
+    expect(confirmedBusInfo?.textContent).toContain('14:30');
+    expect(confirmedBusInfo?.textContent).toContain('18:00');
+    expect(confirmedBusInfo?.textContent).toContain('18:45');
     expect(confirmedBusInfo?.textContent)
       .toContain('chiều về có thể kẹt xe trên cao tốc');
     expect(confirmedBusInfo?.textContent)
@@ -480,7 +503,7 @@ describe('RsvpFormComponent', () => {
     expect(confirmedBusInfo?.querySelector('a')?.getAttribute('href'))
       .toBe('https://maps.app.goo.gl/A4G9MXVdHavg2cTq6');
     expect(confirmedBusInfo?.querySelectorAll('.bus-leg-title')).toHaveLength(2);
-    expect(confirmedBusInfo?.querySelectorAll('strong.bus-info-label')).toHaveLength(6);
+    expect(confirmedBusInfo?.querySelectorAll('strong.bus-info-label')).toHaveLength(7);
 
     const editButton: HTMLButtonElement | null =
       fixture.nativeElement.querySelector('.rsvp-edit-response');

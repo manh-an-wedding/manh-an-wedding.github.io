@@ -1,24 +1,31 @@
 <ng-template #busInformation>
   <div class="bus-info">
     <section class="bus-leg">
-      <h3 class="bus-leg-title">{{ 'rsvp.bus_outbound_title' | translate }}</h3>
-      <p><strong class="bus-info-label">{{ 'rsvp.departure_label' | translate }}:</strong>
-        {{ 'rsvp.bus_outbound_departure' | translate }}</p>
-      <p><strong class="bus-info-label">{{ 'rsvp.location_label' | translate }}:</strong>
+      <h3 class="bus-leg-title">{{ 'rsvp.bus_outbound_title' | translate }}
+        <span class="bus-leg-date">{{ 'rsvp.bus_weekday' | translate }} · {{ cfg.rsvp.bus.eventDate }}</span></h3>
+      <p><strong class="bus-info-label">{{ 'rsvp.bus_pickup1_label' | translate }}:</strong>
+        {{ cfg.rsvp.bus.outboundDepart1Time }} ·
         <a [href]="busPickupMapUrl" target="_blank" rel="noopener">
           <span aria-hidden="true">&#128205;</span>
           {{ 'rsvp.bus_outbound_location' | translate }}
-        </a>
-      </p>
+        </a></p>
+      <p><strong class="bus-info-label">{{ 'rsvp.bus_pickup2_label' | translate }}:</strong>
+        {{ cfg.rsvp.bus.outboundDepart2Time }} ·
+        <a [href]="busPickup2MapUrl" target="_blank" rel="noopener">
+          <span aria-hidden="true">&#128205;</span>
+          {{ 'rsvp.bus_outbound_location_2' | translate }}
+        </a></p>
       <p><strong class="bus-info-label">{{ 'rsvp.bus_restaurant_arrival' | translate }}:</strong>
         {{ cfg.rsvp.bus.restaurantArrivalTime }}</p>
     </section>
     <section class="bus-leg">
       <h3 class="bus-leg-title">{{ 'rsvp.bus_return_title' | translate }}</h3>
       <p><strong class="bus-info-label">{{ 'rsvp.departure_label' | translate }}:</strong>
-        {{ 'rsvp.bus_return_departure_time' | translate }}</p>
+        {{ 'rsvp.bus_return_departure_time' | translate:{ time: cfg.rsvp.bus.returnDepartTime } }}</p>
       <p><strong class="bus-info-label">{{ 'rsvp.location_label' | translate }}:</strong>
         {{ 'rsvp.bus_return_location' | translate }}</p>
+      <p><strong class="bus-info-label">{{ 'rsvp.bus_park_arrival' | translate }}:</strong>
+        {{ cfg.rsvp.bus.parkArrivalTime }}</p>
       <p><strong class="bus-info-label">{{ 'rsvp.bus_hotel_arrival' | translate }}:</strong>
         {{ cfg.rsvp.bus.hotelArrivalTime }}
         <span class="bus-traffic-note">{{ 'rsvp.bus_return_traffic_note' | translate }}</span>
@@ -71,6 +78,13 @@
       </div>
     }
     @if (model.status === 'bus') {
+      <p class="rsvp-confirmation-pickup">
+        <strong>{{ 'rsvp.pickup_at_label' | translate }}:</strong>
+        {{ ('rsvp.pickup_' + model.busPickup) | translate }}
+      </p>
+      @if (!model.busReturn) {
+        <p class="rsvp-confirmation-no-return">{{ 'rsvp.no_return_label' | translate }}</p>
+      }
       <ng-container [ngTemplateOutlet]="busInformation"></ng-container>
     }
     <button type="button" class="rsvp-edit-response" (click)="editResponse()">
@@ -134,8 +148,27 @@
         </div>
       }
       @if (model.status === 'bus') {
-        <label class="bus-phone">{{ 'rsvp.phone' | translate }}
-          <input name="phone" [(ngModel)]="model.phone" inputmode="tel"></label>
+        <div class="bus-details">
+          <label class="bus-phone">
+            <span class="bus-field-label">{{ 'rsvp.phone' | translate }}</span>
+            <input name="phone" [(ngModel)]="model.phone" inputmode="tel"></label>
+          <div class="bus-choice" role="radiogroup"
+               [attr.aria-label]="'rsvp.pickup_at_label' | translate">
+            <span class="bus-field-label">{{ 'rsvp.pickup_at_label' | translate }}:</span>
+            <label><input type="radio" name="pickup" value="hotel" [(ngModel)]="model.busPickup">
+              {{ 'rsvp.pickup_hotel' | translate }}</label>
+            <label><input type="radio" name="pickup" value="park" [(ngModel)]="model.busPickup">
+              {{ 'rsvp.pickup_park' | translate }}</label>
+          </div>
+          <div class="bus-choice" role="radiogroup"
+               [attr.aria-label]="'rsvp.roundtrip_label' | translate">
+            <span class="bus-field-label">{{ 'rsvp.roundtrip_label' | translate }}</span>
+            <label><input type="radio" name="roundtrip" [value]="true" [(ngModel)]="model.busReturn">
+              {{ 'rsvp.roundtrip_yes' | translate }}</label>
+            <label><input type="radio" name="roundtrip" [value]="false" [(ngModel)]="model.busReturn">
+              {{ (busPartySize > 1 ? 'rsvp.roundtrip_no_plural' : 'rsvp.roundtrip_no_single') | translate }}</label>
+          </div>
+        </div>
       }
       <label><input type="radio" name="st" value="self_transport" [(ngModel)]="model.status"
                     (ngModelChange)="onStatusChange($event)">

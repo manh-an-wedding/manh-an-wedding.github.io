@@ -3,6 +3,18 @@ import { WeddingConfig } from '../../app/core/wedding-config';
 const WEDDING_MEDIA_BASE_URL =
   'https://bmhwpctxxfpculhigham.supabase.co/storage/v1/object/public/wedding-media/v1';
 
+// Single source of truth for shuttle times, shared by the RSVP form/panel and
+// the Q&A entry so a time change only happens in one place.
+const BUS = {
+  outboundDepart1Time: '07:15',
+  outboundDepart2Time: '07:50',
+  eventDate: '17.10.26',
+  restaurantArrivalTime: '10:45',
+  returnDepartTime: '14:30',
+  parkArrivalTime: '18:00',
+  hotelArrivalTime: '18:45',
+};
+
 export const WEDDING: WeddingConfig = {
   couple: { bride: 'Nhật An', groom: 'Duy Mạnh' },
   families: {
@@ -43,26 +55,43 @@ export const WEDDING: WeddingConfig = {
     mapEmbedUrl: 'https://www.google.com/maps?q=Van+Phat+Riverside+Can+Tho&output=embed&hl=vi',
     mapDirUrl: 'https://maps.app.goo.gl/of7FJD3HC6WWPuv7A',
     datetime: '2026-10-17T11:00:00+07:00',
-    agendaKeys: ['agenda.welcome', 'agenda.ceremony', 'agenda.lunch', 'agenda.party'],
+    agenda: [
+      { time: '10:30', titleKey: 'agenda.welcome.title', pointKeys: ['agenda.welcome.p1', 'agenda.welcome.p2', 'agenda.welcome.p3'] },
+      { time: '11:15', titleKey: 'agenda.ceremony.title', pointKeys: ['agenda.ceremony.p1', 'agenda.ceremony.p2', 'agenda.ceremony.p3'] },
+      { time: '11:45', titleKey: 'agenda.party.title', pointKeys: ['agenda.party.p1', 'agenda.party.p2'] },
+      { time: '13:00', titleKey: 'agenda.closing.title', pointKeys: ['agenda.closing.p1', 'agenda.closing.p2'] },
+    ],
   },
   rsvp: {
-    groups: ['Họ hàng nhà gái', 'Bạn cha Năm', 'Bạn mẹ Bắc', 'Bạn của Mạnh', 'Bạn của Tâm', 'Bạn của An'],
+    groups: ['Bạn của An', 'Bạn của Mạnh', 'Bạn của Tâm', 'Bạn cha Năm', 'Bạn mẹ Bắc', 'Họ hàng nhà gái'],
     deadlineISO: '2026-10-13T11:30:00+07:00',
-    bus: {
-      pickup: 'Ibis hotel, 2 Hồng Hà, Tân Sơn Hòa, Hồ Chí Minh',
-      departTime: '7:15 · Thứ 7 · 17.10.2026',
-      restaurantArrivalTime: '10:45',
-      returnDepartTime: '13:30',
-      hotelArrivalTime: '17:30',
-    },
+    bus: BUS,
   },
   gift: {
     bride: { name: 'Nhật An', bank: '', account: '', qr: '' },
     groom: { name: 'Duy Mạnh', bank: '', account: '', qr: '' },
   },
   faq: [
-    { qKey: 'faq.venue_parking.q', aKey: 'faq.venue_parking.a', showGiftQr: false },
+    {
+      qKey: 'faq.bus.q',
+      items: [
+        { textKey: 'faq.bus.items.pickup1', href: 'https://maps.app.goo.gl/A4G9MXVdHavg2cTq6', linkLabelKey: 'faq.actions.directions', params: { t1: BUS.outboundDepart1Time } },
+        { textKey: 'faq.bus.items.pickup2', href: 'https://maps.app.goo.gl/Zc2hRpL585Z9NPHg8', linkLabelKey: 'faq.actions.directions', params: { t2: BUS.outboundDepart2Time } },
+        { textKey: 'faq.bus.items.arrival', params: { arr: BUS.restaurantArrivalTime } },
+        { textKey: 'faq.bus.items.return', params: { rdep: BUS.returnDepartTime, park: BUS.parkArrivalTime, hotel: BUS.hotelArrivalTime } },
+        { textKey: 'faq.bus.items.breakfast' },
+        { textKey: 'faq.bus.items.deadline' },
+        { textKey: 'faq.bus.items.register' },
+      ],
+    },
     { qKey: 'faq.parking.q', aKey: 'faq.parking.a', showGiftQr: false },
+    {
+      qKey: 'faq.binhphu_parking.q',
+      items: [
+        { textKey: 'faq.binhphu_parking.items.a', href: 'https://maps.app.goo.gl/SWxbADzJunH858U46', linkLabelKey: 'faq.actions.location' },
+      ],
+    },
+    { qKey: 'faq.venue_parking.q', aKey: 'faq.venue_parking.a', showGiftQr: false },
     {
       qKey: 'faq.activities.q',
       items: [

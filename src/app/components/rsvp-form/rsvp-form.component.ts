@@ -27,6 +27,7 @@ import { CompanionsEditorComponent } from '../companions-editor/companions-edito
 })
 export class RsvpFormComponent {
   readonly busPickupMapUrl = 'https://maps.app.goo.gl/A4G9MXVdHavg2cTq6';
+  readonly busPickup2MapUrl = 'https://maps.app.goo.gl/Zc2hRpL585Z9NPHg8';
   readonly maxPartySize = 10;
 
   private rsvp = inject(RsvpService);
@@ -39,8 +40,9 @@ export class RsvpFormComponent {
   @Input() lang: 'vi' | 'en' = 'vi';
 
   model: { guestName: string; category: string;
-           status: '' | 'self_transport' | 'bus' | 'cannot_attend'; phone: string } =
-    { guestName: '', category: '', status: '', phone: '' };
+           status: '' | 'self_transport' | 'bus' | 'cannot_attend'; phone: string;
+           busReturn: boolean; busPickup: 'hotel' | 'park' } =
+    { guestName: '', category: '', status: '', phone: '', busReturn: true, busPickup: 'hotel' };
   companions: CompanionDraft[] = [];
   showBusInfo = false;
   done = false;
@@ -80,6 +82,7 @@ export class RsvpFormComponent {
   private draft(): RsvpDraft {
     return { guestName: this.model.guestName, category: this.model.category,
       status: this.model.status as any, phone: this.model.phone,
+      busReturn: this.model.busReturn, busPickup: this.model.busPickup,
       companions: this.companions.map(companion => ({
         name: companion.name,
         joinsBus: this.model.status === 'bus',

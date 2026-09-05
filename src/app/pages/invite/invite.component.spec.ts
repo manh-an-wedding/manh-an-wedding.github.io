@@ -344,6 +344,7 @@ describe('InviteComponent', () => {
       'separator',
       'reception',
       'separator',
+      'separator',
       'rsvp',
       'separator',
       'separator',

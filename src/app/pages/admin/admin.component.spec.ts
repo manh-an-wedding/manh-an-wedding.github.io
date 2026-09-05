@@ -16,6 +16,8 @@ const currentRow: AdminRsvpRow = {
   category: 'Tiến bước',
   status: 'bus',
   phone: '0900000000',
+  bus_pickup: 'hotel',
+  bus_return: true,
   party_size: 2,
   created_at: '2026-08-02T10:00:00Z',
   superseded_by_id: null,
@@ -301,12 +303,12 @@ describe('AdminComponent', () => {
     const csv = component.buildCsv([firstBusRsvp, secondBusRsvp]);
 
     expect(csv.split('\r\n')).toEqual([
-      '"STT","Tên","SĐT","ID"',
-      '"1","Khách chính 1","0900000032","32"',
-      '"2","Khách đính kèm 1","-","32"',
-      '"3","Khách chính 2","0900000039","39"',
-      '"4","Khách kèm 2","-","39"',
-      '"5","Khách kèm 3","-","39"',
+      '"STT","Tên","SĐT","Đón tại","Khứ hồi","ID"',
+      '"1","Khách chính 1","0900000032","TB","Y","32"',
+      '"2","Khách đính kèm 1","-","TB","Y","32"',
+      '"3","Khách chính 2","0900000039","TB","Y","39"',
+      '"4","Khách kèm 2","-","TB","Y","39"',
+      '"5","Khách kèm 3","-","TB","Y","39"',
     ]);
   });
 
@@ -430,7 +432,7 @@ describe('AdminComponent', () => {
     );
     const choices = Array.from(
       element.querySelectorAll('tbody tr'),
-      row => row.children.item(3)?.textContent?.trim(),
+      row => row.children.item(3)?.textContent?.replace(/\s+/g, ' ').trim(),
     );
     const filterChoices = Array.from(
       element.querySelectorAll('select[aria-label="Lọc lựa chọn"] option'),
@@ -440,7 +442,9 @@ describe('AdminComponent', () => {
     expect(headers).toContain('Check');
     expect(headers).not.toContain('Data check');
     expect(element.querySelectorAll('.data-check-control span')).toHaveLength(0);
-    expect(choices).toEqual(['Tự di chuyển', 'Không tham gia', 'Đi xe']);
+    expect(choices).toEqual([
+      'Tự di chuyển', 'Không tham gia', 'Đi xe Đón: TBKhứ hồi: Y',
+    ]);
     expect(filterChoices).toEqual([
       'Tất cả lựa chọn', 'Đi xe', 'Tự di chuyển', 'Không tham gia',
     ]);

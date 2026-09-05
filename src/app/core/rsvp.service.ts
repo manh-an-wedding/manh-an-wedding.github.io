@@ -7,7 +7,8 @@ export interface CompanionDraft { name: string; joinsBus?: boolean; relation?: s
 export interface RsvpDraft {
   guestName: string; category: string;
   status: 'self_transport' | 'bus' | 'cannot_attend';
-  phone?: string; companions: CompanionDraft[];
+  phone?: string; busReturn?: boolean; busPickup?: 'hotel' | 'park';
+  companions: CompanionDraft[];
 }
 
 export interface RsvpEditHandle {
@@ -20,6 +21,8 @@ export type RsvpStatus = RsvpDraft['status'];
 export interface PublicGroupRsvp {
   guest_name: string;
   status: RsvpStatus;
+  bus_pickup?: 'hotel' | 'park' | null;
+  bus_return?: boolean | null;
   companions: string[];
 }
 
@@ -29,6 +32,8 @@ export interface AdminRsvpUpdate {
   category: string;
   status: RsvpStatus;
   phone?: string;
+  busReturn?: boolean;
+  busPickup?: 'hotel' | 'park';
   companions: CompanionDraft[];
 }
 
@@ -48,6 +53,8 @@ export interface AdminRsvpRow {
   category: string;
   status: RsvpStatus;
   phone: string | null;
+  bus_pickup: 'hotel' | 'park' | null;
+  bus_return: boolean | null;
   party_size: number;
   created_at: string;
   superseded_by_id: number | null;
@@ -111,6 +118,8 @@ export class RsvpService {
       p_category: d.category,
       p_status: d.status,
       p_phone: d.status === 'bus' ? (d.phone ?? null) : null,
+      p_bus_pickup: d.status === 'bus' ? (d.busPickup ?? 'hotel') : null,
+      p_bus_return: d.status === 'bus' ? (d.busReturn ?? true) : null,
       p_companions: d.companions,
       p_edit_token: editToken,
     });
@@ -131,6 +140,8 @@ export class RsvpService {
       p_category: d.category,
       p_status: d.status,
       p_phone: d.status === 'bus' ? (d.phone ?? null) : null,
+      p_bus_pickup: d.status === 'bus' ? (d.busPickup ?? 'hotel') : null,
+      p_bus_return: d.status === 'bus' ? (d.busReturn ?? true) : null,
       p_companions: d.companions,
     });
     if (error) throw error;
@@ -194,6 +205,8 @@ export class RsvpService {
       p_category: d.category,
       p_status: d.status,
       p_phone: d.status === 'bus' ? (d.phone ?? null) : null,
+      p_bus_pickup: d.status === 'bus' ? (d.busPickup ?? 'hotel') : null,
+      p_bus_return: d.status === 'bus' ? (d.busReturn ?? true) : null,
       p_companions: d.companions,
     });
     if (error) throw error;

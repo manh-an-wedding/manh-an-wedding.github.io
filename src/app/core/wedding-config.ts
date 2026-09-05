@@ -3,6 +3,7 @@ export interface FaqAnswerItem {
   textKey: string;
   href?: string;
   linkLabelKey?: string;
+  params?: Record<string, string>;
 }
 
 export interface FaqItem {
@@ -10,6 +11,12 @@ export interface FaqItem {
   aKey?: string;
   items?: FaqAnswerItem[];
   showGiftQr?: boolean;
+}
+
+export interface AgendaItem {
+  time: string;
+  titleKey: string;
+  pointKeys: string[];
 }
 export interface FamilyInfo {
   father: string;
@@ -41,13 +48,15 @@ export interface WeddingConfig {
   ceremony: CeremonyInfo;
   reception: ReceptionInfo;
   event: { name: string; venue: string; address: string; mapEmbedUrl: string;
-           mapDirUrl: string; datetime: string; agendaKeys: string[] };
+           mapDirUrl: string; datetime: string; agenda: AgendaItem[] };
   rsvp: { groups: string[]; deadlineISO: string;
           bus: {
-            pickup: string;
-            departTime: string;
+            outboundDepart1Time: string;
+            outboundDepart2Time: string;
+            eventDate: string;
             restaurantArrivalTime: string;
             returnDepartTime: string;
+            parkArrivalTime: string;
             hotelArrivalTime: string;
           } };
   gift: { bride: Party; groom: Party };
