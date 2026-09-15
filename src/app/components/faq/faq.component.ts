@@ -37,6 +37,35 @@ import { WeddingConfig, FaqItem } from '../../core/wedding-config';
                   }
                 </ul>
               }
+              @if (item.sections?.length) {
+                @for (section of item.sections; track section.headingKey) {
+                  <div class="faq-answer-section">
+                    <h4 class="faq-answer-heading">{{ section.headingKey | translate }}</h4>
+                    @if (section.noteKey) {
+                      <p class="faq-answer-note">{{ section.noteKey | translate }}</p>
+                    }
+                    <ul class="faq-answer-list">
+                      @for (answerItem of section.items; track answerItem.textKey) {
+                        <li>
+                          <span>{{ answerItem.textKey | translate:answerItem.params }}</span>
+                          @if (answerItem.href) {
+                            <a class="faq-answer-link" [href]="answerItem.href"
+                               target="_blank" rel="noopener noreferrer">
+                              {{ (answerItem.linkLabelKey || 'faq.actions.details') | translate }}
+                              <span aria-hidden="true">↗</span>
+                            </a>
+                          }
+                          @if (answerItem.img) {
+                            <figure class="faq-answer-figure">
+                              <img [src]="answerItem.img" [alt]="answerItem.textKey | translate" loading="lazy">
+                            </figure>
+                          }
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                }
+              }
               @if (item.showGiftQr) {
                 <div class="gift">
                   <figure><img [src]="cfg.gift.bride.qr" alt="QR"><figcaption>

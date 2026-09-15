@@ -1044,6 +1044,12 @@ main.invite .faq-title {
 .faq-answer-list li { padding-left: .15rem; }
 .faq-answer-list li::marker { color: var(--gold); }
 .faq-answer-link { display: inline-flex; gap: .2rem; align-items: center; margin-left: .3rem; color: var(--red); font-size: .76rem; font-weight: 600; text-underline-offset: .18em; }
+.faq-answer-section { margin-top: .7rem; }
+.faq-answer-section:first-child { margin-top: .2rem; }
+.faq-answer-heading { margin: 0 0 .1rem; color: var(--red); font-family: var(--font-head); font-size: .82rem; font-weight: 600; }
+.faq-answer-note { margin: .1rem 0 .3rem; font-style: italic; }
+.faq-answer-figure { margin: .4rem 0 0; }
+.faq-answer-figure img { width: 100%; max-width: 260px; border-radius: 10px; border: 1px solid var(--line); }
 .faq .gift { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
 .faq .gift img { width: 150px; height: 150px; object-fit: contain; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
 .faq figure { text-align: center; margin: 0; }

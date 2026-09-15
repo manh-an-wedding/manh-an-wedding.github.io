@@ -4,12 +4,20 @@ export interface FaqAnswerItem {
   href?: string;
   linkLabelKey?: string;
   params?: Record<string, string>;
+  img?: string;
+}
+
+export interface FaqAnswerSection {
+  headingKey: string;
+  noteKey?: string;
+  items: FaqAnswerItem[];
 }
 
 export interface FaqItem {
   qKey: string;
   aKey?: string;
   items?: FaqAnswerItem[];
+  sections?: FaqAnswerSection[];
   showGiftQr?: boolean;
 }
 

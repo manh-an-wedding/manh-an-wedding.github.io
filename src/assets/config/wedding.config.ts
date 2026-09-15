@@ -91,6 +91,27 @@ export const WEDDING: WeddingConfig = {
         { textKey: 'faq.binhphu_parking.items.a', href: 'https://maps.app.goo.gl/SWxbADzJunH858U46', linkLabelKey: 'faq.actions.location' },
       ],
     },
+    {
+      qKey: 'faq.amenities.q',
+      sections: [
+        {
+          headingKey: 'faq.amenities.breakfast.heading',
+          items: [
+            { textKey: 'faq.amenities.breakfast.ibis' },
+            { textKey: 'faq.amenities.breakfast.binhphu', img: 'assets/img/comtam.jpg' },
+            { textKey: 'faq.amenities.breakfast.other' },
+          ],
+        },
+        {
+          headingKey: 'faq.amenities.restroom.heading',
+          noteKey: 'faq.amenities.restroom.note',
+          items: [
+            { textKey: 'faq.amenities.restroom.ibis' },
+            { textKey: 'faq.amenities.restroom.binhphu' },
+          ],
+        },
+      ],
+    },
     { qKey: 'faq.venue_parking.q', aKey: 'faq.venue_parking.a', showGiftQr: false },
     {
       qKey: 'faq.activities.q',

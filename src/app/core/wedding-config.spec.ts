@@ -14,17 +14,24 @@ describe('wedding config', () => {
       'faq.bus.q',
       'faq.parking.q',
       'faq.binhphu_parking.q',
+      'faq.amenities.q',
       'faq.venue_parking.q',
       'faq.activities.q',
       'faq.food.q',
       'faq.hotels.q',
     ]);
-    expect(WEDDING.faq).toHaveLength(7);
+    expect(WEDDING.faq).toHaveLength(8);
     expect(WEDDING.faq[0].items?.filter(item => item.href)).toHaveLength(2);
     expect(WEDDING.faq[2].items?.filter(item => item.href)).toHaveLength(1);
-    expect(WEDDING.faq[4].items?.filter(item => item.href)).toHaveLength(2);
-    expect(WEDDING.faq[5].items?.filter(item => item.href)).toHaveLength(5);
-    expect(WEDDING.faq[6].items?.map(item => item.href)).toEqual([
+    expect(WEDDING.faq[3].sections?.map(section => section.headingKey)).toEqual([
+      'faq.amenities.breakfast.heading',
+      'faq.amenities.restroom.heading',
+    ]);
+    expect(WEDDING.faq[3].sections?.[0].items.find(item => item.img)?.img)
+      .toBe('assets/img/comtam.jpg');
+    expect(WEDDING.faq[5].items?.filter(item => item.href)).toHaveLength(2);
+    expect(WEDDING.faq[6].items?.filter(item => item.href)).toHaveLength(5);
+    expect(WEDDING.faq[7].items?.map(item => item.href)).toEqual([
       'https://maps.app.goo.gl/AuYkjRSzbjUpL4GP8?g_st=ic',
       'https://maps.app.goo.gl/uFZ4YgQgD8mqdFDy7?g_st=ic',
       'https://maps.app.goo.gl/w8r3482E2vuDZYCK7?g_st=ic',
