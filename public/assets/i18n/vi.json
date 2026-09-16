@@ -40,7 +40,7 @@
     "rsvp_intro": "Sự hiện diện của quý khách là niềm vinh hạnh cho gia đình chúng tôi."
   },
   "agenda": { "title": "Chương trình dự kiến", "welcome": { "title": "Đón khách", "p1": "Check-in, ký lưu bút", "p2": "Chụp choẹt với dâu rể", "p3": "Chụp hình Photobooth" }, "ceremony": { "title": "Nghi Lễ", "p1": "MC chém gió", "p2": "Cắt bánh rót rịu", "p3": "Phụ huynh phát biểu" }, "party": { "title": "Dùng tiệc", "p1": "Ăn uống & hát hò", "p2": "Dâu rể đi giao lưu nhó" }, "closing": { "title": "Tan tiệc", "p1": "Lại chụp choẹt với dâu rể", "p2": "Photobooth còn luôn" } },
-  "rsvp": { "your_name": "Bác cho con/em xin tên (và cơ quan/công ty nếu có)", "confirm_help": "Nhờ bác xác nhận thông tin để phía gia đình chuẩn bị đón tiếp được chu đáo hơn nha❤️", "group": "Và nhóm", "groupNames": { "Họ hàng nhà gái": "Họ hàng nhà gái", "Bạn cha Năm": "Bạn cha Năm", "Bạn mẹ Bắc": "Bạn mẹ Bắc", "Bạn của Mạnh": "Bạn của Mạnh", "Bạn của Tâm": "Bạn của Tâm", "Bạn của An": "Bạn của An" }, "add_companion": "Thêm người đi cùng", "remove_companion": "Xóa người đi cùng", "people": "người",
+  "rsvp": { "your_name": "Bác cho con/em xin tên", "confirm_help": "Nhờ bác xác nhận thông tin để phía gia đình chuẩn bị đón tiếp được chu đáo hơn nha❤️", "group": "Và nhóm", "groupNames": { "Họ hàng nhà gái": "Họ hàng nhà gái", "Bạn cha Năm": "Bạn cha Năm", "Bạn mẹ Bắc": "Bạn mẹ Bắc", "Bạn của Mạnh": "Bạn của Mạnh", "Bạn của Tâm": "Bạn của Tâm", "Bạn của An": "Bạn của An" }, "add_companion": "Thêm người đi cùng", "remove_companion": "Xóa người đi cùng", "people": "người",
             "self_transport": "Tham dự và tự di chuyển",
             "bus": "Tham dự và hốt {{count}} suất xe đưa đón khứ hồi HCM–CT", "cannot_attend": "Không thể tham dự",
             "table_full": "Chúc mừng bác đã sở hữu 1 bàn tiệc trọn vẹn!",
@@ -70,7 +70,7 @@
               "placeholder": "Lời chúc của bạn…", "send": "Gửi", "wall": "Lời chúc từ mọi người" },
   "faq": {
     "title": "Q & A",
-    "actions": { "details": "Xem thông tin", "directions": "Chỉ đường", "location": "Vị trí" },
+    "actions": { "details": "Xem thông tin", "directions": "Chỉ đường", "location": "Vị trí", "zoom": "Phóng to hình" },
     "bus": {
       "q": "Thông tin xe đưa đón HCM – Cần Thơ?",
       "items": {
@@ -102,8 +102,7 @@
       "breakfast": {
         "heading": "Ăn sáng",
         "ibis": "IBIS: có Family Mart, Guta Cà Phê, Starbucks",
-        "binhphu": "Bình Phú: có cơm tấm nhà bạn An ở đây nè",
-        "other": "Còn mấy quán khác thì mình không rành"
+        "binhphu": "Bình Phú: có cơm tấm nhà bạn An ở đây nè"
       },
       "restroom": {
         "heading": "Giải quyết số 1, số 2",

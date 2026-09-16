@@ -40,7 +40,7 @@
     "rsvp_intro": "Your presence would be a great honour to our families."
   },
   "agenda": { "title": "Tentative schedule", "welcome": { "title": "Welcome", "p1": "Check in, sign the guestbook", "p2": "Photos with the couple", "p3": "Photobooth photos" }, "ceremony": { "title": "Ceremony", "p1": "MC warm-up", "p2": "Cake cutting & wine pouring", "p3": "Parents' remarks" }, "party": { "title": "Banquet", "p1": "Food, drinks & singing", "p2": "The couple comes around to greet you" }, "closing": { "title": "Wrap-up", "p1": "More photos with the couple", "p2": "More photobooth photos" } },
-  "rsvp": { "your_name": "Your name (and company/organization, if any)", "confirm_help": "Please kindly confirm your information so that our family can prepare to welcome you more thoughtfully. ❤️", "group": "And group", "groupNames": { "Họ hàng nhà gái": "Bride's family", "Bạn cha Năm": "Dad Năm's friends", "Bạn mẹ Bắc": "Mom Bắc's friends", "Bạn của Mạnh": "Mạnh's friends", "Bạn của Tâm": "Tâm's friends", "Bạn của An": "An's friends" }, "add_companion": "Add companion", "remove_companion": "Remove companion", "people": "people",
+  "rsvp": { "your_name": "Your name", "confirm_help": "Please kindly confirm your information so that our family can prepare to welcome you more thoughtfully. ❤️", "group": "And group", "groupNames": { "Họ hàng nhà gái": "Bride's family", "Bạn cha Năm": "Dad Năm's friends", "Bạn mẹ Bắc": "Mom Bắc's friends", "Bạn của Mạnh": "Mạnh's friends", "Bạn của Tâm": "Tâm's friends", "Bạn của An": "An's friends" }, "add_companion": "Add companion", "remove_companion": "Remove companion", "people": "people",
             "self_transport": "Attending — own transport",
             "bus": "Attending — reserve {{count}} round-trip HCM–Can Tho shuttle seats", "cannot_attend": "Cannot attend",
             "table_full": "Congratulations, you now have a complete table!",
@@ -70,7 +70,7 @@
               "placeholder": "Your wishes…", "send": "Send", "wall": "Wishes from guests" },
   "faq": {
     "title": "Q & A",
-    "actions": { "details": "View details", "directions": "Directions", "location": "Location" },
+    "actions": { "details": "View details", "directions": "Directions", "location": "Location", "zoom": "Zoom image" },
     "bus": {
       "q": "HCM – Can Tho shuttle information?",
       "items": {
@@ -102,8 +102,7 @@
       "breakfast": {
         "heading": "Breakfast",
         "ibis": "IBIS: Family Mart, Guta Cà Phê, Starbucks",
-        "binhphu": "Bình Phú: An's family's cơm tấm (broken-rice) spot is right here",
-        "other": "Not sure about the other spots, sorry!"
+        "binhphu": "Bình Phú: An's family's cơm tấm (broken-rice) spot is right here"
       },
       "restroom": {
         "heading": "Handling number 1 & 2",

@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, HostListener, Inject } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { WEDDING_CONFIG } from '../../core/wedding-config.token';
 import { WeddingConfig, FaqItem } from '../../core/wedding-config';
@@ -57,7 +57,11 @@ import { WeddingConfig, FaqItem } from '../../core/wedding-config';
                           }
                           @if (answerItem.img) {
                             <figure class="faq-answer-figure">
-                              <img [src]="answerItem.img" [alt]="answerItem.textKey | translate" loading="lazy">
+                              <button type="button" class="faq-zoom-trigger"
+                                      (click)="openZoom(answerItem.img)"
+                                      [attr.aria-label]="'faq.actions.zoom' | translate">
+                                <img [src]="answerItem.img" [alt]="answerItem.textKey | translate" loading="lazy">
+                              </button>
                             </figure>
                           }
                         </li>
@@ -78,11 +82,20 @@ import { WeddingConfig, FaqItem } from '../../core/wedding-config';
           }
         </div>
       }
-    </section>`,
+    </section>
+    @if (zoomedImg) {
+      <div class="faq-lightbox" (click)="closeZoom()" role="dialog" aria-modal="true">
+        <img [src]="zoomedImg" alt="" (click)="$event.stopPropagation()">
+      </div>
+    }`,
 })
 export class FaqComponent {
   items: FaqItem[];
   openIndex = -1;
+  zoomedImg: string | null = null;
   constructor(@Inject(WEDDING_CONFIG) public cfg: WeddingConfig) { this.items = cfg.faq; }
   toggle(i: number) { this.openIndex = this.openIndex === i ? -1 : i; }
+  openZoom(src: string) { this.zoomedImg = src; }
+  closeZoom() { this.zoomedImg = null; }
+  @HostListener('document:keydown.escape') onEscape() { this.closeZoom(); }
 }

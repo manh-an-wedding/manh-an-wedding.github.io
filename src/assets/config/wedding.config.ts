@@ -99,7 +99,6 @@ export const WEDDING: WeddingConfig = {
           items: [
             { textKey: 'faq.amenities.breakfast.ibis' },
             { textKey: 'faq.amenities.breakfast.binhphu', img: 'assets/img/comtam.jpg' },
-            { textKey: 'faq.amenities.breakfast.other' },
           ],
         },
         {

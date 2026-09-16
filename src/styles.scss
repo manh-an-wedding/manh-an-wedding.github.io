@@ -1049,7 +1049,10 @@ main.invite .faq-title {
 .faq-answer-heading { margin: 0 0 .1rem; color: var(--red); font-family: var(--font-head); font-size: .82rem; font-weight: 600; }
 .faq-answer-note { margin: .1rem 0 .3rem; font-style: italic; }
 .faq-answer-figure { margin: .4rem 0 0; }
-.faq-answer-figure img { width: 100%; max-width: 260px; border-radius: 10px; border: 1px solid var(--line); }
+.faq-zoom-trigger { display: block; padding: 0; border: 0; background: none; cursor: zoom-in; width: 100%; max-width: 260px; }
+.faq-answer-figure img { display: block; width: 100%; border-radius: 10px; border: 1px solid var(--line); }
+.faq-lightbox { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1.5rem; background: rgba(0, 0, 0, .82); cursor: zoom-out; }
+.faq-lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 12px 44px rgba(0, 0, 0, .5); cursor: default; }
 .faq .gift { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
 .faq .gift img { width: 150px; height: 150px; object-fit: contain; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
 .faq figure { text-align: center; margin: 0; }
