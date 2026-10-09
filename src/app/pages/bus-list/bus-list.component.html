@@ -43,7 +43,7 @@
                 }
                 <span class="guest-number" aria-hidden="true">{{ group.startIndex + $index + 1 }}.</span>
                 <strong>{{ row.guestName }}</strong>
-                <span class="guest-choice">(Đón: {{ pickupLabel(row.busPickup) }} · Khứ hồi: {{ returnLabel(row.busReturn) }}@if (withPhone) {<span> · @if (row.phone) {<a class="phone-link" [href]="'tel:' + dialable(row.phone)" [attr.aria-label]="'Gọi ' + row.guestName">☎ {{ row.phone }}</a><button type="button" class="phone-copy" [attr.aria-label]="'Copy SĐT ' + row.guestName" (click)="copyPhone(row)">{{ copiedPhoneFor() === row.rsvpId ? '✓' : '⧉' }}</button>} @else {☎ —}</span>})</span>
+                <span class="guest-choice">(Đón: {{ pickupLabel(row.busPickup) }} · Khứ hồi: {{ returnLabel(row.busReturn) }}@if (withPhone) {<span> · @if (row.phone) {<a class="phone-link" [href]="'tel:' + dialable(row.phone)" [attr.aria-label]="'Gọi ' + row.guestName">{{ row.phone }}</a><button type="button" class="phone-copy" [attr.aria-label]="'Copy SĐT ' + row.guestName" (click)="copyPhone(row)">{{ copiedPhoneFor() === row.rsvpId ? '✓' : '⧉' }}</button>} @else {—}</span>})</span>
                 @if (withPhone) {
                   <button type="button" class="note-icon"
                           [attr.aria-label]="'Ghi chú cho ' + row.guestName"

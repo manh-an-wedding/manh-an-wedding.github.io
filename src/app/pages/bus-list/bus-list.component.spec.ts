@@ -154,7 +154,8 @@ describe('BusListComponent', () => {
       },
     ]);
 
-    expect(element.querySelector('.guest-choice')?.textContent).not.toContain('☎');
+    expect(element.querySelector('.phone-link')).toBeNull();
+    expect(element.querySelector('.phone-copy')).toBeNull();
   });
 
   it('does not request or reveal the list without a token', async () => {
