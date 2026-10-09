@@ -1,0 +1,82 @@
+<main class="group-page">
+  <header>
+    <p class="eyebrow">Mạnh & An · Thứ 7 · 17.10.2026</p>
+    <h3 class="group-title">{{ title }}</h3>
+  </header>
+
+  @if (loading()) {
+    <p class="state">Đang tải danh sách…</p>
+  } @else if (error) {
+    <p class="state state-error">{{ error }}</p>
+  } @else if (rows.length === 0) {
+    <p class="state">Chưa có ai đăng ký đi xe.</p>
+  } @else {
+    <div class="list-summary">
+      <span class="stat"><strong>Tổng:</strong> {{ totalRiders }}</span><span class="sep" aria-hidden="true">·</span>
+      <span class="stat"><strong>Tân Bình:</strong> {{ tanBinhRiders }}</span><span class="sep" aria-hidden="true">·</span>
+      <span class="stat"><strong>Quận 6:</strong> {{ quan6Riders }}</span><span class="sep" aria-hidden="true">·</span>
+      <span class="stat"><strong>Khứ hồi:</strong> {{ roundTripRiders }}</span><span class="sep" aria-hidden="true">·</span>
+      <span class="stat"><strong>Ở lại:</strong> {{ stayRiders }}</span>
+    </div>
+    @if (withPhone) {
+      <div class="board-actions">
+        <span>Đã lên xe: {{ checkedPeople }}/{{ totalRiders }}</span>
+        <div class="board-buttons">
+          <button type="button" class="check-all" [disabled]="saving()" (click)="checkAll()">Chọn tất cả</button>
+          <button type="button" class="uncheck-all" [disabled]="saving()" (click)="uncheckAll()">Bỏ chọn tất cả</button>
+        </div>
+      </div>
+    }
+    @if (saveError) { <p class="state state-error">{{ saveError }}</p> }
+    @for (group of groups; track group.category) {
+      <section class="bus-group">
+        <h4 class="group-subhead">{{ group.category }} · {{ group.people }} người</h4>
+        <ol class="guest-list">
+          @for (row of group.rows; track row.guestName + $index) {
+            <li [class.is-checked]="withPhone && row.checked">
+              <div class="guest-heading" [class.with-actions]="withPhone">
+                @if (withPhone) {
+                  <input class="board-check" type="checkbox"
+                         [attr.aria-label]="'Đã lên xe: ' + row.guestName"
+                         [checked]="row.checked" [disabled]="saving()"
+                         (change)="toggleChecked(row, $any($event.target).checked)">
+                }
+                <span class="guest-number" aria-hidden="true">{{ group.startIndex + $index + 1 }}.</span>
+                <strong>{{ row.guestName }}</strong>
+                <span class="guest-choice">(Đón: {{ pickupLabel(row.busPickup) }} · Khứ hồi: {{ returnLabel(row.busReturn) }}@if (withPhone) {<span> · @if (row.phone) {<a class="phone-link" [href]="'tel:' + dialable(row.phone)" [attr.aria-label]="'Gọi ' + row.guestName">☎ {{ row.phone }}</a><button type="button" class="phone-copy" [attr.aria-label]="'Copy SĐT ' + row.guestName" (click)="copyPhone(row)">{{ copiedPhoneFor() === row.rsvpId ? '✓' : '⧉' }}</button>} @else {☎ —}</span>})</span>
+                @if (withPhone) {
+                  <button type="button" class="note-icon"
+                          [attr.aria-label]="'Ghi chú cho ' + row.guestName"
+                          (click)="startNote(row)"><svg class="memo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4"/><path d="M8 8h6M8 12h5M8 16h3"/><g transform="translate(8 8) scale(.6)" stroke-width="3.3"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></g></svg></button>
+                }
+              </div>
+              @if (row.companions.length > 0) {
+                <ul>
+                  @for (companion of row.companions; track companion + $index) {
+                    <li class="companion-item"><span aria-hidden="true">+</span> {{ companion }}</li>
+                  }
+                </ul>
+              }
+              @if (withPhone && editingNoteFor === row.rsvpId) {
+                <div class="note-edit">
+                  <textarea rows="2" maxlength="500" placeholder="Ghi chú (ví dụ: lên ở điểm phụ, đi trễ…)"
+                            [(ngModel)]="noteDraft" [disabled]="saving()"></textarea>
+                  <div class="note-actions">
+                    <button type="button" class="note-save" [disabled]="saving()" (click)="saveNote(row)">Lưu</button>
+                    <button type="button" class="note-cancel" [disabled]="saving()" (click)="cancelNote()">Huỷ</button>
+                  </div>
+                </div>
+              } @else if (withPhone && row.note) {
+                <p class="note-text"><svg class="memo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4"/><path d="M8 8h6M8 12h5M8 16h3"/><g transform="translate(8 8) scale(.6)" stroke-width="3.3"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></g></svg> {{ row.note }}</p>
+              }
+            </li>
+          }
+        </ol>
+      </section>
+    }
+  }
+
+  <footer>
+    <a routerLink="/">Mở thiệp cưới</a>
+  </footer>
+</main>

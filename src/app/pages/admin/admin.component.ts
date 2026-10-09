@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import {
   AdminDashboard,
   AdminDuplicateRow,
+  AdminPublicLink,
   AdminRsvpUpdate,
   AdminRsvpRow,
   DuplicateReviewStatus,
@@ -17,6 +18,7 @@ type AdminTab =
   | 'current'
   | 'history'
   | 'duplicates'
+  | 'links'
   | 'busCurrent'
   | 'busHistory';
 
@@ -65,6 +67,8 @@ export class AdminComponent implements OnInit {
   readonly returnFilter = signal('');
   readonly page = signal(1);
   readonly pageSize = PAGE_SIZE;
+  readonly publicLinks = signal<AdminPublicLink[]>([]);
+  readonly copiedKey = signal('');
   editDraft: EditDraft | null = null;
 
   readonly visibleRows = computed(() => {
@@ -347,6 +351,84 @@ export class AdminComponent implements OnInit {
   private async loadDashboard(): Promise<void> {
     this.dashboard.set(await this.rsvp.getAdminDashboard());
     this.goToPage(this.page());
+    try {
+      this.publicLinks.set(await this.rsvp.getAdminPublicLinks());
+    } catch {
+      this.publicLinks.set([]);
+    }
+  }
+
+  linkKey(link: AdminPublicLink): string {
+    return `${link.kind}:${link.slug}`;
+  }
+
+  publicLinkUrl(link: AdminPublicLink): string {
+    const origin = typeof location !== 'undefined' ? location.origin : '';
+    const path = link.kind === 'group' ? `/view/${link.slug}` : `/${link.slug}`;
+    return `${origin}${path}?t=${link.access_token}`;
+  }
+
+  async copyLink(link: AdminPublicLink): Promise<void> {
+    const key = this.linkKey(link);
+    try {
+      await navigator.clipboard.writeText(this.publicLinkUrl(link));
+      this.copiedKey.set(key);
+      setTimeout(() => {
+        if (this.copiedKey() === key) this.copiedKey.set('');
+      }, 2000);
+    } catch {
+      this.copiedKey.set('');
+    }
+  }
+
+  get busSeats(): number {
+    return this.busSeatRows().reduce((sum, row) => sum + this.seatsForRow(row), 0);
+  }
+
+  get busTanBinh(): number {
+    return this.busSeatRows()
+      .filter(row => row.bus_pickup === 'hotel')
+      .reduce((sum, row) => sum + this.seatsForRow(row), 0);
+  }
+
+  get busQuan6(): number {
+    return this.busSeatRows()
+      .filter(row => row.bus_pickup === 'park')
+      .reduce((sum, row) => sum + this.seatsForRow(row), 0);
+  }
+
+  get busRoundTrip(): number {
+    return this.busSeatRows()
+      .filter(row => row.bus_return === true)
+      .reduce((sum, row) => sum + this.seatsForRow(row), 0);
+  }
+
+  get busStay(): number {
+    return this.busSeatRows()
+      .filter(row => row.bus_return === false)
+      .reduce((sum, row) => sum + this.seatsForRow(row), 0);
+  }
+
+  groupAttending(category: string | null): number {
+    if (!category) return 0;
+    return this.dashboard().current
+      .filter(row => row.category === category && row.status !== 'cannot_attend')
+      .reduce((sum, row) => sum + row.party_size, 0);
+  }
+
+  groupBusSeats(category: string | null): number {
+    if (!category) return 0;
+    return this.busSeatRows()
+      .filter(row => row.category === category)
+      .reduce((sum, row) => sum + this.seatsForRow(row), 0);
+  }
+
+  private busSeatRows(): AdminRsvpRow[] {
+    return this.dashboard().current.filter(row => row.status === 'bus');
+  }
+
+  private seatsForRow(row: AdminRsvpRow): number {
+    return 1 + row.companions.length;
   }
 
   private rowsForTab(data: AdminDashboard, tab: AdminTab): AdminRsvpRow[] {
@@ -356,7 +438,8 @@ export class AdminComponent implements OnInit {
       case 'busHistory': return data.busHistory;
       case 'overview':
       case 'current': return data.current;
-      case 'duplicates': return [];
+      case 'duplicates':
+      case 'links': return [];
     }
   }
 

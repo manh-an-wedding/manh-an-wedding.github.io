@@ -11,6 +11,7 @@
   } @else if (rows.length === 0) {
     <p class="state">Chưa có xác nhận nào trong nhóm này.</p>
   } @else {
+    <p class="state">Tổng tham dự: {{ attendingPeople }} · Đi xe: {{ busRiders }}</p>
     <ol class="guest-list">
       @for (row of pagedRows; track row.guest_name + $index) {
         <li>

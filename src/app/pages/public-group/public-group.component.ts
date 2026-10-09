@@ -39,6 +39,18 @@ export class PublicGroupComponent implements OnInit {
     return this.rows.slice(start, start + this.pageSize);
   }
 
+  get attendingPeople(): number {
+    return this.rows
+      .filter(row => row.status !== 'cannot_attend')
+      .reduce((sum, row) => sum + 1 + row.companions.length, 0);
+  }
+
+  get busRiders(): number {
+    return this.rows
+      .filter(row => row.status === 'bus')
+      .reduce((sum, row) => sum + 1 + row.companions.length, 0);
+  }
+
   constructor(
     private readonly route: ActivatedRoute,
     private readonly rsvp: RsvpService,

@@ -39,6 +39,7 @@
       <button type="button" [class.active]="tab() === 'busCurrent'" (click)="selectTab('busCurrent')">DS xe đã xử lý</button>
       <button type="button" [class.active]="tab() === 'busHistory'" (click)="selectTab('busHistory')">Raw DS Xe</button>
       <button type="button" [class.active]="tab() === 'duplicates'" (click)="selectTab('duplicates')">Duyệt trùng</button>
+      <button type="button" [class.active]="tab() === 'links'" (click)="selectTab('links')">Links</button>
     </nav>
 
     @if (tab() === 'overview') {
@@ -50,6 +51,40 @@
         <article><strong>{{ dashboard().summary.pendingDuplicateCount }}</strong><span>trùng chờ duyệt</span></article>
       </section>
       <h2>Xác nhận mới nhất</h2>
+    }
+
+    @if (tab() === 'links') {
+      <section class="bus-links" aria-label="Link công khai">
+        <p class="links-summary">Tổng tham dự: {{ dashboard().summary.attendingPeople }} (Đi xe: {{ busSeats }})</p>
+        @if (publicLinks().length === 0) {
+          <p class="empty">Chưa có link công khai nào.</p>
+        }
+        <ul class="bus-link-list">
+          @for (link of publicLinks(); track linkKey(link)) {
+            <li>
+              <div class="bus-link-head">
+                <strong>{{ link.title }}</strong>
+                @if (link.includes_phone) { <span class="bus-link-tag warn">kèm SĐT · chỉ gửi trưởng đoàn</span> }
+                @if (!link.is_public) { <span class="bus-link-tag off">đang tắt</span> }
+              </div>
+              <div class="link-detail">
+                @if (link.kind === 'group') {
+                  <span>Tổng tham dự: {{ groupAttending(link.category) }} · Đi xe: {{ groupBusSeats(link.category) }}</span>
+                } @else {
+                  <span>Tổng: {{ busSeats }} · Tân Bình: {{ busTanBinh }} · Quận 6: {{ busQuan6 }}</span>
+                  <span>Khứ hồi: {{ busRoundTrip }} · Ở lại: {{ busStay }}</span>
+                }
+              </div>
+              <div class="bus-link-row">
+                <input type="text" readonly [value]="publicLinkUrl(link)" (focus)="$any($event.target).select()">
+                <button type="button" (click)="copyLink(link)">
+                  {{ copiedKey() === linkKey(link) ? 'Đã copy ✓' : 'Copy' }}
+                </button>
+              </div>
+            </li>
+          }
+        </ul>
+      </section>
     }
 
     @if (tab() === 'duplicates') {
@@ -100,7 +135,7 @@
           </nav>
         }
       </section>
-    } @else {
+    } @else if (tab() !== 'links') {
       <section class="filters">
         <input
           type="search"

@@ -220,6 +220,7 @@ describe('AdminComponent', () => {
       'DS xe đã xử lý',
       'Raw DS Xe',
       'Duyệt trùng',
+      'Links',
     ]);
   });
 

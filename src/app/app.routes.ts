@@ -11,6 +11,18 @@ export const routes: Routes = [
     data: { readOnly: true },
   },
   {
+    path: 'bus',
+    loadComponent: () => import('./pages/bus-list/bus-list.component')
+      .then(module => module.BusListComponent),
+    data: { readOnly: true, withPhone: false },
+  },
+  {
+    path: 'bus-admin',
+    loadComponent: () => import('./pages/bus-list/bus-list.component')
+      .then(module => module.BusListComponent),
+    data: { readOnly: true, withPhone: true },
+  },
+  {
     path: 'admin',
     loadComponent: () => import('./pages/admin/admin.component')
       .then(module => module.AdminComponent),

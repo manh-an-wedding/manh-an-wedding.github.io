@@ -26,6 +26,37 @@ export interface PublicGroupRsvp {
   companions: string[];
 }
 
+export interface PublicBusRsvp {
+  guest_name: string;
+  category: string;
+  phone?: string | null;
+  bus_pickup?: 'hotel' | 'park' | null;
+  bus_return?: boolean | null;
+  companions: string[];
+}
+
+export interface PublicBusAdminRsvp {
+  rsvp_id: number;
+  guest_name: string;
+  category: string;
+  phone?: string | null;
+  bus_pickup?: 'hotel' | 'park' | null;
+  bus_return?: boolean | null;
+  checked: boolean;
+  note: string | null;
+  companions: string[];
+}
+
+export interface AdminPublicLink {
+  kind: 'group' | 'bus';
+  slug: string;
+  category: string | null;
+  title: string;
+  access_token: string;
+  is_public: boolean;
+  includes_phone: boolean;
+}
+
 export interface AdminRsvpUpdate {
   sourceId: number;
   guestName: string;
@@ -154,6 +185,51 @@ export class RsvpService {
     });
     if (error) throw error;
     return (data ?? []) as PublicGroupRsvp[];
+  }
+
+  async getPublicBusRsvps(token: string): Promise<PublicBusRsvp[]> {
+    const { data, error } = await this.sb.rpc('get_public_bus_rsvps', {
+      p_token: token,
+    });
+    if (error) throw error;
+    return (data ?? []) as PublicBusRsvp[];
+  }
+
+  async getPublicBusAdminRsvps(token: string): Promise<PublicBusAdminRsvp[]> {
+    const { data, error } = await this.sb.rpc('get_public_bus_admin_rsvps', {
+      p_token: token,
+    });
+    if (error) throw error;
+    return (data ?? []) as PublicBusAdminRsvp[];
+  }
+
+  async setBusGuestMark(
+    token: string,
+    rsvpId: number,
+    checked: boolean,
+    note: string | null,
+  ): Promise<void> {
+    const { error } = await this.sb.rpc('set_public_bus_guest_mark', {
+      p_token: token,
+      p_rsvp_id: rsvpId,
+      p_checked: checked,
+      p_note: note?.trim() ? note.trim() : null,
+    });
+    if (error) throw error;
+  }
+
+  async setAllBusGuestChecks(token: string, checked: boolean): Promise<void> {
+    const { error } = await this.sb.rpc('set_all_public_bus_guest_checks', {
+      p_token: token,
+      p_checked: checked,
+    });
+    if (error) throw error;
+  }
+
+  async getAdminPublicLinks(): Promise<AdminPublicLink[]> {
+    const { data, error } = await this.sb.rpc('get_admin_public_links', {});
+    if (error) throw error;
+    return (data ?? []) as AdminPublicLink[];
   }
 
   async signInAdmin(email: string, password: string): Promise<void> {
