@@ -75,7 +75,7 @@
                 }
               </div>
               <div class="bus-link-row">
-                <input type="text" readonly [value]="publicLinkUrl(link)" (focus)="$any($event.target).select()">
+                <a [href]="publicLinkUrl(link)" target="_blank" rel="noopener">{{ publicLinkUrl(link) }}</a>
                 <button type="button" (click)="copyLink(link)">
                   {{ copiedKey() === linkKey(link) ? 'Đã copy ✓' : 'Copy' }}
                 </button>

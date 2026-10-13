@@ -31,6 +31,15 @@ class RsvpStub {
     if (this.failure) throw this.failure;
     this.updated = { handle, draft: d };
   };
+
+  leaders: any[] = [];
+  leaderFailure: Error | null = null;
+  leaderHandles: any[] = [];
+  getBusLeaders = async (handle: any) => {
+    this.leaderHandles.push(handle);
+    if (this.leaderFailure) throw this.leaderFailure;
+    return this.leaders;
+  };
 }
 describe('RsvpFormComponent', () => {
   let rsvp: RsvpStub;
@@ -60,17 +69,18 @@ describe('RsvpFormComponent', () => {
     expect(c.valid()).toBe(true);
   });
 
-  it('closes only shuttle registration after the local deadline', () => {
-    const c = TestBed.createComponent(RsvpFormComponent).componentInstance;
-    Object.defineProperty(c, 'deadlinePassed', { configurable: true, get: () => true });
+  it('keeps the shuttle option open with no registration deadline', () => {
+    const fixture = TestBed.createComponent(RsvpFormComponent);
+    fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement;
+    expect((element.querySelector('input[type="radio"][value="bus"]') as HTMLInputElement).disabled).toBe(false);
+    expect(element.querySelector('.warn')).toBeNull();
+
+    const c = fixture.componentInstance;
     c.model.guestName = 'A';
     c.model.category = 'IAS';
-    c.model.phone = '0900000000';
-
     c.model.status = 'bus';
-    expect(c.valid()).toBe(false);
-
-    c.model.status = 'self_transport';
+    c.model.phone = '0900000000';
     expect(c.valid()).toBe(true);
   });
 
@@ -161,8 +171,6 @@ describe('RsvpFormComponent', () => {
       bus_park_arrival: 'Dự kiến về đến Công viên Bình Phú',
       bus_hotel_arrival: 'Dự kiến về đến IBIS',
       bus_return_traffic_note: '(chiều về có thể kẹt xe trên cao tốc)',
-      bus_deadline_prefix: 'Danh sách đi xe sẽ được chốt vào',
-      bus_deadline_detail: '11:30 AM thứ 7, 10.10.2026',
       bus_info_hint: 'xem thông tin xe ở đây',
       bus_driver_update_note: 'Thông tin tài xế và thay đổi lịch trình (nếu có) sẽ được gửi vào SĐT của bác nha.',
       bus_driver_update_thanks: 'Xin cảm ơn.',
@@ -205,13 +213,8 @@ describe('RsvpFormComponent', () => {
     expect(busText).toContain('18:00');
     expect(busText).toContain('18:45');
     expect(busText).toContain('chiều về có thể kẹt xe trên cao tốc');
-    expect(busText)
-      .toContain('Danh sách đi xe sẽ được chốt vào 11:30 AM thứ 7, 10.10.2026');
-    expect(element.querySelector('.bus-registration-deadline > em')).not.toBeNull();
-    expect(Array.from(
-      element.querySelectorAll('.bus-registration-deadline strong'),
-      (item: Element) => item.textContent?.trim(),
-    )).toEqual(['11:30 AM thứ 7, 10.10.2026']);
+    expect(busText).not.toContain('Danh sách đi xe sẽ được chốt vào');
+    expect(element.querySelector('.bus-registration-deadline')).toBeNull();
     const driverUpdateNote = element.querySelector('.bus-driver-update-note');
     expect(driverUpdateNote?.querySelector(':scope > em')).not.toBeNull();
     expect(driverUpdateNote?.querySelector('br')).not.toBeNull();
@@ -220,10 +223,10 @@ describe('RsvpFormComponent', () => {
     );
     expect(text('.bus-driver-update-note-thanks')).toBe('Xin cảm ơn.');
     const registrationNotes = element.querySelector('.bus-registration-notes');
-    expect(registrationNotes?.children.length).toBe(2);
-    expect(element.querySelector('.bus-registration-deadline')?.nextElementSibling)
+    expect(registrationNotes?.children.length).toBe(1);
+    expect(registrationNotes?.firstElementChild)
       .toBe(element.querySelector('.bus-driver-update-note'));
-    expect(element.querySelectorAll('.bus-info p')).toHaveLength(9);
+    expect(element.querySelectorAll('.bus-info p')).toHaveLength(8);
   });
 
   it('moves focus into the bus information and back to its trigger when closed', () => {
@@ -263,8 +266,6 @@ describe('RsvpFormComponent', () => {
       bus_park_arrival: 'Estimated arrival at Binh Phu Park',
       bus_hotel_arrival: 'Estimated arrival at IBIS',
       bus_return_traffic_note: '(return traffic may be congested on the expressway)',
-      bus_deadline_prefix: 'The shuttle list will be finalized at',
-      bus_deadline_detail: '11:30 AM Saturday, 10.10.2026',
       bus_driver_update_note: 'Driver details and any schedule changes will be sent to your phone number.',
       bus_driver_update_thanks: 'Thank you.',
     } });
@@ -289,7 +290,7 @@ describe('RsvpFormComponent', () => {
     expect(busText).toContain('18:45');
     expect(busText).toContain('IBIS SAIGON AIRPORT');
     expect(busText)
-      .toContain('The shuttle list will be finalized at 11:30 AM Saturday, 10.10.2026');
+      .not.toContain('The shuttle list will be finalized at');
     expect(busText)
       .toContain('Driver details and any schedule changes will be sent to your phone number. Thank you.');
     expect(busText).not.toContain('tại');
@@ -438,8 +439,6 @@ describe('RsvpFormComponent', () => {
         pickup_at_label: 'Đón tại',
         pickup_hotel: 'Ibis hotel (Tân Bình cũ)',
         no_return_label: 'Không theo xe về HCM',
-        bus_deadline_prefix: 'Danh sách đi xe sẽ được chốt vào',
-        bus_deadline_detail: '11:30 AM thứ 7, 10.10.2026',
         bus_driver_update_note: 'Thông tin tài xế và thay đổi lịch trình (nếu có) sẽ được gửi vào SĐT của bác nha.',
         bus_driver_update_thanks: 'Xin cảm ơn.',
         edit_response: 'Chỉnh sửa',
@@ -491,15 +490,11 @@ describe('RsvpFormComponent', () => {
     expect(confirmedBusInfo?.textContent)
       .toContain('chiều về có thể kẹt xe trên cao tốc');
     expect(confirmedBusInfo?.textContent)
-      .toContain('Danh sách đi xe sẽ được chốt vào');
+      .not.toContain('Danh sách đi xe sẽ được chốt vào');
     expect(confirmedBusInfo?.querySelector('.bus-driver-update-note-main')?.textContent?.trim())
       .toBe('Thông tin tài xế và thay đổi lịch trình (nếu có) sẽ được gửi vào SĐT của bác nha.');
     expect(confirmedBusInfo?.querySelector('.bus-driver-update-note-thanks')?.textContent?.trim())
       .toBe('Xin cảm ơn.');
-    expect(Array.from(
-      confirmedBusInfo?.querySelectorAll('.bus-registration-deadline strong') ?? [],
-      (item: Element) => item.textContent?.trim(),
-    )).toEqual(['11:30 AM thứ 7, 10.10.2026']);
     expect(confirmedBusInfo?.querySelector('a')?.getAttribute('href'))
       .toBe('https://maps.app.goo.gl/A4G9MXVdHavg2cTq6');
     expect(confirmedBusInfo?.querySelectorAll('.bus-leg-title')).toHaveLength(2);
@@ -580,5 +575,64 @@ describe('RsvpFormComponent', () => {
       fixture.nativeElement.querySelector('.rsvp-edit-response');
     expect(editButton?.textContent).toContain('Chỉnh sửa');
     expect(editButton).toBe(fixture.nativeElement.querySelector('.rsvp-confirmation > :last-child'));
+  });
+  describe('bus leader info after confirming the bus', () => {
+    async function confirm(status: 'bus' | 'self_transport') {
+      const translate = TestBed.inject(TranslateService);
+      translate.setTranslation('vi', {
+        rsvp: {
+          bus_leader_intro: 'Đây là thông tin trưởng đoàn và link nhóm Zalo để tiện trao đổi trong lúc di chuyển, mời bạn tham gia nhé:',
+          bus_leader_label: 'Trưởng đoàn',
+          bus_leader_zalo_label: 'Link Zalo',
+        },
+      });
+      await firstValueFrom(translate.use('vi'));
+      const fixture = TestBed.createComponent(RsvpFormComponent);
+      const c = fixture.componentInstance;
+      c.model.guestName = 'Duy Mạnh';
+      c.model.category = 'IAS';
+      c.model.status = status;
+      c.model.phone = '0900';
+      fixture.detectChanges();
+      await c.trySubmit();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      return fixture.nativeElement as HTMLElement;
+    }
+
+    it('shows the leader, phone and Zalo link to a guest who chose the bus', async () => {
+      rsvp.leaders = [{ name: 'Anh Tâm', phone: '0909 111 222', zalo_link: 'https://zalo.me/g/abc' }];
+      const element = await confirm('bus');
+
+      expect(rsvp.leaderHandles).toEqual([{ rsvpId: 21, editToken: 'a'.repeat(64) }]);
+      const block = element.querySelector('.rsvp-confirmation .bus-leader-info');
+      expect(block?.querySelector('p')?.textContent?.trim()).toBe(
+        'Đây là thông tin trưởng đoàn và link nhóm Zalo để tiện trao đổi trong lúc di chuyển, mời bạn tham gia nhé:',
+      );
+      const items = Array.from(block?.querySelectorAll('li') ?? [], li => li.textContent?.replace(/\s+/g, ' ').trim());
+      expect(items).toEqual(['Trưởng đoàn: Anh Tâm - 0909 111 222', 'Link Zalo: https://zalo.me/g/abc']);
+      const links = Array.from(block?.querySelectorAll('a') ?? []) as HTMLAnchorElement[];
+      expect(links.map(a => a.getAttribute('href'))).toEqual(['tel:0909 111 222', 'https://zalo.me/g/abc']);
+      expect(links[1].getAttribute('target')).toBe('_blank');
+    });
+
+    it('shows nothing while no leader has been entered', async () => {
+      const element = await confirm('bus');
+      expect(element.querySelector('.bus-leader-info')).toBeNull();
+    });
+
+    it('shows nothing when the leader lookup fails', async () => {
+      rsvp.leaders = [{ name: 'Anh Tâm', phone: null, zalo_link: null }];
+      rsvp.leaderFailure = new Error('denied');
+      const element = await confirm('bus');
+      expect(element.querySelector('.bus-leader-info')).toBeNull();
+    });
+
+    it('never asks for leader info when the guest travels on their own', async () => {
+      rsvp.leaders = [{ name: 'Anh Tâm', phone: '0909', zalo_link: 'https://zalo.me/g/abc' }];
+      const element = await confirm('self_transport');
+      expect(rsvp.leaderHandles).toEqual([]);
+      expect(element.querySelector('.bus-leader-info')).toBeNull();
+    });
   });
 });

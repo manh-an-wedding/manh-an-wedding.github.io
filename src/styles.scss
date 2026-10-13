@@ -801,6 +801,10 @@ fieldset label { font-weight: 400; }
 .bus-choice label input { flex: 0 0 auto; margin-right: 0; margin-top: .1rem; }
 .rsvp-confirmation-pickup { margin: .25rem 0 0; }
 .rsvp-confirmation-no-return { margin: .15rem 0 0; color: var(--red); font-weight: 600; }
+.bus-leader-info { margin: .5rem 0 0; padding: .7rem .85rem; background: var(--cream); border-radius: 8px; text-align: left; }
+.bus-leader-info p { margin: 0 0 .35rem; }
+.bus-leader-info ul { margin: 0; padding-left: 1.1rem; }
+.bus-leader-info a { color: var(--red); overflow-wrap: anywhere; }
 .bus-info { display: grid; gap: 1rem; background: var(--cream); border-radius: 8px; padding: .85rem; }
 .bus-info h3 {
   margin: 0 0 .55rem;
@@ -820,16 +824,12 @@ fieldset label { font-weight: 400; }
   color: var(--muted);
   white-space: nowrap;
 }
-.bus-registration-deadline {
-  padding-top: .75rem;
-  border-top: 1px solid var(--line);
-  text-align: center;
-}
 .bus-registration-notes {
   display: grid;
   gap: .25rem;
+  padding-top: .75rem;
+  border-top: 1px solid var(--line);
 }
-.bus-registration-notes .bus-registration-deadline,
 .bus-registration-notes .bus-driver-update-note {
   margin: 0;
 }
@@ -871,7 +871,6 @@ fieldset label { font-weight: 400; }
   outline: 1px solid var(--gold);
   outline-offset: .2rem;
 }
-.warn { color: var(--red-dark); background: #fbeaea; border-radius: 8px; padding: .6rem .7rem; font-size: .88rem; }
 .table-full-message {
   margin: 0;
   padding: .65rem .8rem;

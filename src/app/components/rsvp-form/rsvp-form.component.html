@@ -32,12 +32,6 @@
       </p>
     </section>
     <div class="bus-registration-notes">
-      <p class="bus-registration-deadline">
-        <em>
-          {{ 'rsvp.bus_deadline_prefix' | translate }}
-          <strong>{{ 'rsvp.bus_deadline_detail' | translate }}</strong>.
-        </em>
-      </p>
       <p class="bus-driver-update-note">
         <em>
           <span class="bus-driver-update-note-main">
@@ -85,6 +79,19 @@
       @if (!model.busReturn) {
         <p class="rsvp-confirmation-no-return">{{ 'rsvp.no_return_label' | translate }}</p>
       }
+      @if (busLeaders().length > 0) {
+        <div class="bus-leader-info">
+          <p>{{ 'rsvp.bus_leader_intro' | translate }}</p>
+          <ul>
+            @for (leader of busLeaders(); track $index) {
+              <li>{{ 'rsvp.bus_leader_label' | translate }}: {{ leader.name }}@if (leader.phone) { - <a [href]="'tel:' + leader.phone">{{ leader.phone }}</a>}</li>
+              @if (leader.zalo_link) {
+                <li>{{ 'rsvp.bus_leader_zalo_label' | translate }}: <a [href]="leader.zalo_link" target="_blank" rel="noopener">{{ leader.zalo_link }}</a></li>
+              }
+            }
+          </ul>
+        </div>
+      }
       <ng-container [ngTemplateOutlet]="busInformation"></ng-container>
     }
     <button type="button" class="rsvp-edit-response" (click)="editResponse()">
@@ -96,7 +103,6 @@
 <form (ngSubmit)="trySubmit()" [attr.aria-busy]="submitting" [hidden]="done">
     <p class="rsvp-confirm-help">{{ 'rsvp.confirm_help' | translate }}</p>
 
-    @if (deadlinePassed) { <p class="warn">{{ 'rsvp.deadline_passed' | translate }}</p> }
 
     <label class="rsvp-name-label">{{ 'rsvp.your_name' | translate }}
       <input name="name" [(ngModel)]="model.guestName"
@@ -120,7 +126,6 @@
     }
     <fieldset>
       <label class="bus-option-label"><input type="radio" name="st" value="bus" [(ngModel)]="model.status"
-                    [disabled]="deadlinePassed"
                     (ngModelChange)="onStatusChange($event)">
         {{ 'rsvp.bus' | translate:{ count: formattedBusPartySize } }}
         <button #busInfoHintButton type="button" class="bus-info-hint"

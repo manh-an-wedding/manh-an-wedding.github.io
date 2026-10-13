@@ -179,10 +179,10 @@ footer a {
 .note-save { color: #fff; background: #861922; }
 .note-cancel { color: #861922; background: #fff; }
 .board-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; margin: -.4rem 0 1rem; color: #786b68; font-size: .9rem; }
-.board-buttons { display: flex; gap: .45rem; }
-.check-all, .uncheck-all { padding: .4rem .85rem; border: 1px solid #861922; border-radius: 8px; cursor: pointer; font-size: .85rem; }
+.board-buttons { display: flex; flex-wrap: wrap; gap: .45rem; }
+.check-all, .uncheck-all, .export-excel { padding: .4rem .85rem; border: 1px solid #861922; border-radius: 8px; cursor: pointer; font-size: .85rem; }
 .check-all { color: #fff; background: #861922; }
-.uncheck-all { color: #861922; background: #fff; }
+.uncheck-all, .export-excel { color: #861922; background: #fff; }
 .check-all:disabled, .uncheck-all:disabled { opacity: .45; cursor: default; }
 .phone-link { color: inherit; text-decoration: underline dotted; text-underline-offset: 2px; }
 .phone-copy {

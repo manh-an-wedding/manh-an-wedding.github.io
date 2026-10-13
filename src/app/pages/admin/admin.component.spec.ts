@@ -519,4 +519,25 @@ describe('AdminComponent', () => {
 
     expect(editButtons).toHaveLength(1);
   });
+  it('renders each public link as a new-tab anchor next to its copy button', async () => {
+    const { fixture } = await render(true);
+    const component = fixture.componentInstance;
+    component.publicLinks.set([
+      { kind: 'group', slug: 'ias', category: 'IAS', title: 'Nhóm IAS', access_token: 'tok-group', is_public: true, includes_phone: false },
+      { kind: 'bus', slug: 'bus-admin', category: null, title: 'Danh sách đi xe (kèm SĐT)', access_token: 'tok-bus', is_public: true, includes_phone: true },
+    ]);
+    component.selectTab('links');
+    fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement;
+
+    const anchors = Array.from(element.querySelectorAll('.bus-link-row a')) as HTMLAnchorElement[];
+    expect(anchors.map(a => a.getAttribute('href'))).toEqual([
+      `${location.origin}/view/ias?t=tok-group`,
+      `${location.origin}/bus-admin?t=tok-bus`,
+    ]);
+    expect(anchors.map(a => a.textContent?.trim())).toEqual(anchors.map(a => a.getAttribute('href')));
+    expect(anchors.every(a => a.target === '_blank' && a.rel === 'noopener')).toBe(true);
+    expect(element.querySelectorAll('.bus-link-row button')).toHaveLength(2);
+    expect(element.querySelector('.bus-link-row input')).toBeNull();
+  });
 });

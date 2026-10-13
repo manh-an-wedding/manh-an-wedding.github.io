@@ -106,7 +106,7 @@ button:disabled { cursor: wait; opacity: .6; }
 .bus-link-tag.warn { color: #861922; background: #fbe8e9; }
 .bus-link-tag.off { color: #555; background: #eee4d7; }
 .bus-link-row { display: flex; gap: .5rem; }
-.bus-link-row input { flex: 1; min-width: 0; padding: .5rem .6rem; color: #574c49; background: #faf5ec; border: 1px solid #ccbfae; border-radius: 8px; font-size: .8rem; }
+.bus-link-row a { flex: 1; min-width: 0; overflow: hidden; align-self: center; color: #861922; font-size: .8rem; text-overflow: ellipsis; white-space: nowrap; }
 .bus-link-row button { padding: .5rem .9rem; color: #fff; background: #861922; border: 1px solid #861922; border-radius: 8px; white-space: nowrap; }
 
 .links-summary { margin: 0 0 .9rem; color: #861922; font-size: 1.05rem; font-weight: 700; }

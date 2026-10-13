@@ -64,7 +64,6 @@ export const WEDDING: WeddingConfig = {
   },
   rsvp: {
     groups: ['Bạn của An', 'Bạn của Mạnh', 'Bạn của Tâm', 'Bạn cha Năm', 'Bạn mẹ Bắc', 'Họ hàng nhà gái'],
-    deadlineISO: '2026-10-13T11:30:00+07:00',
     bus: BUS,
   },
   gift: {

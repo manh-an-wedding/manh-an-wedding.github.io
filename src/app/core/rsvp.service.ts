@@ -47,6 +47,12 @@ export interface PublicBusAdminRsvp {
   companions: string[];
 }
 
+export interface BusLeader {
+  name: string;
+  phone: string | null;
+  zalo_link: string | null;
+}
+
 export interface AdminPublicLink {
   kind: 'group' | 'bus';
   slug: string;
@@ -176,6 +182,15 @@ export class RsvpService {
       p_companions: d.companions,
     });
     if (error) throw error;
+  }
+
+  async getBusLeaders(handle: RsvpEditHandle): Promise<BusLeader[]> {
+    const { data, error } = await this.sb.rpc('get_bus_leaders_for_rsvp', {
+      p_rsvp_id: handle.rsvpId,
+      p_edit_token: handle.editToken,
+    });
+    if (error) throw error;
+    return (data ?? []) as BusLeader[];
   }
 
   async getPublicGroupRsvps(slug: string, token: string): Promise<PublicGroupRsvp[]> {

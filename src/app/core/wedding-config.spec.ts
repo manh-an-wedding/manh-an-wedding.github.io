@@ -55,7 +55,6 @@ describe('wedding config', () => {
     expect(WEDDING.reception.mapEmbedUrl).toContain('hl=vi');
     expect(WEDDING.reception.mapDirUrl)
       .toBe('https://maps.app.goo.gl/of7FJD3HC6WWPuv7A');
-    expect(WEDDING.rsvp.deadlineISO).toBe('2026-10-13T11:30:00+07:00');
     expect(WEDDING.rsvp.bus).toEqual({
       outboundDepart1Time: '07:15',
       outboundDepart2Time: '07:50',

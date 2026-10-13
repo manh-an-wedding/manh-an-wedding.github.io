@@ -5,6 +5,7 @@ import {
   Inject,
   inject,
   Input,
+  signal,
   ViewChild,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
@@ -15,6 +16,7 @@ import {
   RsvpDraft,
   RsvpEditHandle,
   CompanionDraft,
+  BusLeader,
 } from '../../core/rsvp.service';
 import { WEDDING_CONFIG } from '../../core/wedding-config.token';
 import { WeddingConfig } from '../../core/wedding-config';
@@ -48,11 +50,11 @@ export class RsvpFormComponent {
   done = false;
   submitting = false;
   submitFailed = false;
+  readonly busLeaders = signal<BusLeader[]>([]);
   private editHandle: RsvpEditHandle | null = null;
 
   constructor(@Inject(WEDDING_CONFIG) public cfg: WeddingConfig) {}
 
-  get deadlinePassed(): boolean { return new Date() > new Date(this.cfg.rsvp.deadlineISO); }
   get busPartySize(): number { return 1 + this.companions.length; }
   get formattedBusPartySize(): string {
     return String(this.busPartySize).padStart(2, '0');
@@ -75,7 +77,6 @@ export class RsvpFormComponent {
   valid(): boolean {
     if (!this.model.guestName.trim() || !this.model.category || !this.model.status) return false;
     if (this.model.status === 'bus' && !this.model.phone.trim()) return false;
-    if (this.model.status === 'bus' && this.deadlinePassed) return false;
     return true;
   }
 
@@ -103,6 +104,7 @@ export class RsvpFormComponent {
         this.editHandle = await this.rsvp.submit(draft);
       }
       this.done = true;
+      void this.loadBusLeaders();
     } catch (error) {
       console.error('RSVP submission failed', error);
       if (this.editHandle && this.isUnauthorizedEdit(error)) {
@@ -117,6 +119,19 @@ export class RsvpFormComponent {
       } else if (this.submitFailed) {
         this.focusAndCenter(this.submitError?.nativeElement);
       }
+    }
+  }
+
+  private async loadBusLeaders(): Promise<void> {
+    const handle = this.editHandle;
+    if (this.model.status !== 'bus' || !handle) {
+      this.busLeaders.set([]);
+      return;
+    }
+    try {
+      this.busLeaders.set(await this.rsvp.getBusLeaders(handle));
+    } catch {
+      this.busLeaders.set([]);
     }
   }
 

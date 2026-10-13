@@ -360,4 +360,44 @@ describe('BusListComponent', () => {
     expect(prompt).toHaveBeenCalledWith('Copy số điện thoại:', '0909123456');
     vi.restoreAllMocks();
   });
+  it('exports guests and their companions with the leader-friendly note', async () => {
+    const { fixture } = await render(
+      [
+        { rsvp_id: 1, guest_name: 'Bắp', category: 'Bạn của An', phone: '0964124330', bus_pickup: 'park', bus_return: true, checked: false, note: 'Về sớm 1h', companions: ['Nhà chị Hân'] },
+        { rsvp_id: 2, guest_name: 'Kai', category: 'IAS', phone: '0909', bus_pickup: 'hotel', bus_return: true, checked: false, note: null, companions: ['Bé Na'] },
+      ],
+      'phonetoken',
+      true,
+    );
+
+    expect(fixture.componentInstance.exportRows()).toEqual([
+      ['Tên', 'Nhóm', 'SĐT', 'Ghi chú'],
+      ['Bắp', 'Bạn của An', '0964124330', 'Về sớm 1h'],
+      ['Nhà chị Hân', 'Bạn của An', '', 'Đi cùng Bắp; Về sớm 1h'],
+      ['Kai', 'IAS', '0909', ''],
+      ['Bé Na', 'IAS', '', 'Đi cùng Kai'],
+    ]);
+  });
+
+  it('downloads an .xlsx file from the export button', async () => {
+    const blobs: Blob[] = [];
+    const downloads: string[] = [];
+    Object.defineProperty(URL, 'createObjectURL', { value: (blob: Blob) => { blobs.push(blob); return 'blob:x'; }, configurable: true });
+    Object.defineProperty(URL, 'revokeObjectURL', { value: () => undefined, configurable: true });
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) {
+      downloads.push(this.download);
+    });
+    const { element } = await render(
+      [{ rsvp_id: 1, guest_name: 'Bắp', category: 'N', phone: '0964124330', bus_pickup: 'park', bus_return: true, checked: false, note: null, companions: [] }],
+      'phonetoken',
+      true,
+    );
+
+    (element.querySelector('button.export-excel') as HTMLButtonElement).click();
+
+    expect(blobs.map(blob => blob.type)).toEqual(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);
+    expect(downloads).toHaveLength(1);
+    expect(downloads[0]).toMatch(/^danh-sach-di-xe-\d{4}-\d{2}-\d{2}\.xlsx$/);
+    vi.restoreAllMocks();
+  });
 });

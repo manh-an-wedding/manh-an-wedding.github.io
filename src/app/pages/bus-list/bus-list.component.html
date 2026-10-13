@@ -24,6 +24,7 @@
         <div class="board-buttons">
           <button type="button" class="check-all" [disabled]="saving()" (click)="checkAll()">Chọn tất cả</button>
           <button type="button" class="uncheck-all" [disabled]="saving()" (click)="uncheckAll()">Bỏ chọn tất cả</button>
+          <button type="button" class="export-excel" (click)="exportExcel()">Xuất Excel</button>
         </div>
       </div>
     }

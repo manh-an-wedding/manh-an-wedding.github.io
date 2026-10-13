@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { PublicBusAdminRsvp, PublicBusRsvp, RsvpService } from '../../core/rsvp.service';
+import { buildXlsx, downloadXlsx } from '../../core/xlsx-writer';
 
 type Pickup = 'hotel' | 'park' | null | undefined;
 
@@ -151,6 +152,28 @@ export class BusListComponent implements OnInit {
     } catch {
       window.prompt('Copy số điện thoại:', row.phone);
     }
+  }
+
+  exportRows(): string[][] {
+    const rows = [['Tên', 'Nhóm', 'SĐT', 'Ghi chú']];
+    for (const group of this.groups) {
+      for (const row of group.rows) {
+        rows.push([row.guestName, row.category, row.phone ?? '', row.note ?? '']);
+        const companionNote = row.note ? `Đi cùng ${row.guestName}; ${row.note}` : `Đi cùng ${row.guestName}`;
+        for (const companion of row.companions) rows.push([companion, row.category, '', companionNote]);
+      }
+    }
+    return rows;
+  }
+
+  exportExcel(): void {
+    if (!this.withPhone) return;
+    const now = new Date();
+    const date = [now.getFullYear(), now.getMonth() + 1, now.getDate()]
+      .map(part => String(part).padStart(2, '0'))
+      .join('-');
+    const bytes = buildXlsx('Danh sách đi xe', this.exportRows(), { columnWidths: [28, 18, 16, 48] });
+    downloadXlsx(`danh-sach-di-xe-${date}.xlsx`, bytes);
   }
 
   get checkedPeople(): number {
