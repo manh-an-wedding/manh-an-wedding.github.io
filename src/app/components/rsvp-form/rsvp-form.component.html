@@ -126,7 +126,7 @@
     }
     <fieldset>
       <label class="bus-option-label"><input type="radio" name="st" value="bus" [(ngModel)]="model.status"
-                    [disabled]="busRegistrationClosed"
+                    [attr.disabled]="busRegistrationClosed ? '' : null"
                     (ngModelChange)="onStatusChange($event)">
         {{ 'rsvp.bus' | translate:{ count: formattedBusPartySize } }}
         <button #busInfoHintButton type="button" class="bus-info-hint"
@@ -147,6 +147,9 @@
           </em>
         </button>
       </label>
+      @if (busRegistrationClosed) {
+        <p class="bus-closed-note">{{ 'rsvp.bus_closed_note' | translate }}</p>
+      }
       @if (showBusInfo) {
         <div #busInfoPanel id="bus-information" class="bus-info-focus-target"
              role="region" tabindex="-1">

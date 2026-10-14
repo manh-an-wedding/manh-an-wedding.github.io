@@ -799,6 +799,7 @@ fieldset label { font-weight: 400; }
   color: var(--muted);
 }
 .bus-choice label input { flex: 0 0 auto; margin-right: 0; margin-top: .1rem; }
+.bus-closed-note { margin: .15rem 0 .35rem 1.6rem; color: var(--red); font-size: .78rem; font-style: italic; }
 .rsvp-confirmation-pickup { margin: .25rem 0 0; }
 .rsvp-confirmation-no-return { margin: .15rem 0 0; color: var(--red); font-weight: 600; }
 .bus-leader-info { margin: .5rem 0 0; padding: .7rem .85rem; background: var(--cream); border-radius: 8px; text-align: left; }

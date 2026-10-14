@@ -78,9 +78,13 @@ describe('RsvpFormComponent', () => {
     await fixture.whenStable();
     fixture.detectChanges();
     expect((fixture.nativeElement.querySelector('input[type="radio"][value="bus"]') as HTMLInputElement).disabled).toBe(false);
+    expect(fixture.nativeElement.querySelector('.bus-closed-note')).toBeNull();
   });
 
-  it('closes only the shuttle option, without a notice, once registration is closed', async () => {
+  it('closes only the shuttle option, with a contact note, once registration is closed', async () => {
+    const translate = TestBed.inject(TranslateService);
+    translate.setTranslation('vi', { rsvp: { bus_closed_note: 'Bác cần đi xe thì liên hệ nhà em đặt thêm nha' } });
+    await firstValueFrom(translate.use('vi'));
     const fixture = TestBed.createComponent(RsvpFormComponent);
     const c = fixture.componentInstance;
     Object.defineProperty(c, 'busRegistrationClosed', { configurable: true, get: () => true });
@@ -88,16 +92,25 @@ describe('RsvpFormComponent', () => {
     await fixture.whenStable();
     fixture.detectChanges();
     const element = fixture.nativeElement as HTMLElement;
-    expect((element.querySelector('input[type="radio"][value="bus"]') as HTMLInputElement).disabled).toBe(true);
+    const radio = (value: string) => element.querySelector(`input[name="st"][value="${value}"]`) as HTMLInputElement;
+
+    expect(radio('bus').disabled).toBe(true);
+    expect(radio('self_transport').disabled).toBe(false);
+    expect(radio('cannot_attend').disabled).toBe(false);
+    expect(element.querySelector('.bus-closed-note')?.textContent?.trim()).toBe('Bác cần đi xe thì liên hệ nhà em đặt thêm nha');
     expect(element.querySelector('.warn')).toBeNull();
+
+    radio('self_transport').click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(c.model.status).toBe('self_transport');
 
     c.model.guestName = 'A';
     c.model.category = 'IAS';
     c.model.phone = '0900000000';
+    expect(c.valid()).toBe(true);
     c.model.status = 'bus';
     expect(c.valid()).toBe(false);
-    c.model.status = 'self_transport';
-    expect(c.valid()).toBe(true);
   });
 
   it('does not expose the guest list through browser autocomplete', () => {
