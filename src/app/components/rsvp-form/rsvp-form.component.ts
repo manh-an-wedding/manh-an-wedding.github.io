@@ -55,6 +55,7 @@ export class RsvpFormComponent {
 
   constructor(@Inject(WEDDING_CONFIG) public cfg: WeddingConfig) {}
 
+  get busRegistrationClosed(): boolean { return !this.cfg.rsvp.busRegistrationOpen; }
   get busPartySize(): number { return 1 + this.companions.length; }
   get formattedBusPartySize(): string {
     return String(this.busPartySize).padStart(2, '0');
@@ -77,6 +78,7 @@ export class RsvpFormComponent {
   valid(): boolean {
     if (!this.model.guestName.trim() || !this.model.category || !this.model.status) return false;
     if (this.model.status === 'bus' && !this.model.phone.trim()) return false;
+    if (this.model.status === 'bus' && this.busRegistrationClosed) return false;
     return true;
   }
 

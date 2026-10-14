@@ -64,6 +64,7 @@ export const WEDDING: WeddingConfig = {
   },
   rsvp: {
     groups: ['Bạn của An', 'Bạn của Mạnh', 'Bạn của Tâm', 'Bạn cha Năm', 'Bạn mẹ Bắc', 'Họ hàng nhà gái'],
+    busRegistrationOpen: false,
     bus: BUS,
   },
   gift: {

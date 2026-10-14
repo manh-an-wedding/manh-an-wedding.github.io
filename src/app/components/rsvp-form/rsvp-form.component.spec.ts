@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { RsvpFormComponent } from './rsvp-form.component';
 import { RsvpService } from '../../core/rsvp.service';
+import { WEDDING_CONFIG } from '../../core/wedding-config.token';
+import { WEDDING } from '../../../assets/config/wedding.config';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
@@ -50,6 +52,7 @@ describe('RsvpFormComponent', () => {
       providers: [
         provideTranslateService({}),
         { provide: RsvpService, useValue: rsvp },
+        { provide: WEDDING_CONFIG, useValue: { ...WEDDING, rsvp: { ...WEDDING.rsvp, busRegistrationOpen: true } } },
       ],
     }).compileComponents();
   });
@@ -69,18 +72,31 @@ describe('RsvpFormComponent', () => {
     expect(c.valid()).toBe(true);
   });
 
-  it('keeps the shuttle option open with no registration deadline', () => {
+  it('allows the shuttle option while registration is open', async () => {
     const fixture = TestBed.createComponent(RsvpFormComponent);
     fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect((fixture.nativeElement.querySelector('input[type="radio"][value="bus"]') as HTMLInputElement).disabled).toBe(false);
+  });
+
+  it('closes only the shuttle option, without a notice, once registration is closed', async () => {
+    const fixture = TestBed.createComponent(RsvpFormComponent);
+    const c = fixture.componentInstance;
+    Object.defineProperty(c, 'busRegistrationClosed', { configurable: true, get: () => true });
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
     const element = fixture.nativeElement as HTMLElement;
-    expect((element.querySelector('input[type="radio"][value="bus"]') as HTMLInputElement).disabled).toBe(false);
+    expect((element.querySelector('input[type="radio"][value="bus"]') as HTMLInputElement).disabled).toBe(true);
     expect(element.querySelector('.warn')).toBeNull();
 
-    const c = fixture.componentInstance;
     c.model.guestName = 'A';
     c.model.category = 'IAS';
-    c.model.status = 'bus';
     c.model.phone = '0900000000';
+    c.model.status = 'bus';
+    expect(c.valid()).toBe(false);
+    c.model.status = 'self_transport';
     expect(c.valid()).toBe(true);
   });
 

@@ -57,7 +57,7 @@ export interface WeddingConfig {
   reception: ReceptionInfo;
   event: { name: string; venue: string; address: string; mapEmbedUrl: string;
            mapDirUrl: string; datetime: string; agenda: AgendaItem[] };
-  rsvp: { groups: string[];
+  rsvp: { groups: string[]; busRegistrationOpen: boolean;
           bus: {
             outboundDepart1Time: string;
             outboundDepart2Time: string;

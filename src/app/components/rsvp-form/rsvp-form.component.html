@@ -126,6 +126,7 @@
     }
     <fieldset>
       <label class="bus-option-label"><input type="radio" name="st" value="bus" [(ngModel)]="model.status"
+                    [disabled]="busRegistrationClosed"
                     (ngModelChange)="onStatusChange($event)">
         {{ 'rsvp.bus' | translate:{ count: formattedBusPartySize } }}
         <button #busInfoHintButton type="button" class="bus-info-hint"
